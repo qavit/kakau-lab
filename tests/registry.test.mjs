@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { experimentalLabs, labRegistry, publishedLabs } from "../lib/labs/registry.ts";
+import { catalogLabs, experimentalLabs, labRegistry, publishedLabs, unlistedLabs } from "../lib/labs/registry.ts";
 
-const requiredFields = ["id", "title", "subject", "description", "topics", "level", "status"];
+const requiredFields = ["id", "title", "subject", "description", "topics", "level", "status", "maturity", "visibility"];
 
 test("registry ids are unique", () => {
   const ids = labRegistry.map((lab) => lab.id);
@@ -12,7 +12,7 @@ test("registry ids are unique", () => {
 });
 
 test("registry numbers are unique", () => {
-  const numbers = labRegistry.map((lab) => lab.number);
+  const numbers = labRegistry.map((lab) => lab.number).filter((n) => n !== undefined);
   assert.equal(new Set(numbers).size, numbers.length);
 });
 
@@ -23,12 +23,48 @@ test("registry numbers 01 through 09 are all present", () => {
   }
 });
 
-test("published count is 9", () => {
-  assert.equal(publishedLabs().length, 9);
+test("inventory holds labs 01-09 plus the uncatalogued FBD", () => {
+  assert.equal(labRegistry.length, 10);
+  const fbd = labRegistry.find((lab) => lab.id === "fbd");
+  assert.ok(fbd);
+  assert.equal(fbd.number, undefined);
+  assert.deepEqual(fbd.implementation, { app: "kakau-lab", route: "/fbd" });
+});
+
+test("maturity and visibility matrix is exact", () => {
+  const matrix = Object.fromEntries(labRegistry.map((lab) => [lab.id, `${lab.maturity}/${lab.visibility}`]));
+  assert.deepEqual(matrix, {
+    "solar-sphere": "beta/public",
+    "magnetic-field-superposition": "prototype/unlisted",
+    "planetary-wind-systems": "prototype/unlisted",
+    "valley-bedding": "prototype/unlisted",
+    "standard-atmosphere-profile": "beta/public",
+    "coriolis-effect": "prototype/unlisted",
+    "projectile-motion": "stable/public",
+    "two-source-interference": "beta/public",
+    electrostatics: "stable/public",
+    fbd: "prototype/unlisted",
+  });
+});
+
+test("catalogLabs selects exactly the five public non-prototype labs in product order", () => {
+  assert.deepEqual(
+    catalogLabs().map((lab) => lab.id),
+    ["solar-sphere", "standard-atmosphere-profile", "projectile-motion", "two-source-interference", "electrostatics"],
+  );
+  const excluded = ["magnetic-field-superposition", "planetary-wind-systems", "valley-bedding", "coriolis-effect", "fbd"];
+  assert.deepEqual(unlistedLabs().map((lab) => lab.id).sort(), [...excluded].sort());
+});
+
+test("catalog and sitemap logic no longer depend on legacy status", async () => {
+  for (const file of ["../components/ModelCatalog.tsx", "../app/sitemap.ts"]) {
+    const source = await readFile(new URL(file, import.meta.url), "utf8");
+    assert.doesNotMatch(source, /publishedLabs|\.status\b/, file);
+  }
 });
 
 test("models 01-07 are internal kakau-lab routes", () => {
-  const internal = labRegistry.filter((lab) => Number(lab.number) <= 7);
+  const internal = labRegistry.filter((lab) => lab.number !== undefined && Number(lab.number) <= 7);
   assert.equal(internal.length, 7);
   for (const lab of internal) {
     assert.equal(lab.implementation.app, "kakau-lab");
@@ -54,6 +90,7 @@ test("model 09 is the published local electrostatics route", () => {
   assert.equal(model09.implementation.route, "/electrostatics");
   assert.equal(model09.status, "published");
   assert.equal(publishedLabs().includes(model09), true);
+  assert.equal(catalogLabs().includes(model09), true);
   assert.deepEqual(experimentalLabs(), []);
 });
 

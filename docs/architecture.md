@@ -184,8 +184,14 @@ machine-readable data. It must never import React, Three.js, or `lucide-react` â
 details (icons, card art, preview images) are stored as string keys, and the mapping from a key
 like `"orbit"` to the actual `Orbit` icon component lives in `components/ModelCatalog.tsx`, the
 one layer allowed to combine data with rendering. `ModelCatalog.tsx` renders entirely from
-`publishedLabs()` and, only when a server-side preview flag is enabled, a separate
-`experimentalLabs()` section; there is no second, hard-coded model list anywhere in the app.
+`catalogLabs()` (public and not prototype) and, only when a server-side preview flag is enabled,
+a separate `experimentalLabs()` section; there is no second, hard-coded model list anywhere in the app.
+
+Every lab carries two independent product dimensions: `maturity` (`prototype | beta | stable`) and
+`visibility` (`public | unlisted | private`). The registry is an inventory, not just a catalog list:
+unlisted labs such as `/fbd` are included (without a catalogue `number`), and the sitemap's lab
+routes derive from `catalogLabs()`. The legacy `status` field is deprecated and no longer read by
+the catalog or sitemap. Unlisted routes must also declare `robots: { index: false }` in page metadata.
 
 The registry also distinguishes *which app* implements a lab. `implementation.app` is either:
 

@@ -58,14 +58,17 @@ test("server-renders the Kakau Lab model catalog", async () => {
   assert.match(html, /<title>Kakau Lab｜互動式科學模型<\/title>/);
   assert.match(html, /選擇一個主題開始探索/);
   assert.match(html, /太陽、天球與竿影/);
-  assert.match(html, /全球行星風系/);
-  assert.match(html, /岩層位態/);
-  assert.match(html, /多導線磁場疊加/);
-  assert.match(html, /科氏力效應/);
-  assert.match(html, /風場粒子/);
+  assert.match(html, /大氣垂直結構/);
+  assert.match(html, /拋體運動/);
+  for (const hidden of ["全球行星風系", "岩層位態", "多導線磁場疊加", "科氏力效應", "自由體圖", "風場粒子"]) {
+    assert.doesNotMatch(html, new RegExp(hidden), `${hidden} must not be in the production catalog`);
+  }
+  for (const href of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/fbd"]) {
+    assert.doesNotMatch(html, new RegExp(`href="${href}"`));
+  }
   assert.match(html, /雙點波源干涉/);
   assert.match(html, /靜電學/);
-  assert.match(html, /09 interactive models/);
+  assert.match(html, /05 interactive models/);
   assert.match(html, /href="https:\/\/kakau\.tw\/lab\/interference"/);
   assert.doesNotMatch(html, /data-testid="experimental-catalog"/);
   assert.doesNotMatch(html, /同步控制台/);
@@ -80,11 +83,36 @@ test("server-side preview flag adds no experimental section while no model is ex
     const html = await response.text();
     assert.doesNotMatch(html, /data-testid="experimental-catalog"/);
     assert.match(html, /href="\/electrostatics"/);
-    assert.match(html, /09 interactive models/);
+    assert.match(html, /05 interactive models/);
   } finally {
     if (previous === undefined) delete process.env.KAKAU_EXPERIMENTAL_PREVIEW;
     else process.env.KAKAU_EXPERIMENTAL_PREVIEW = previous;
   }
+});
+
+test("sitemap lists only catalog-eligible local labs and supporting pages", async () => {
+  const response = await render("/sitemap.xml");
+  assert.equal(response.status, 200);
+  const xml = await response.text();
+  const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
+  for (const path of ["/solar", "/atmosphere-profile", "/projectile", "/electrostatics"]) {
+    assert.ok(paths.includes(path), `${path} should be in the sitemap`);
+  }
+  for (const path of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/fbd", "/lab/interference"]) {
+    assert.ok(!paths.includes(path), `${path} must not be in the sitemap`);
+  }
+  assert.doesNotMatch(xml, /kakau\.tw\/lab\/interference/);
+});
+
+test("unlisted lab routes stay reachable but are noindex", async () => {
+  for (const path of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/fbd"]) {
+    const response = await render(path);
+    assert.equal(response.status, 200, path);
+    const html = await response.text();
+    assert.match(html, /<meta name="robots" content="noindex/, `${path} must be noindex`);
+  }
+  const indexed = await (await render("/projectile")).text();
+  assert.doesNotMatch(indexed, /<meta name="robots" content="noindex/);
 });
 
 const SITE_OG = "https://lab.kakau.tw/brand/og-lab.png";
@@ -510,9 +538,9 @@ test("server-renders the shared electrostatics theory notes at /electrostatics/n
 });
 
 test("every published route declares a self canonical and a page-specific og:title", async () => {
-  const sitemapSource = await readFile(new URL("../app/sitemap.ts", import.meta.url), "utf8");
-  const paths = [...sitemapSource.matchAll(/^\s+"(\/[^"]*)",$/gm)].map((match) => match[1]);
-  assert.ok(paths.length >= 13, `expected the published routes, got ${paths.length}`);
+  const xml = await (await render("/sitemap.xml")).text();
+  const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
+  assert.ok(paths.length >= 9, `expected the published routes, got ${paths.length}`);
   const siteTitle = "Kakau Lab｜互動式科學模型";
   for (const path of paths) {
     const html = await (await render(path)).text();
