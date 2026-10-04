@@ -20,7 +20,17 @@ export type LabSubject =
   | "math"
   | "chemistry";
 
+/**
+ * @deprecated Transitional. Product state is `LabMaturity` × `LabVisibility`; catalog, sitemap
+ * and robots logic must not read `status`. Kept only until remaining consumers are migrated.
+ */
 export type LabStatus = "published" | "experimental" | "paused";
+
+/** How far a lab has matured as a product. Independent of who can see it. */
+export type LabMaturity = "prototype" | "beta" | "stable";
+
+/** Who can find a lab: `public` is indexable, `unlisted` is direct-URL only, `private` is not served. */
+export type LabVisibility = "public" | "unlisted" | "private";
 
 /** Which first-party Kakau app hosts the implementation. */
 export type LabApp = "kakau-lab" | "kakau-web";
@@ -65,8 +75,11 @@ export interface LabScientificQuality {
 
 export interface LabManifest {
   id: string;
-  /** Catalogue number, which follows the order the models were built, not the order shown. */
-  number: string;
+  /**
+   * Catalogue number, which follows the order the models were built, not the order shown.
+   * Absent for labs that have never been catalogued (e.g. the unlisted FBD prototype).
+   */
+  number?: string;
   title: string;
   subject: LabSubject;
   description: string;
@@ -75,7 +88,10 @@ export interface LabManifest {
   representations?: readonly string[];
   level: readonly string[];
   implementation: LabImplementation;
+  /** @deprecated Transitional; use `maturity` and `visibility`. */
   status: LabStatus;
+  maturity: LabMaturity;
+  visibility: LabVisibility;
   presentation?: LabPresentation;
   scientificQuality?: LabScientificQuality;
 }
@@ -91,6 +107,8 @@ export const labRegistry: readonly LabManifest[] = [
     level: ["high-school"],
     implementation: { app: "kakau-lab", route: "/solar" },
     status: "published",
+    maturity: "beta",
+    visibility: "public",
     presentation: { tone: "solar", previewImage: "/solar-sphere-preview.png", icon: "orbit" },
   },
   {
@@ -103,6 +121,8 @@ export const labRegistry: readonly LabManifest[] = [
     level: ["high-school"],
     implementation: { app: "kakau-lab", route: "/magnetism" },
     status: "published",
+    maturity: "prototype",
+    visibility: "unlisted",
     presentation: { tone: "magnetism", cardArt: "magnet", icon: "magnet" },
   },
   {
@@ -115,6 +135,8 @@ export const labRegistry: readonly LabManifest[] = [
     level: ["high-school"],
     implementation: { app: "kakau-lab", route: "/atmosphere" },
     status: "published",
+    maturity: "prototype",
+    visibility: "unlisted",
     presentation: { tone: "atmosphere", previewImage: "/atmosphere-preview.png", icon: "wind" },
   },
   {
@@ -127,6 +149,8 @@ export const labRegistry: readonly LabManifest[] = [
     level: ["high-school"],
     implementation: { app: "kakau-lab", route: "/geology" },
     status: "published",
+    maturity: "prototype",
+    visibility: "unlisted",
     presentation: { tone: "geology", previewImage: "/geology-preview.png", icon: "mountain" },
   },
   {
@@ -139,6 +163,8 @@ export const labRegistry: readonly LabManifest[] = [
     level: ["high-school"],
     implementation: { app: "kakau-lab", route: "/atmosphere-profile" },
     status: "published",
+    maturity: "beta",
+    visibility: "public",
     presentation: { tone: "atmosphere", cardArt: "layers", icon: "layers" },
   },
   {
@@ -151,6 +177,8 @@ export const labRegistry: readonly LabManifest[] = [
     level: ["high-school"],
     implementation: { app: "kakau-lab", route: "/coriolis" },
     status: "published",
+    maturity: "prototype",
+    visibility: "unlisted",
     presentation: { tone: "coriolis", cardArt: "coriolis", icon: "rotate-cw" },
   },
   {
@@ -163,6 +191,8 @@ export const labRegistry: readonly LabManifest[] = [
     level: ["high-school"],
     implementation: { app: "kakau-lab", route: "/projectile" },
     status: "published",
+    maturity: "stable",
+    visibility: "public",
     presentation: { tone: "projectile", cardArt: "projectile", icon: "target" },
   },
   {
@@ -189,6 +219,8 @@ export const labRegistry: readonly LabManifest[] = [
     level: ["high-school"],
     implementation: { app: "kakau-web", url: "https://kakau.tw/lab/interference" },
     status: "published",
+    maturity: "beta",
+    visibility: "public",
     presentation: { tone: "interference", icon: "waves" },
   },
   {
@@ -203,14 +235,41 @@ export const labRegistry: readonly LabManifest[] = [
     level: ["high-school"],
     implementation: { app: "kakau-lab", route: "/electrostatics" },
     status: "published",
+    maturity: "stable",
+    visibility: "public",
     presentation: { tone: "electrostatic", icon: "zap" },
+  },
+  {
+    id: "fbd",
+    title: "自由體圖",
+    subject: "physics",
+    description: "從木塊、桌面與手的交互作用建立自由體圖，提交、比較並修正你的模型。",
+    topics: ["自由體圖", "交互作用", "牛頓第三定律"],
+    level: ["high-school"],
+    implementation: { app: "kakau-lab", route: "/fbd" },
+    // Legacy field only; "paused" keeps FBD out of the legacy owner-preview list (which keys off "experimental").
+    status: "paused",
+    maturity: "prototype",
+    visibility: "unlisted",
   },
 ];
 
+/** Labs shown in the production homepage catalog, in registry (product) order. */
+export function catalogLabs(registry: readonly LabManifest[] = labRegistry): readonly LabManifest[] {
+  return registry.filter((lab) => lab.visibility === "public" && lab.maturity !== "prototype");
+}
+
+/** Labs that must be reachable by direct URL but never listed, sitemapped, or indexed. */
+export function unlistedLabs(registry: readonly LabManifest[] = labRegistry): readonly LabManifest[] {
+  return registry.filter((lab) => lab.visibility === "unlisted");
+}
+
+/** @deprecated Reads legacy `status`; not a source of truth for the catalog. Use `catalogLabs()`. */
 export function publishedLabs(registry: readonly LabManifest[] = labRegistry): readonly LabManifest[] {
   return registry.filter((lab) => lab.status === "published");
 }
 
+/** @deprecated Reads legacy `status`. Owner-preview only; nothing is currently `experimental` except FBD. */
 export function experimentalLabs(registry: readonly LabManifest[] = labRegistry): readonly LabManifest[] {
   return registry.filter((lab) => lab.status === "experimental");
 }
