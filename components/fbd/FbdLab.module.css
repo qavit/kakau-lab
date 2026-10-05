@@ -23,3 +23,15 @@
 @media(max-width:800px) { .grid { grid-template-columns:1fr; } .card { padding:16px; } .steps { font-size:12px; } }
 
 @media(max-width:660px) { .shell :global(.header-actions) button { font-size:13px; } }
+
+/* Graphite renders literal black/white; theme it from the consumer side. */
+.graphiteFbd { color: var(--muted); touch-action: pan-y; }
+.graphiteFbd :global(svg) { width:100%; max-height:280px; display:block; }
+.graphiteFbd :global(svg > rect) { fill: transparent; }
+.graphiteFbd :global(text) { fill: currentColor; }
+.graphiteFbd :global(marker polygon) { fill: currentColor; }
+.graphiteFbd :global(line[data-element-type="force-vector"]:not(.fbd-hit)) { stroke: var(--muted); }
+.graphiteFbd :global(circle:not(.fbd-handle)) { fill: var(--strong); stroke: none; }
+.graphiteFbd :global(.fbd-selected) { stroke: var(--strong); filter: drop-shadow(0 0 3px var(--strong)); }
+.graphiteFbd :global(.fbd-handle) { fill: var(--bg, #fff); stroke: var(--strong); stroke-width: 3; cursor: grab; touch-action: none; }
+.graphiteFbd :global(.fbd-hit) { cursor: pointer; stroke: transparent; }
