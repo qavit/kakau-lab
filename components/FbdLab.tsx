@@ -8,6 +8,8 @@ import { directionFromDegrees } from "../lib/science/fbd.ts";
 import { addFbdForce, addFbdInteraction, createFbdForce, removeFbdForce, selectFbdForce, updateFbdForce, type FbdForceKind, type FbdLabState } from "../models/fbd.ts";
 import { TABLE_AGENTS, commitTable, compareTable, compareTableDiagram, initialTableLearning, reviseTable, type NormalAssumption } from "../models/fbd-table.ts";
 import styles from "./fbd/FbdLab.module.css";
+import GraphiteFbdCanvas from "./fbd/GraphiteFbdCanvas.tsx";
+import { applyGraphiteIntentToFbd } from "./fbd/graphiteAdapter.ts";
 
 const FORCE_CHOICES: readonly [FbdForceKind, string][] = [["weight", "重力"], ["normal", "正向力"], ["applied", "手的拉力"], ["other", "運動力（我的假設）"], ["friction", "摩擦力（我的假設）"]];
 const PHASES = ["觀察情境", "選擇系統", "辨識交互作用", "建立力圖", "提交", "比較", "修正"];
@@ -66,11 +68,7 @@ export default function FbdLab() {
           {phase === "interactions" && <button onClick={() => move("forces")}>用交互作用建立力圖</button>}
           {phase !== "interactions" && <>
             <div className={styles.diagram}>
-              <svg viewBox="0 0 360 280" role="img" aria-label={`木塊自由體圖，有 ${diagram.forces.length} 個由學習者建立的力；箭頭長度只表示定性草圖`}>
-                <defs><marker id="fbd-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" /></marker></defs>
-                {diagram.forces.map((force) => { const length = lengths[force.id] ?? 65; const x = 180 + force.direction.x * length; const y = 140 - force.direction.y * length; return <g key={force.id} color={force.id === selectedForceId ? "var(--strong)" : "var(--muted)"}><line x1="180" y1="140" x2={x} y2={y} stroke="currentColor" strokeWidth="3" markerEnd="url(#fbd-arrow)" /><text x={x} y={y - 10} textAnchor="middle" fill="currentColor" fontSize="12">{force.label}</text></g>; })}
-                <circle cx="180" cy="140" r="7" fill="var(--strong)" /><text x="180" y="165" textAnchor="middle" fill="currentColor">木塊</text>
-              </svg><small>箭尾共用質點，不代表實際接觸位置。方向：右 0°、上 90°、左 180°、下 270°。</small>
+              <GraphiteFbdCanvas diagram={diagram} lengths={lengths} selectedForceId={selectedForceId} editable={editable} ariaLabel={`木塊自由體圖，有 ${diagram.forces.length} 個由學習者建立的力；箭頭長度只表示定性草圖。可拖曳選取力的箭頭方向。`} onSelectForce={(id) => edit((current) => selectFbdForce(current, id))} onIntent={(intent) => edit((current) => applyGraphiteIntentToFbd(current, intent, lengths))} /><small>箭尾共用質點，不代表實際接觸位置。方向：右 0°、上 90°、左 180°、下 270°。</small>
             </div>
             {editable && <>
               <div className={styles.stack}>{diagram.interactions.map((interaction) => <button key={interaction.id} onClick={() => addForce(interaction.id)}>從 {interaction.label} 補一個力</button>)}{diagram.interactions.length === 0 && <p>先選交互作用，才能補力。</p>}</div>
