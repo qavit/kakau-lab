@@ -11,12 +11,15 @@
 .interactions label { display:flex; align-items:center; gap:10px; }
 .editor label,.assumption { display:grid; gap:8px; min-width:0; }
 .card select { width:100%; max-width:100%; padding:9px; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:5px; }
+.card textarea { width:100%; max-width:100%; padding:9px; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:5px; font:inherit; resize:vertical; }
 .diagram { background:var(--tint-alpha); border:1px solid var(--line); padding:12px; border-radius:8px; margin:16px 0; }
 .diagram svg { width:100%; max-height:280px; display:block; }
 .stack { display:grid; gap:8px; }
 .forceList,.directions { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
 .primary { margin-top:20px; }
 .feedback li { margin:12px 0; line-height:1.6; }
+.evidence { margin:18px 0; padding:16px; border:1px solid var(--line); border-radius:8px; background:var(--tint-alpha); }
+.evidence h4 { margin:0 0 8px; }
 .shell button { min-height:40px; white-space:normal; }
 .shell :is(button,input,select,a):focus-visible { outline:3px solid var(--strong); outline-offset:3px; }
 .shell button[aria-pressed="true"] { border-color:var(--strong); background:var(--tint); }

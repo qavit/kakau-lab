@@ -43,7 +43,8 @@ export function fbdToDiagramSpec(state: FbdLabState, lengths: FbdDisplayLengths 
       id: `${force.id}-label`,
       type: "label",
       visibility,
-      position: { x: end.x, y: end.y - 10 },
+      // Keep a downward force name beside its arrowhead instead of on the shaft.
+      position: force.direction.y < -0.5 ? { x: end.x + 12, y: end.y + 4 } : { x: end.x + 8, y: end.y - 10 },
       text: force.label,
       fontSize: 12,
     });
