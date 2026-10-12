@@ -1,22 +1,20 @@
 import { directionFromDegrees, normalize } from "../lib/science/fbd.ts";
 import { type FbdDiagram, type FbdLabState, type FbdReferenceModel } from "./fbd.ts";
 
-/** One reviewed scene, not a scenario authoring schema. The table is smooth; the hand stays in contact. */
+/** One reviewed scene, not a scenario authoring schema. The block is at rest on a horizontal table. */
 export const TABLE_AGENTS = [
   { id: "earth", label: "地球", kind: "gravitational" },
   { id: "table", label: "桌面", kind: "contact" },
-  { id: "hand", label: "手", kind: "applied" },
   { id: "air", label: "空氣", kind: "drag" },
 ] as const;
 
 export const TABLE_REFERENCE: FbdReferenceModel = {
-  canonicalInteractions: TABLE_AGENTS.slice(0, 3).map((agent) => ({
+  canonicalInteractions: TABLE_AGENTS.slice(0, 2).map((agent) => ({
     id: `${agent.id}-block`, kind: agent.kind, sourceAgentId: agent.id, targetSystemId: "block", label: `${agent.label} ↔ 木塊`,
   })),
   canonicalForces: [
     { id: "weight", interactionId: "earth-block", kind: "weight", label: "重力", magnitudeN: null, direction: directionFromDegrees(270) },
     { id: "normal", interactionId: "table-block", kind: "normal", label: "正向力", magnitudeN: null, direction: directionFromDegrees(90) },
-    { id: "pull", interactionId: "hand-block", kind: "applied", label: "手的拉力", magnitudeN: null, direction: directionFromDegrees(0) },
   ],
 };
 
@@ -70,7 +68,7 @@ export function compareTableDiagram(diagram: FbdDiagram, assumption: NormalAssum
       const sameKind = reference.canonicalForces.find((candidate) => candidate.kind === force.kind);
       issue(sameKind ? "wrong-agent" : "extra-force", sameKind
         ? `${force.label} 的種類存在，但交互作用／施力者不對。`
-        : `${force.label} 沒有此情境的物理依據；向右運動不代表有「運動力」，分量也不是額外的力。`, { forceId: force.id });
+        : `${force.label} 沒有此情境的物理依據；靜止不代表有額外的「平衡力」，分量也不是額外的力。`, { forceId: force.id });
       continue;
     }
     if (represented.has(expected.id)) {
@@ -87,7 +85,7 @@ export function compareTableDiagram(diagram: FbdDiagram, assumption: NormalAssum
   for (const expected of reference.canonicalForces) {
     if (!represented.has(expected.id)) issue("missing-force", `缺少由交互作用支持的${expected.label}。`);
   }
-  if (assumption === "always-mg") issue("invalid-assumption", "N = mg 不是一般定律。本情境沒有垂直加速度，且沒有其他垂直力，才可推得 N = mg；仍無法求數值。");
+  if (assumption === "always-mg") issue("invalid-assumption", "N = mg 不是一般定律。本情境物塊靜止，且沒有其他垂直力，才可推得 N = mg；仍無法求數值。");
   return { pass: diagnostics.every((diagnostic) => diagnostic.severity === "info"), diagnostics };
 }
 

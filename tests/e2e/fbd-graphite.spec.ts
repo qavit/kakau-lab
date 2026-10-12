@@ -5,7 +5,7 @@ async function enter(page: Page) {
   await expect(page.locator("main")).toHaveAttribute("data-interactive", "true");
   await page.getByRole("button", { name: "開始選擇系統" }).click();
   await page.getByRole("button", { name: "選擇木塊為系統" }).click();
-  for (const agent of ["地球", "桌面", "手"]) await page.getByRole("checkbox", { name: `${agent} ↔ 木塊`, exact: true }).check();
+  for (const agent of ["地球", "桌面"]) await page.getByRole("checkbox", { name: `${agent} ↔ 木塊`, exact: true }).check();
   await page.getByRole("button", { name: "用交互作用建立力圖" }).click();
 }
 async function addForce(page: Page, agent: string, kind: string, direction: string) {
@@ -34,7 +34,7 @@ test("direct manipulation: select, drag direction, fixed anchor/length, magnitud
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await enter(page);
-  await addForce(page, "手", "applied", "向右");
+  await addForce(page, "桌面", "normal", "向右");
   const [x1, y1, x2, y2] = await geometry(page);
   const length = Math.hypot(x2 - x1, y2 - y1);
   await expect(page.locator(".fbd-handle")).toHaveCount(1);
@@ -59,21 +59,18 @@ test("direct manipulation: select, drag direction, fixed anchor/length, magnitud
 test("non-horizontal direction and learning flow with dragged forces @graphite", async ({ page }) => {
   await enter(page);
   await addForce(page, "地球", "weight", "向下");
-  await addForce(page, "桌面", "normal", "向下"); // learner starts wrong
-  await addForce(page, "手", "applied", "向左");
-  // select the normal force by clicking its arrow on the canvas
-  await page.getByRole("button", { name: /正向力 ·/ }).click();
+  await addForce(page, "桌面", "normal", "向上");
+  // Edit the learner's normal force through the selected tip handle.
   await expect(page.locator(".fbd-handle")).toHaveCount(1);
   await dragTip(page, 0, -60); // straight up
   await expect(page.getByLabel("方向（度）")).toHaveValue("90");
-  await page.getByRole("button", { name: /手的拉力 ·/ }).click();
-  await dragTip(page, 80, 0); // right
+  await dragTip(page, 80, 0); // right, still the table's normal force
   await expect(page.getByLabel("方向（度）")).toHaveValue("0");
   await dragTip(page, 100, -58); // ~30deg above horizontal: a non-horizontal direction is representable
   const deg = Number(await page.getByLabel("方向（度）").inputValue());
   expect(deg).toBeGreaterThanOrEqual(28);
   expect(deg).toBeLessThanOrEqual(32);
-  await dragTip(page, 80, 0);
+  await dragTip(page, 0, -80);
   await page.getByRole("button", { name: "提交我的力圖" }).click();
   await expect(page.locator(".fbd-handle")).toHaveCount(0); // not editable after commit
   await page.getByRole("button", { name: "比較交互作用與力" }).click();
@@ -97,7 +94,7 @@ test("canvas cannot create anonymous forces; slider/button fallback still works 
 
 test("direct manipulation works with touch input on mobile @graphite @mobile", async ({ page }) => {
   await enter(page);
-  await addForce(page, "手", "applied", "向右");
+  await addForce(page, "桌面", "normal", "向右");
   const anchor = await page.locator("svg:has(.fbd-handle) circle:not(.fbd-handle)").first().boundingBox();
   const handle = await page.locator(".fbd-handle").boundingBox();
   const ax = anchor!.x + anchor!.width / 2, ay = anchor!.y + anchor!.height / 2;

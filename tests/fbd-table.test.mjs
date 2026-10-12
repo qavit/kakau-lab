@@ -11,10 +11,10 @@ function correct() {
   return state;
 }
 const codes = (diagram, assumption, reference) => compareTableDiagram(diagram, assumption, reference).diagnostics.map((item) => item.code);
-test("table scene passes with three interaction-backed qualitative forces", () => {
+test("stationary table scene passes with two interaction-backed qualitative forces", () => {
   const diagram = correct().diagram;
   assert.equal(compareTableDiagram(diagram).pass, true);
-  assert.equal(codes(diagram).filter((code) => code === "indeterminate-magnitude").length, 3);
+  assert.equal(codes(diagram).filter((code) => code === "indeterminate-magnitude").length, 2);
   assert.equal(compareTableDiagram(diagram, "vertical-balance").pass, true);
 });
 test("missing gravity and normal are diagnosed independently", () => {
@@ -26,17 +26,17 @@ test("missing gravity and normal are diagnosed independently", () => {
     assert.ok(codes(omitted).includes("missing-interaction"));
   }
 });
-test("motion is not an interaction force, nor are vector components", () => {
-  const state = addFbdForce(correct(), createFbdForce({ id: "motion", interactionId: "hand-block", kind: "other", label: "向右運動力" }));
+test("an invented balancing force is not an interaction force, nor are vector components", () => {
+  const state = addFbdForce(correct(), createFbdForce({ id: "balance", interactionId: "table-block", kind: "other", label: "額外的平衡力" }));
   assert.ok(codes(state.diagram).includes("extra-force"));
 });
-test("reverse applied force has correct identity but wrong direction", () => {
-  const state = updateFbdForce(correct(), "pull", { direction: directionFromDegrees(180) });
+test("reversed normal force has correct identity but wrong direction", () => {
+  const state = updateFbdForce(correct(), "normal", { direction: directionFromDegrees(270) });
   assert.ok(codes(state.diagram).includes("wrong-direction"));
   assert.ok(!codes(state.diagram).includes("missing-force"));
 });
 test("wrong agent/interaction is diagnosed, not accepted by vector equality", () => {
-  const state = updateFbdForce(correct(), "weight", { interactionId: "hand-block" });
+  const state = updateFbdForce(correct(), "weight", { interactionId: "table-block" });
   assert.ok(codes(state.diagram).includes("wrong-agent"));
   assert.ok(codes(state.diagram).includes("missing-force"));
 });
@@ -52,10 +52,11 @@ test("normal equals mg only under stated vertical balance assumptions", () => {
   assert.ok(codes(correct().diagram, "always-mg").includes("invalid-assumption"));
   assert.ok(!codes(correct().diagram, "vertical-balance").includes("invalid-assumption"));
 });
-test("detached hand has no remaining applied force", () => {
-  const detachedReference = { canonicalInteractions: TABLE_REFERENCE.canonicalInteractions.filter((item) => item.sourceAgentId !== "hand"), canonicalForces: TABLE_REFERENCE.canonicalForces.filter((item) => item.kind !== "applied") };
-  assert.ok(codes(correct().diagram, "unknown", detachedReference).includes("extra-interaction"));
-  assert.ok(codes(correct().diagram, "unknown", detachedReference).includes("extra-force"));
+test("air resistance is excluded from this stationary scene", () => {
+  const diagram = correct().diagram;
+  const air = { id: "air-block", kind: "drag", sourceAgentId: "air", targetSystemId: "block", label: "空氣 ↔ 木塊" };
+  assert.ok(codes({ ...diagram, interactions: [...diagram.interactions, air] }).includes("extra-interaction"));
+  assert.ok(codes({ ...diagram, interactions: [...diagram.interactions, air], forces: [...diagram.forces, createFbdForce({ id: "drag", interactionId: air.id, kind: "drag", label: "空氣阻力" })] }).includes("extra-force"));
 });
 test("anonymous and duplicate forces, wrong agent and extra air interaction are diagnosed", () => {
   const diagram = correct().diagram;

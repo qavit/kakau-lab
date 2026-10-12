@@ -11,7 +11,7 @@ import styles from "./fbd/FbdLab.module.css";
 import GraphiteFbdCanvas from "./fbd/GraphiteFbdCanvas.tsx";
 import { applyGraphiteIntentToFbd } from "./fbd/graphiteAdapter.ts";
 
-const FORCE_CHOICES: readonly [FbdForceKind, string][] = [["weight", "重力"], ["normal", "正向力"], ["applied", "手的拉力"], ["other", "運動力（我的假設）"], ["friction", "摩擦力（我的假設）"]];
+const FORCE_CHOICES: readonly [FbdForceKind, string][] = [["weight", "重力"], ["normal", "正向力"], ["other", "額外的平衡力（我的假設）"], ["friction", "摩擦力（我的假設）"]];
 const PHASES = ["觀察情境", "選擇系統", "辨識交互作用", "建立力圖", "提交", "比較", "修正"];
 
 export default function FbdLab() {
@@ -49,19 +49,18 @@ export default function FbdLab() {
     <ol className={styles.steps} aria-label="學習流程">{PHASES.map((label, index) => <li key={label} aria-current={index === phaseIndex ? "step" : undefined}>{index + 1}. {label}</li>)}</ol>
     <div className={styles.grid}>
       <section className={styles.card} aria-label="物理情境">
-        <h2>情境：手向右拉木塊</h2><p>木塊在光滑的水平桌面上，手持續接觸木塊並水平向右拉。忽略空氣阻力；木塊沒有垂直加速度。</p>
-        <svg className={styles.scene} viewBox="0 0 440 240" role="img" aria-label="木塊放在桌面，右側的手接觸木塊，下方是地球；情境圖沒有力箭頭">
+        <h2>情境：靜止在水平桌面上的木塊</h2><p>木塊靜止在水平桌面上；除了桌面，沒有其他物體接觸它。忽略空氣阻力。請依情境判斷哪些物體對木塊施力。</p>
+        <svg className={styles.scene} viewBox="0 0 440 240" role="img" aria-label="靜止的木塊放在水平桌面上；情境圖沒有力箭頭">
           <rect x="45" y="128" width="345" height="16" rx="4" fill="var(--muted)" /><path d="M75 144v44M365 144v44" stroke="var(--muted)" strokeWidth="10" />
           <rect x="150" y="66" width="100" height="62" rx="5" fill="#cba575" /><text x="200" y="101" textAnchor="middle" fill="#172a3b">木塊</text>
-          <path d="M310 88h-48q-12 0-12 10q0 10 12 10h48" fill="none" stroke="#d49c7f" strokeWidth="12" /><text x="325" y="100" fill="currentColor">手</text>
-          <text x="90" y="166" fill="currentColor">桌面</text><ellipse cx="220" cy="223" rx="160" ry="20" fill="#489482" /><text x="220" y="229" textAnchor="middle" fill="#fff">地球</text>
+          <text x="90" y="166" fill="currentColor">桌面</text>
         </svg>
         <small>這是物理情境，沒有力箭頭。右側的 FBD 只畫作用在木塊上的力。</small>
       </section>
       <section className={styles.card} aria-label="學習工作區">
         <h2 ref={headingRef} tabIndex={-1}>{PHASES[phaseIndex]}</h2>
         {phase === "scene" && <><p>先找出物體、接觸面與外部施力者，再決定研究哪個系統。</p><button onClick={() => move("system")}>開始選擇系統</button></>}
-        {phase === "system" && <><p>本次只研究單一木塊。地球、桌面與手都在系統之外。</p><button onClick={() => move("interactions")}>選擇木塊為系統</button></>}
+        {phase === "system" && <><p>本次只研究單一木塊。先選定研究系統，再判斷系統外有哪些施力者。</p><button onClick={() => move("interactions")}>選擇木塊為系統</button></>}
         {phaseIndex >= 2 && <>
           <p><strong>研究系統：{diagram.system.label}</strong> · 質點模型，沒有轉矩或作用點。</p>
           {editable && <fieldset className={styles.interactions}><legend>哪些外部施力者與木塊交互作用？</legend>{TABLE_AGENTS.map((agent) => <label key={agent.id}><input type="checkbox" checked={diagram.interactions.some((interaction) => interaction.sourceAgentId === agent.id)} onChange={() => toggleInteraction(agent)} />{agent.label} ↔ 木塊</label>)}<small>取消交互作用也會移除其力；力不能失去來源。</small></fieldset>}
