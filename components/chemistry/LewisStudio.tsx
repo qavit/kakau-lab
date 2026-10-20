@@ -6,6 +6,7 @@ import KakauLabMark from "../KakauLabMark";
 import ThemeToggle from "../ThemeToggle";
 import { initialCo2, evaluateCo2, type LewisDiagram } from "../../models/chemistry/lewis";
 import styles from "./LewisStudio.module.css";
+import { co2PairDots, horizontalBondDots } from "../../models/chemistry/lewis-layout";
 import { initialPairPlacement, changePairCount, octetInspection, applyPairPlacement, availableSites, type PairPlacement, type PairSite } from "../../models/chemistry/lewis-placement";
 
 const feedback = {
@@ -47,7 +48,7 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
         {Array.from({length:bond.order},(_,i) => representation==="line" ? <line key={i}
           x1={left} x2={right} y1={110+(i-(bond.order-1)/2)*12}
           y2={110+(i-(bond.order-1)/2)*12} stroke="var(--strong)"
-          strokeWidth="3.5" strokeLinecap="round" pointerEvents="none"/> : <g key={i} fill="#008c94" pointerEvents="none"><circle cx={(left+right)/2-6} cy={110+(i-(bond.order-1)/2)*12} r="3.5"/><circle cx={(left+right)/2+6} cy={110+(i-(bond.order-1)/2)*12} r="3.5"/></g>)}
+          strokeWidth="3.5" strokeLinecap="round" pointerEvents="none"/> : <g key={i} fill="#008c94" pointerEvents="none">{horizontalBondDots(cx,110,bond.order)[i].map((dot,j)=><circle key={j} cx={dot.x} cy={dot.y} r="3.5"/>)}</g>)}
         {bond.order === 0 && <path d={"M"+left+" 110H"+right} stroke="var(--muted)"
           strokeDasharray="4 6" strokeWidth="1.5" pointerEvents="none"/>}
         <text x={cx} y={153} textAnchor="middle" fill="var(--muted)" fontSize="10" pointerEvents="none">
@@ -59,12 +60,6 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
     {data.atoms.map((atom) => {
       const x = xPos[atom.id];
       const sites = availableSites(atom.id);
-      const coord = (site: PairSite): [number,number] => {
-        if(site==="top")return atom.id==="c" ? [x,53] : [x+(atom.id==="o-left"?-31:31),78];
-        if(site==="bottom")return atom.id==="c" ? [x,168] : [x+(atom.id==="o-left"?-31:31),142];
-        if(site==="outer")return [x+(atom.id==="o-left"?-57:57),110];
-        return [x,110];
-      };
       return <g key={atom.id}>
         <circle cx={x} cy="110" r="77" className={inspectId===atom.id?styles.inspectRing:styles.hiddenRing} pointerEvents="none"/>
         <g className={styles.hitTarget} {...action(atom.id+" atom",()=>inspectId!==null ? onInspect(atom.id) : onAtom(atom.id),()=>onRemoveAtom(atom.id))}>
@@ -75,13 +70,13 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
         <text x={x} y="120" fontSize="28" textAnchor="middle"
           fill="var(--ink)" fontWeight="600" pointerEvents="none">{atom.element}</text>
         {sites.map(site=>{
-          const [px,py]=coord(site);
+          const dots=co2PairDots(atom.id,site,x);
+          const px=(dots[0].x+dots[1].x)/2,py=(dots[0].y+dots[1].y)/2;
           const filled=(placement[atom.id]??[]).includes(site);
           return <g key={site} className={styles.hitTarget}
             {...action(atom.id+" "+site+" lone-pair position "+(filled?"occupied":"empty"),()=>inspectId!==null?onInspect(atom.id):onAtom(atom.id),()=>onRemoveAtom(atom.id))}>
             <circle cx={px} cy={py} r="19" fill="transparent" stroke="none"/>
-            {filled?<g fill="#008c94" pointerEvents="none"><circle cx={site==="outer"?px:px-5} cy={site==="outer"?py-6:atom.id==="c"?py:site==="top"?py+5:py-5} r="3.6"/><circle cx={site==="outer"?px:px+5} cy={site==="outer"?py+6:atom.id==="c"?py:site==="top"?py-5:py+5} r="3.6"/></g>:
-            null}
+            {filled?<g fill="#008c94" pointerEvents="none">{dots.map((dot,i)=><circle key={i} cx={dot.x} cy={dot.y} r="3.6"/>)}</g>:null}
             <title>{atom.element+" "+site+" electron-pair position"}</title>
           </g>;
         })}
