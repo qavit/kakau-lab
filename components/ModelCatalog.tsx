@@ -12,7 +12,7 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react";
-import { experimentalLabs, publishedLabs, type LabManifest, type LabSubject } from "@/lib/labs/registry";
+import { catalogLabs, experimentalLabs, type LabManifest, type LabSubject } from "@/lib/labs/registry";
 import KakauLabMark from "@/components/KakauLabMark";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -105,7 +105,7 @@ function ModelCard({ lab, experimental = false }: { lab: LabManifest; experiment
       <div className="model-card-art">
         <CardArt lab={lab} />
         <div className="model-card-art-overlay" />
-        <span className="model-card-number">{lab.number}</span>
+        <span className="model-card-number">{lab.number ?? ""}</span>
       </div>
       <div className="model-card-body">
         <div className="model-card-meta">
@@ -134,7 +134,7 @@ function ModelCard({ lab, experimental = false }: { lab: LabManifest; experiment
 }
 
 export default function ModelCatalog({ showExperimental = process.env.KAKAU_EXPERIMENTAL_PREVIEW === "1" }: { showExperimental?: boolean }) {
-  const labs = publishedLabs();
+  const labs = catalogLabs();
   const previews = showExperimental ? experimentalLabs() : [];
 
   return (

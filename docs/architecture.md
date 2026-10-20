@@ -184,8 +184,20 @@ machine-readable data. It must never import React, Three.js, or `lucide-react` â
 details (icons, card art, preview images) are stored as string keys, and the mapping from a key
 like `"orbit"` to the actual `Orbit` icon component lives in `components/ModelCatalog.tsx`, the
 one layer allowed to combine data with rendering. `ModelCatalog.tsx` renders entirely from
-`publishedLabs()` and, only when a server-side preview flag is enabled, a separate
-`experimentalLabs()` section; there is no second, hard-coded model list anywhere in the app.
+`catalogLabs()` (public and not prototype) and, only when a server-side preview flag is enabled,
+a separate `experimentalLabs()` section; there is no second, hard-coded model list anywhere in the app.
+
+Every lab carries two independent product dimensions: `maturity` (`prototype | beta | stable`) and
+`visibility` (`public | unlisted | private`). The registry is an inventory, not just a catalog list:
+unlisted labs such as `/fbd` are included (without a catalogue `number`), and the sitemap's lab
+routes derive from `catalogLabs()`. The legacy `status` field is deprecated and no longer read by
+the catalog or sitemap. Unlisted routes must also declare `robots: { index: false }` in page metadata.
+
+Remaining legacy surface, kept deliberately (follow-up): `status` and `experimentalLabs()` still feed
+the owner-only preview section in `ModelCatalog` (`KAKAU_EXPERIMENTAL_PREVIEW=1`; covered by
+`rendered-html.test.mjs`), and FBD carries `status: "paused"` to stay out of that section. Removing
+them means deleting that preview section and the field together; do that in its own change. The
+unused `publishedLabs()` helper has already been removed.
 
 The registry also distinguishes *which app* implements a lab. `implementation.app` is either:
 
