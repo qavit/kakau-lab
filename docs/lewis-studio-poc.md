@@ -117,7 +117,7 @@ Also covered: shuffled atoms/bonds, swapped H ids, wrong skeleton/element/unknow
 ## Open issues / honest limits
 
 1. Lone pairs sit at a fixed 57 px radius for all atoms; around H₂O's oxygen they read slightly detached from the atom circle (same as the accepted CO₂ look).
-2. A learner who adds >2 pairs near a crowded atom (e.g. carbon in CH₄) gets pairs placed closer together/near bonds. Counts remain correct; spacing is a minimum 22°.
+2. Wrong states with many pairs (e.g. 3 lone pairs on H) are drawn fully inside the view and spread over the free arcs (a second pair on a linear atom goes to the opposite side), but pairs inside one crowded arc keep only a 22° minimum spacing.
 3. Hints are generic arithmetic scaffolds, not misconception-specific; only the three-step ladder exists.
 4. Switching molecules discards in-progress work without confirmation.
 5. Octet inspector only; no per-electron (radical) model, resonance, ions or hypervalent species, as scoped out.
