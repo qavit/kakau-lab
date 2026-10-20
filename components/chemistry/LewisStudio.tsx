@@ -80,7 +80,7 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
           return <g key={site} className={styles.hitTarget}
             {...action(atom.id+" "+site+" lone-pair position "+(filled?"occupied":"empty"),()=>inspectId!==null?onInspect(atom.id):onAtom(atom.id),()=>onRemoveAtom(atom.id))}>
             <circle cx={px} cy={py} r="19" fill="transparent" stroke="none"/>
-            {filled?<g fill="#008c94" pointerEvents="none"><circle cx={site==="outer"?px:atom.id==="c"?px-5:px-5} cy={site==="outer"?py-6:atom.id==="c"?py:site==="top"?py+5:py-5} r="3.6"/><circle cx={site==="outer"?px:atom.id==="c"?px+5:px+5} cy={site==="outer"?py+6:atom.id==="c"?py:site==="top"?py-5:py+5} r="3.6"/></g>:
+            {filled?<g fill="#008c94" pointerEvents="none"><circle cx={site==="outer"?px:px-5} cy={site==="outer"?py-6:atom.id==="c"?py:site==="top"?py+5:py-5} r="3.6"/><circle cx={site==="outer"?px:px+5} cy={site==="outer"?py+6:atom.id==="c"?py:site==="top"?py-5:py+5} r="3.6"/></g>:
             null}
             <title>{atom.element+" "+site+" electron-pair position"}</title>
           </g>;
@@ -107,7 +107,7 @@ export default function LewisStudio() {
   const t=(zh:string,en:string)=>language==="en"?en:language==="dual"?zh+" / "+en:zh;
   const edit=(fn:(d:LewisDiagram)=>LewisDiagram)=>{if(pass)return;const next=fn(diagram);if(next===diagram)return;setUndo(h=>[...h,{diagram,placement}]);setRedo([]);setDiagram(next);setSubmission(null);};
   const useUndo=()=>{if(pass||!undo.length)return;setRedo(h=>[{diagram,placement},...h]);setDiagram(undo[undo.length-1].diagram);setPlacement(undo[undo.length-1].placement);setUndo(h=>h.slice(0,-1));setSubmission(null);};
-  const useRedo=()=>{if(pass||!redo.length)return;setUndo(h=>[...h,diagram]);setDiagram(redo[0].diagram);setPlacement(redo[0].placement);setRedo(h=>h.slice(1));setSubmission(null);};
+  const useRedo=()=>{if(pass||!redo.length)return;setUndo(h=>[...h,{diagram,placement}]);setDiagram(redo[0].diagram);setPlacement(redo[0].placement);setRedo(h=>h.slice(1));setSubmission(null);};
   const changeAtom=(id:string,delta:-1|1)=>{if(pass||inspect!==null)return;
     const next=changePairCount(placement,id,delta);
     if(next===placement)return;
