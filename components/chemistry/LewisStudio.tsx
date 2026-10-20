@@ -24,11 +24,11 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
 }) {
   const action = (label: string, callback: () => void) => ({
     role: "button" as const,
-    tabIndex: locked ? -1 : 0,
+    tabIndex: locked && inspectId===null ? -1 : 0,
     "aria-label": label,
-    onClick: () => { if (!locked) callback(); },
+    onClick: () => { if (!locked || inspectId!==null) callback(); },
     onKeyDown: (event: React.KeyboardEvent<SVGGElement>) => {
-      if (!locked && (event.key === "Enter" || event.key === " ")) {
+      if ((inspectId!==null || !locked) && (event.key === "Enter" || event.key === " ")) {
         event.preventDefault(); callback();
       }
     },
@@ -57,14 +57,14 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
       const x = xPos[atom.id];
       const sites = availableSites(atom.id);
       const coord = (site: PairSite): [number,number] => {
-        if(site==="top") return [x,53];
-        if(site==="bottom") return [x,168];
+        if(site==="top") return [atom.id==="c"?x:(atom.id==="o-left"?x-31:x+31),55];
+        if(site==="bottom") return [atom.id==="c"?x:(atom.id==="o-left"?x-31:x+31),165];
         if(site==="outer") return [atom.id==="o-left"?x-55:x+55,110];
         return [x,110];
       };
       return <g key={atom.id}>
         <circle cx={x} cy="110" r="43" className={inspectId===atom.id?styles.inspectRing:styles.hiddenRing} pointerEvents="none"/>
-        <g className={styles.hitTarget} {...action(atom.id+" atom",()=>tool==="bond" ? onInspect(atom.id) : onAtom(atom.id))}>
+        <g className={styles.hitTarget} {...action(atom.id+" atom",()=>inspectId!==null ? onInspect(atom.id) : onAtom(atom.id))}>
           <circle cx={x} cy="110" r="33" fill="transparent"/>
         </g>
         <circle cx={x} cy="110" r="27" fill="var(--surface-solid)"
@@ -78,8 +78,7 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
             {...action(atom.id+" "+site+" lone-pair position "+(filled?"occupied":"empty"),()=>onAtom(atom.id))}>
             <circle cx={px} cy={py} r="19" fill="transparent" stroke="none"/>
             {filled?<g fill="#008c94" pointerEvents="none"><circle cx={site==="outer"?px: px-5} cy={site==="outer"?py-5:py} r="3.6"/><circle cx={site==="outer"?px: px+5} cy={site==="outer"?py+5:py} r="3.6"/></g>:
-            false?<circle cx={px} cy={py} r="12" fill="none"
-              stroke="var(--line-strong)" strokeDasharray="3 4" pointerEvents="none"/>:null}
+            null}
             <title>{atom.element+" "+site+" electron-pair position"}</title>
           </g>;
         })}
@@ -106,7 +105,7 @@ export default function LewisStudio() {
   const edit=(fn:(d:LewisDiagram)=>LewisDiagram)=>{if(pass)return;const next=fn(diagram);if(next===diagram)return;setUndo(h=>[...h,{diagram,placement}]);setRedo([]);setDiagram(next);setSubmission(null);};
   const useUndo=()=>{if(pass||!undo.length)return;setRedo(h=>[{diagram,placement},...h]);setDiagram(undo[undo.length-1].diagram);setPlacement(undo[undo.length-1].placement);setUndo(h=>h.slice(0,-1));setSubmission(null);};
   const useRedo=()=>{if(pass||!redo.length)return;setUndo(h=>[...h,diagram]);setDiagram(redo[0].diagram);setPlacement(redo[0].placement);setRedo(h=>h.slice(1));setSubmission(null);};
-  const onAtom=(id:string)=>{if(pass||tool==="bond")return;
+  const onAtom=(id:string)=>{if(pass||tool==="bond"||inspect!==null)return;
     const next=changePairCount(placement,id,tool==="pair"?1:-1);
     if(next===placement)return;
     setUndo(h=>[...h,{diagram,placement}]);setRedo([]);setPlacement(next);
