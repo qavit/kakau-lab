@@ -10,5 +10,6 @@ export function editLonePairs(diagram: LewisDiagram,id:string,tool:DrawTool):Lew
   if(tool==="bond")return diagram;
   const atom=diagram.atoms.find(x=>x.id===id);
   if(!atom)return diagram;
-  return setLonePairs(diagram,id,tool==="erase"?Math.max(0,atom.lonePairs-1):(atom.lonePairs+1)%5);
+  const next=atom.lonePairs+(tool==="erase"?-1:1);
+  return next<0||next>4?diagram:setLonePairs(diagram,id,next);
 }

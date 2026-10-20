@@ -1,4 +1,7 @@
 import { setLonePairs, type LewisDiagram } from "./lewis.ts";
+import { shellTarget } from "./lewis-species.ts";
+// PairPlacement is the CO2 POC (v0.3) site grammar, kept with its regression tests. Practice Mode now
+// derives pair directions from the pair count (lewis-layout.ts); octetInspection is shared by both.
 /** A Lewis-dot layout convention; sites are not literal electron coordinates or VSEPR predictions. */
 export type PairSite = "top" | "bottom" | "outer" | "inner";
 export type PairPlacement = Readonly<Record<string, readonly PairSite[]>>;
@@ -26,5 +29,5 @@ export function octetInspection(diagram: LewisDiagram,id: string) {
   if (!atom) return null;
   const bondingPairs=diagram.bonds.filter(b=>b.a===id||b.b===id).reduce((n,b)=>n+b.order,0);
   const nonbondingElectrons=atom.lonePairs*2;
-  return {bondingElectrons:bondingPairs*2,nonbondingElectrons,total:bondingPairs*2+nonbondingElectrons,target:8};
+  return {bondingElectrons:bondingPairs*2,nonbondingElectrons,total:bondingPairs*2+nonbondingElectrons,target:shellTarget(atom.element)};
 }
