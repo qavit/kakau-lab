@@ -45,3 +45,12 @@ Introduce one genuinely blank canvas starting with a species formula + atom pale
 - Added `tests/lewis-placement.test.mjs` to check reversible placement, exclusion of inward oxygen positions, chemically equivalent graphical positions, and accepted O=C=O construction.
 - **Still required**: run all three suites (lewis, lewis-editor, lewis-placement), build, and Owner hands-on viewport/keyboard testing before calling v0.3 PASS. Keep Draft PR #23 and no catalog entry.
 - **Known boundary**: v0.3 places electron *pairs*, not individually unpaired valence electrons; free skeleton and bond drawing by selecting two atoms remain future work.
+
+## v0.3a–c scope completed in source (Owner QA pending)
+
+- Atom click increases an atom's lone-pair count and automatically positions electron-pair marks. CO₂ oxygen layout uses a 120°-inspired top/bottom/outward convention; the left/right outer pair is vertically oriented (colon). This is a drawing heuristic, not a physical electron-position model.
+- Bond-line and electron-dot representations are independently selectable without changing the chemical graph; one line = two bonding electrons, double = four, triple = six.
+- Octet Inspect uses a per-atom selection and computes incident bond electron counts plus the selected atom's nonbonding electron count. Shared bonding electrons count around both respective atoms, but once in the molecule's overall valence budget.
+- Existing CO₂ submission and deterministic chemistry evaluator remain unchanged. Inspector is formative representation feedback, not solution autofill.
+- Added tests for atom-click auto layout and octet arithmetic. Owner must run `node --test tests/lewis*.test.mjs`, `npm run build` and browser QA; these checks have **not** been executed by this agent. No merge or release.
+- Known limits: fixed O–C–O, pair placement only (not single-electron radicals), three oxygen placement sites, simplified layout not generalized VSEPR, no complete account or spaced practice system.
