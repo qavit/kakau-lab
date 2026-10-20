@@ -12,7 +12,7 @@ After installing the repo's normal dependencies: start the usual Kakau Lab devel
 
 ## Deliberate constraints
 
-- Fixed O–C–O connectivity; bond order (0–3) and lone pairs (0–4) are learner-controlled, not freely draggable atoms yet.
+- Fixed O–C–O connectivity. In v0.2 the bond and lone-pair tools operate directly on the SVG hit targets, with keyboard Enter/Space and Undo/Redo. The layout is still fixed; free atom placement is not implemented.
 - Only the dominant zero-formal-charge CO₂ structure is a PASS. Minor formal-charge resonance contributors are diagnosed, not generalized.
 - No odd-electron species, generalized element rules, VSEPR, hybridization, aromaticity, 3D, aqueous colors, full spaced-repetition engine, learner accounts, or tracking.
 - A chemical graph determines correctness; SVG coordinates are only a rendering. A formal-charge policy is not a quantum chemical energy calculation.
@@ -28,3 +28,11 @@ After installing the repo's normal dependencies: start the usual Kakau Lab devel
 ## Next narrow improvement if this passes
 
 Introduce one genuinely blank canvas starting with a species formula + atom palette, still CO₂ only. Add graph-isomorphism and undo/redo tests before any broader molecule coverage. Broader molecular representations are downstream models, not hidden fields in the Lewis graph.
+
+## v0.2 experimental update
+
+- Choose Bond, Lone pair, or Erase. Click a bond region to cycle 0 → 1 → 2 → 3 → 0; click an atom to add a lone pair. Erase subtracts one bond order or lone pair.
+- Undo/Redo stores learner diagrams in page-local memory only; any new edit clears redo. A passing submission locks editing until starting another blank attempt.
+- Added `models/chemistry/lewis-editor.ts` and `tests/lewis-editor.test.mjs` for focused interaction semantics. Run both test files with `node --test tests/lewis*.test.mjs`, then build and manually inspect.
+- **Not yet verified**: full build, end-to-end mouse/touch/keyboard, accessibility, responsive, and student learning evidence.
+- FBD and Lab catalog remain unchanged; this remains Draft PR #23.
