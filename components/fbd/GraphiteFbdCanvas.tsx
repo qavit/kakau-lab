@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { renderToSVG } from "@graphite/render-svg";
-import type { DiagramEditIntent } from "@graphite/diagram-spec";
+import { renderToSVG } from "@kakau-tw/render-svg";
+import type { DiagramEditIntent } from "@kakau-tw/diagram-spec";
 import type { FbdDiagram } from "../../models/fbd.ts";
 import { fbdToDiagramSpec, type FbdDisplayLengths } from "./graphiteAdapter.ts";
 import styles from "./FbdLab.module.css";

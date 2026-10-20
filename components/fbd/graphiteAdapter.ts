@@ -6,7 +6,7 @@
  *   Graphite DiagramEditIntent --applyGraphiteIntentToFbd--> updateFbdForce(direction)
  * SVG is never parsed back into FBD state.
  */
-import { applyDiagramEditIntent, type DiagramEditIntent, type DiagramSpec, type Point } from "@graphite/diagram-spec";
+import { applyDiagramEditIntent, type DiagramEditIntent, type DiagramSpec, type Point } from "@kakau-tw/diagram-spec";
 import { normalize } from "../../lib/science/fbd.ts";
 import { updateFbdForce, type FbdLabState } from "../../models/fbd.ts";
 

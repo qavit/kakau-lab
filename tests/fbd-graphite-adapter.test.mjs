@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { renderToSVG } from "@graphite/render-svg";
+import { renderToSVG } from "@kakau-tw/render-svg";
 import { FBD_ANCHOR, applyGraphiteIntentToFbd, fbdToDiagramSpec } from "../components/fbd/graphiteAdapter.ts";
 import { addFbdAgent, addFbdForce, addFbdInteraction, createFbdForce, initialFbdState } from "../models/fbd.ts";
 import { TABLE_REFERENCE, compareTableDiagram } from "../models/fbd-table.ts";

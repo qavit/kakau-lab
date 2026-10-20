@@ -24,8 +24,8 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
-    "@graphite/diagram-spec": "file:../../../../../tmp/gtar/graphite-diagram-spec-0.1.0.tgz",
-    "@graphite/render-svg": "file:../../../../../tmp/gtar/graphite-render-svg-0.1.0.tgz",
+    "@kakau-tw/diagram-spec": "^0.1.0",
+    "@kakau-tw/render-svg": "^0.1.0",
     "@types/three": "^0.185.3",
     "astronomy-engine": "^2.1.19",
     "better-react-mathjax": "^3.0.2",
