@@ -7,3 +7,6 @@
 .drawing .hitTarget:focus-visible rect{fill:var(--tint-alpha);stroke:var(--teal);stroke-width:1.5}
 .history{display:flex;gap:8px;margin-top:10px}
 .history button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+.inspectRing{fill:rgba(0,150,155,.05);stroke:#088e96;stroke-width:2;stroke-dasharray:5 4}
+.hiddenRing{fill:none;stroke:transparent}
