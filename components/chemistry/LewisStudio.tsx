@@ -6,7 +6,7 @@ import KakauLabMark from "../KakauLabMark";
 import ThemeToggle from "../ThemeToggle";
 import { initialDiagram, evaluateLewis, type LewisCode, type LewisDiagram, type SpeciesId } from "../../models/chemistry/lewis";
 import { SPECIES, SPECIES_ORDER, atomLabel } from "../../models/chemistry/lewis-species";
-import { ATOM_CLEARANCE, LAYOUTS, PAIR_RADIUS, bondPairDots, directionDegrees, lonePairAngles, tangentPair } from "../../models/chemistry/lewis-layout";
+import { ATOM_CLEARANCE, LAYOUTS, PAIR_RADIUS, bondPairDots, viewBoxOf, directionDegrees, lonePairAngles, tangentPair } from "../../models/chemistry/lewis-layout";
 import { commit, createHistory, redo, undo } from "../../models/chemistry/lewis-history";
 import { budgetNote, diagnose, hints } from "../../models/chemistry/lewis-feedback";
 import { octetInspection } from "../../models/chemistry/lewis-placement";
@@ -23,6 +23,7 @@ function Diagram({ data, locked, representation, inspectId, onAtom, onBond, onIn
 }) {
   const species = SPECIES[data.speciesId];
   const layout = LAYOUTS[data.speciesId];
+  const box = viewBoxOf(layout);
   const at = (id: string) => layout.positions[id];
   const editable = !locked && inspectId === null;
   const action = (label: string, callback: () => void, remove: () => void) => ({
@@ -36,7 +37,7 @@ function Diagram({ data, locked, representation, inspectId, onAtom, onBond, onIn
       if (editable && (event.key === "Backspace" || event.key === "Delete")) { event.preventDefault(); remove(); }
     },
   });
-  return <svg className={styles.drawing} viewBox={`0 0 ${layout.width} ${layout.height}`} role="group" aria-label={species.formula + " structure construction workspace"}>
+  return <svg className={styles.drawing} viewBox={`${box.x} ${box.y} ${box.width} ${box.height}`} role="group" aria-label={species.formula + " structure construction workspace"}>
     {data.bonds.map((bond) => {
       const a = at(bond.a), b = at(bond.b);
       const dist = Math.hypot(b.x - a.x, b.y - a.y);

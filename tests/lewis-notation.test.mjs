@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { SPECIES, SPECIES_ORDER } from "../models/chemistry/lewis-species.ts";
-import { LAYOUTS, ATOM_CLEARANCE, PAIR_RADIUS, bondPairDots, lonePairAngles, directionDegrees, co2PairDots, tangentPair } from "../models/chemistry/lewis-layout.ts";
+import { LAYOUTS, viewBoxOf, ATOM_CLEARANCE, PAIR_RADIUS, bondPairDots, lonePairAngles, directionDegrees, co2PairDots, tangentPair } from "../models/chemistry/lewis-layout.ts";
 import { createHistory, commit, undo, redo } from "../models/chemistry/lewis-history.ts";
 import { initialDiagram, evaluateLewis } from "../models/chemistry/lewis.ts";
 import { advanceBond, editLonePairs } from "../models/chemistry/lewis-editor.ts";
@@ -16,7 +16,8 @@ test("layouts place every atom once and leave room for three bonding pairs on ev
     const layout = LAYOUTS[id], sp = SPECIES[id];
     assert.deepEqual(Object.keys(layout.positions).sort(), sp.atoms.map((a) => a.id).sort());
     const pts = Object.values(layout.positions);
-    for (const p of pts) assert.ok(p.x - 60 > -20 && p.x + 60 < layout.width + 20 && p.y > 20 && p.y < layout.height - 20, `${id} fits`);
+    const box = viewBoxOf(layout);
+    for (const p of pts) assert.ok(p.x - 57 - 4 >= box.x && p.x + 57 + 4 <= box.x + box.width && p.y - 57 - 4 >= box.y && p.y + 57 + 4 <= box.y + box.height, `${id} pairs on any side stay inside the view`);
     for (const [a, b] of sp.bonds) assert.ok(dist(layout.positions[a], layout.positions[b]) >= 2 * ATOM_CLEARANCE + 2 * 11 + 10, `${id} ${a}-${b} bond is long enough`);
   }
 });
@@ -69,6 +70,13 @@ test("the pairs that complete each reference structure never sit on a bond", () 
       .map(([a, b]) => directionDegrees(here, LAYOUTS[id].positions[a === atomId ? b : a]));
     for (const angle of lonePairAngles(bondAngles, k)) for (const bond of bondAngles) assert.ok(angDist(angle, bond) >= 60, `${id}/${atomId} pair ${angle} vs bond ${bond}`);
   }
+});
+test("a second lone pair on a linear atom goes to the opposite side; pairs spread over free arcs", () => {
+  const hcnC = [directionDegrees(LAYOUTS.hcn.positions.c, LAYOUTS.hcn.positions.h), directionDegrees(LAYOUTS.hcn.positions.c, LAYOUTS.hcn.positions.n)];
+  assert.deepEqual(lonePairAngles(hcnC, 1), [270]);
+  const two = lonePairAngles(hcnC, 2).sort((a, b) => a - b);
+  assert.deepEqual(two, [90, 270]);
+  assert.equal(lonePairAngles(hcnC, 3).filter((a) => a < 180).length, 1);
 });
 test("water's two lone pairs sit above the bent H-O-H, nitrogen's one above NH3", () => {
   const o = LAYOUTS.h2o.positions;
