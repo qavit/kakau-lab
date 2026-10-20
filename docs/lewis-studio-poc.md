@@ -61,3 +61,9 @@ Introduce one genuinely blank canvas starting with a species formula + atom pale
 - Practice uses **primary click on atom = add lone pair; primary click on bond = increase bond order; secondary click = remove one**. Erase mode and Delete/Backspace are alternatives for touch/keyboard users. Electron-dot and bond-line views remain read-only projections of the same chemical graph.
 - The octet inspector remains a separate non-editing mode, and Undo/Redo snapshots retain both graph and display placement.
 - Teacher must verify visual pair orientation against the reference image, correct CO2 electron counts (16), click/secondary-click, keyboard and touch, Undo/Redo, switching representations, octet inspection, failed submit and PASS. This update is NOT yet build/browser certified.
+
+## Geometry regression: CO₂ dot notation (2026-10-21)
+- Shared electron pairs on a horizontal bond are **vertical colons**: single `:`; double two side-by-side colons, not horizontal `··`.
+- Oxygen lone pairs use tangential placement around upper/lower outward-facing directions; each pair consists of exactly two dots. Pure geometry lives in `models/chemistry/lewis-layout.ts`, with `tests/lewis-layout.test.mjs` locking orientation and count.
+- This is a drawing convention, not measured molecular electron geometry. Chemistry validator and other Labs unchanged.
+- Source changed; run `node --test tests/lewis*.test.mjs`, `npm run build`, and visual compare with teacher reference before closing the gate. No merge or release until verified.
