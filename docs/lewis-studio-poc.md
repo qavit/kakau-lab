@@ -54,3 +54,10 @@ Introduce one genuinely blank canvas starting with a species formula + atom pale
 - Existing CO₂ submission and deterministic chemistry evaluator remain unchanged. Inspector is formative representation feedback, not solution autofill.
 - Added tests for atom-click auto layout and octet arithmetic. Owner must run `node --test tests/lewis*.test.mjs`, `npm run build` and browser QA; these checks have **not** been executed by this agent. No merge or release.
 - Known limits: fixed O–C–O, pair placement only (not single-electron radicals), three oxygen placement sites, simplified layout not generalized VSEPR, no complete account or spaced practice system.
+
+## Practice Mode usability revision (2026-10-21)
+
+- After teacher screenshot review, CO2 oxygen lone pairs are drawn as **two diagonal pairs toward the outer side** (top-outward and bottom-outward) rather than adding extra dots on either side. This changes drawing layout only; correct CO2 still has precisely four nonbonding electrons per oxygen.
+- Practice uses **primary click on atom = add lone pair; primary click on bond = increase bond order; secondary click = remove one**. Erase mode and Delete/Backspace are alternatives for touch/keyboard users. Electron-dot and bond-line views remain read-only projections of the same chemical graph.
+- The octet inspector remains a separate non-editing mode, and Undo/Redo snapshots retain both graph and display placement.
+- Teacher must verify visual pair orientation against the reference image, correct CO2 electron counts (16), click/secondary-click, keyboard and touch, Undo/Redo, switching representations, octet inspection, failed submit and PASS. This update is NOT yet build/browser certified.
