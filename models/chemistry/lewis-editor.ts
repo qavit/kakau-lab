@@ -1,4 +1,4 @@
-import { setBondOrder, setLonePairs, type LewisDiagram } from "./lewis";
+import { setBondOrder, setLonePairs, type LewisDiagram } from "./lewis.ts";
 export type DrawTool = "bond" | "pair" | "erase";
 export function advanceBond(diagram: LewisDiagram,a:string,b:string,tool:DrawTool):LewisDiagram {
   if(tool==="pair")return diagram;
