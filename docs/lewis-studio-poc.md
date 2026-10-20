@@ -36,3 +36,12 @@ Introduce one genuinely blank canvas starting with a species formula + atom pale
 - Added `models/chemistry/lewis-editor.ts` and `tests/lewis-editor.test.mjs` for focused interaction semantics. Run both test files with `node --test tests/lewis*.test.mjs`, then build and manually inspect.
 - **Not yet verified**: full build, end-to-end mouse/touch/keyboard, accessibility, responsive, and student learning evidence.
 - FBD and Lab catalog remain unchanged; this remains Draft PR #23.
+
+## v0.3 Electron Placement Model (unverified implementation)
+
+- Drawing-side `PairPlacement` tracks top/bottom/outward electron-pair positions independently from the scientifically evaluated `LewisDiagram` pair count. No electron placement is a real molecular orbital coordinate.
+- Oxygen only offers top/bottom/outward placement positions because the inward side is occupied by bonding. Carbon currently offers top/bottom. This is a constrained CO₂ grammar, not a universal valence-shell editor.
+- Pair tool adds a pair at one explicit unoccupied location; Erase removes an occupied pair. SVG locations accept click and keyboard Enter/Space. Undo/Redo snapshots include both the graph and placement state.
+- Added `tests/lewis-placement.test.mjs` to check reversible placement, exclusion of inward oxygen positions, chemically equivalent graphical positions, and accepted O=C=O construction.
+- **Still required**: run all three suites (lewis, lewis-editor, lewis-placement), build, and Owner hands-on viewport/keyboard testing before calling v0.3 PASS. Keep Draft PR #23 and no catalog entry.
+- **Known boundary**: v0.3 places electron *pairs*, not individually unpaired valence electrons; free skeleton and bond drawing by selecting two atoms remain future work.
