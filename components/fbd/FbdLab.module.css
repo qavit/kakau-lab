@@ -17,6 +17,10 @@
 .stack { display:grid; gap:8px; }
 .forceList,.directions { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
 .primary { margin-top:20px; }
+.secondary { margin:12px 0 0 12px; background:none; border:none; color:var(--muted); text-decoration:underline; min-height:40px; cursor:pointer; }
+.reminder { margin:16px 0; padding:12px 14px; border:1px solid var(--line); border-left:4px solid var(--strong); border-radius:6px; background:var(--tint-alpha); }
+.reminder ul { margin:8px 0 0; padding-left:20px; }
+.reminder li { margin:6px 0; line-height:1.6; }
 .feedback li { margin:12px 0; line-height:1.6; }
 .evidence { margin:18px 0; padding:16px; border:1px solid var(--line); border-radius:8px; background:var(--tint-alpha); }
 .evidence h4 { margin:0 0 8px; }

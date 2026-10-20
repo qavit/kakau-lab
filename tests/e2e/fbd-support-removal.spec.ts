@@ -28,6 +28,7 @@ test("remove support: wrong prediction, old normal diagnosis, revision, then evi
   await enterBaseline(page);
   await expect(page.getByRole("button", { name: "撤走桌面，開始下一段" })).toHaveCount(0);
   await passBaseline(page);
+  await expect(page.getByText("待修正")).toHaveCount(0); // PASS: no diagnostic wall
   await page.getByRole("button", { name: "撤走桌面，開始下一段" }).click();
   await expect(page.getByRole("heading", { name: "情境：桌面剛從木塊下方撤走" })).toBeVisible();
   await expect(page.getByRole("group", { name: /木塊自由體圖/ })).toHaveCount(0);
@@ -47,7 +48,9 @@ test("remove support: wrong prediction, old normal diagnosis, revision, then evi
   await page.getByRole("button", { name: "比較交互作用與力" }).click();
   await expect(page.locator('[data-code="inactive-agent-force"]')).toContainText("正向力");
   await expect(page.getByRole("region", { name: "物理證據" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "修正我的力圖" })).toHaveCount(1); // failing result: one next step
   await page.getByRole("button", { name: "修正我的力圖" }).click();
+  await expect(page.getByRole("status", { name: "上次待修正" })).toContainText("正向力"); // last issues stay visible while repairing
   await page.getByRole("checkbox", { name: "桌面 ↔ 木塊（桌面已撤走）" }).uncheck();
   await expect(page.getByRole("button", { name: /正向力 ·/ })).toHaveCount(0);
   await page.getByRole("button", { name: "提交我的力圖" }).click();
@@ -56,6 +59,9 @@ test("remove support: wrong prediction, old normal diagnosis, revision, then evi
   await expect(page.getByRole("region", { name: "物理證據" })).toContainText("−mg");
   await expect(page.getByRole("region", { name: "物理證據" })).toContainText("−g");
   await expect(page.getByRole("region", { name: "物理證據" })).toContainText("我猜原來的平衡會維持。");
+  await expect(page.getByRole("status", { name: "上次待修正" })).toHaveCount(0); // reminder cleared after resubmit
+  await page.getByRole("button", { name: "完成，重新練習一次" }).click();
+  await expect(page.getByRole("heading", { name: "情境：靜止在水平桌面上的木塊" })).toBeVisible();
   expect(errors).toEqual([]);
 });
 

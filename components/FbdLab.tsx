@@ -30,6 +30,7 @@ export default function FbdLab() {
   useEffect(() => { shellRef.current?.setAttribute("data-interactive", "true"); }, []);
   const [learning, setLearning] = useState(initialTableLearning);
   const [predictionDraft, setPredictionDraft] = useState<PredictionDraft>(EMPTY_PREDICTION);
+  const [lastIssues, setLastIssues] = useState<readonly string[]>([]);
   const nextId = useRef(1);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const { learner, phase } = learning;
@@ -40,6 +41,8 @@ export default function FbdLab() {
   const result = compareTableSubmission(learning);
   const forceChoices = learning.supportPresent ? BASELINE_FORCE_CHOICES : RELEASED_FORCE_CHOICES;
   const edit = (change: (current: FbdLabState) => FbdLabState) => setLearning((current) => ({ ...current, learner: change(current.learner) }));
+  const restart = () => { setLearning(initialTableLearning()); setPredictionDraft(EMPTY_PREDICTION); setLastIssues([]); nextId.current = 1; };
+  const revise = () => { headingRef.current?.focus(); setLastIssues(result?.diagnostics.filter((diagnostic) => diagnostic.severity === "issue").map((diagnostic) => diagnostic.message) ?? []); setLearning(reviseTable); };
   const move = (next: TablePhase) => { headingRef.current?.focus(); setLearning((current) => ({ ...current, phase: next })); };
   const toggleInteraction = (agent: typeof TABLE_AGENTS[number]) => edit((current) => {
     const id = `${agent.id}-block`;
@@ -56,7 +59,7 @@ export default function FbdLab() {
   return <main ref={shellRef} className={`lab-shell ${styles.shell}`}>
     <header className="topbar">
       <div><Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link><div className="eyebrow">Mechanics · FBD v0.1</div><h1>自由體圖：先找交互作用</h1></div>
-      <div className="header-actions"><ThemeToggle /><button onClick={() => { setLearning(initialTableLearning()); setPredictionDraft(EMPTY_PREDICTION); nextId.current = 1; }}>重新開始</button></div>
+      <div className="header-actions"><ThemeToggle /><button onClick={restart}>重新開始</button></div>
     </header>
     <ol className={styles.steps} aria-label="學習流程">{["基線建模", "基線檢查", "撤除桌面", "先做預測", "修訂模型", "證據與回顧"].map((label, index) => {
       const current = phase === "scene" || phase === "system" || phase === "interactions" || phase === "forces" ? 0
@@ -90,6 +93,7 @@ export default function FbdLab() {
             <label>為什麼這樣預測？<textarea value={predictionDraft.reason} onChange={(event) => setPredictionDraft((current) => ({ ...current, reason: event.target.value }))} rows={3} maxLength={300} /></label>
             <button disabled={!predictionDraft.lostInteraction || !predictionDraft.remainingInteraction || !predictionDraft.motion || !predictionDraft.reason.trim()} onClick={() => { headingRef.current?.focus(); setLearning((current) => recordTablePrediction(current, predictionDraft as TablePrediction)); }}>保存預測並修訂模型</button>
           </fieldset>}
+          {editable && lastIssues.length > 0 && <aside role="status" aria-label="上次待修正" className={styles.reminder}><strong>上次待修正（逐項處理即可）</strong><ul>{lastIssues.map((message, index) => <li key={index}>{message}</li>)}</ul></aside>}
           {phase === "rebuild" && <p>下方保留你原先提交的模型作為草稿；請重新確認來源、力與方向，再提交。系統不會替你刪除舊力。</p>}
           {showDiagram && <>
             <div className={styles.diagram}>
@@ -106,13 +110,16 @@ export default function FbdLab() {
                 <p>力大小：未知。箭長固定，不表示牛頓值；拖曳箭頭只會改方向。</p><button onClick={() => edit((current) => removeFbdForce(current, selected.id))}>刪除選取的力</button>
               </fieldset>}
               {learning.supportPresent && <label className={styles.assumption}>你對正向力的假設<select value={learning.assumption} onChange={(event) => setLearning((current) => ({ ...current, assumption: event.target.value as NormalAssumption }))}><option value="unknown">先不判斷大小</option><option value="always-mg">任何情況都有 N = mg</option><option value="vertical-balance">只有垂直平衡、無其他垂直力時才有 N = mg</option></select></label>}
-              <button className={styles.primary} onClick={() => { headingRef.current?.focus(); setLearning(commitTable); }}>提交我的力圖</button>
+              <button className={styles.primary} onClick={() => { headingRef.current?.focus(); setLastIssues([]); setLearning(commitTable); }}>提交我的力圖</button>
             </>}
-            {phase === "committed" && <><p>已保存你的提交。比較只讀取這次提交，不會自動補上答案。</p><button onClick={() => setLearning(compareTable)}>比較交互作用與力</button><button onClick={() => setLearning(reviseTable)}>返回修正</button></>}
-            {result && <div aria-live="polite" className={styles.feedback}><h3>{result.pass ? "PASS：交互作用、力的身分與方向一致" : "還有需要修正的模型假設"}</h3><ul>{result.diagnostics.map((diagnostic, index) => <li key={index} data-code={diagnostic.code}><strong>{diagnostic.severity === "issue" ? "待修正" : "大小未定"}</strong>：{diagnostic.message}</li>)}</ul>
-              {!learning.supportPresent && result.pass && <section aria-label="物理證據" className={styles.evidence}><h4>物理證據｜剛撤走桌面後</h4><p>以向上為 +y。原先靜止，撤走瞬間速度仍為 0；接著由剩下的作用力決定加速度。</p><p>ΣF<sub>y</sub> = {releasedTableEvidence().netForceY}，a<sub>y</sub> = {releasedTableEvidence().accelerationY} ≈ {releasedTableEvidence().accelerationMps2Y} m/s²，方向向下。</p><p>合力與加速度是模型的結果，不能再畫成一支作用力。</p><h4>回看你的預測</h4>{learning.prediction && <><p>你預測消失：{LOST_PREDICTION_TEXT[learning.prediction.lostInteraction]}；仍存在：{REMAINING_PREDICTION_TEXT[learning.prediction.remainingInteraction]}；運動：{MOTION_PREDICTION_TEXT[learning.prediction.motion]}。</p><p>{learning.prediction.reason}</p></>}<small>這段自述由你填寫；系統沒有判讀文字是否正確。請比較預測、受力來源與證據。</small></section>}
-              {learning.supportPresent && result.pass && <button onClick={() => { headingRef.current?.focus(); setLearning(removeTableSupport); }}>撤走桌面，開始下一段</button>}
-              <button onClick={() => { headingRef.current?.focus(); setLearning(reviseTable); }}>修正我的力圖</button></div>}
+            {phase === "committed" && <><p>已保存你的提交。比較只讀取這次提交，不會自動補上答案。</p><button onClick={() => setLearning(compareTable)}>比較交互作用與力</button><button onClick={() => { setLastIssues([]); setLearning(reviseTable); }}>返回修正</button></>}
+            {result && <div aria-live="polite" className={styles.feedback}><h3>{result.pass ? "PASS：交互作用、力的身分與方向一致" : "還有需要修正的模型假設"}</h3>
+              {!result.pass && <ul>{result.diagnostics.filter((diagnostic) => diagnostic.severity === "issue").map((diagnostic, index) => <li key={index} data-code={diagnostic.code}><strong>待修正</strong>：{diagnostic.message}</li>)}</ul>}
+              <small>各力的大小未定；箭頭長度只是定性草圖。</small>
+              {!learning.supportPresent && result.pass && <section aria-label="物理證據" className={styles.evidence}><h4>物理證據｜剛撤走桌面後</h4><p>以向上為 +y；原先靜止，撤走瞬間速度仍為 0。</p><p>ΣF<sub>y</sub> = {releasedTableEvidence().netForceY}，a<sub>y</sub> = {releasedTableEvidence().accelerationY} ≈ {releasedTableEvidence().accelerationMps2Y} m/s²，方向向下。合力與加速度是結果，不是另一支作用力。</p>{learning.prediction && <><h4>回看你的預測</h4><p>消失：{LOST_PREDICTION_TEXT[learning.prediction.lostInteraction]}；仍存在：{REMAINING_PREDICTION_TEXT[learning.prediction.remainingInteraction]}；運動：{MOTION_PREDICTION_TEXT[learning.prediction.motion]}。</p><p>{learning.prediction.reason}</p><small>這段是你的自述，系統不判讀對錯；請對照受力來源與證據。</small></>}</section>}
+              {result.pass
+                ? <><button className={styles.primary} onClick={() => { if (learning.supportPresent) { headingRef.current?.focus(); setLastIssues([]); setLearning(removeTableSupport); } else restart(); }}>{learning.supportPresent ? "撤走桌面，開始下一段" : "完成，重新練習一次"}</button><button className={styles.secondary} onClick={revise}>修正我的力圖</button></>
+                : <button className={styles.primary} onClick={revise}>修正我的力圖</button>}</div>}
           </>}
         </>}
       </section>
