@@ -67,3 +67,63 @@ Introduce one genuinely blank canvas starting with a species formula + atom pale
 - Oxygen lone pairs use tangential placement around upper/lower outward-facing directions; each pair consists of exactly two dots. Pure geometry lives in `models/chemistry/lewis-layout.ts`, with `tests/lewis-layout.test.mjs` locking orientation and count.
 - This is a drawing convention, not measured molecular electron geometry. Chemistry validator and other Labs unchanged.
 - Source changed; run `node --test tests/lewis*.test.mjs`, `npm run build`, and visual compare with teacher reference before closing the gate. No merge or release until verified.
+
+---
+
+# Practice Mode multi-molecule MVP (2026-10-21)
+
+Continues Draft PR #23 on the same branch. Gate separation: the **CO₂ POC gate (Owner-approved, limited UX gate)** is unchanged and its 23 tests still pass untouched; everything below is the **multi-molecule gate, pending Owner review**.
+
+## What changed
+
+| Area | File | Change |
+|---|---|---|
+| `SpeciesDefinition` + `TaskDefinition` data | `models/chemistry/lewis-species.ts` | Elements (H/C/N/O), valence electrons, duet/octet targets, reviewed skeletons for H₂O, CH₄, NH₃, H₂, HCN, CO₂, teaching order. |
+| `LearnerGraph` + `ValidationProfile` | `models/chemistry/lewis.ts` | `evaluateLewis` replaces the CO₂-only checks (`evaluateCo2` kept as alias). Order: structure → missing bond → electron count (excess/deficit) → duet/octet → zero formal charge. The skeleton is matched by graph isomorphism (element + connectivity), so atom order, ids of identical H, and bond direction never decide correctness. New codes `duet`, plus `problemAtoms`/`targets` for diagnosis. |
+| `LewisLayoutPolicy` | `models/chemistry/lewis-layout.ts` | Per-species 2D placement; `bondPairDots` puts each shared pair across the bond (horizontal → colon, vertical → `··`, diagonal → tilted); `lonePairAngles` centres lone pairs in the widest free arc, keeping clear of bonds. CO₂ oxygen output is identical to the accepted ±60° layout. Count-driven: it cannot add or drop an electron. |
+| Diagnostics | `models/chemistry/lewis-feedback.ts` | Bilingual messages naming failing atoms and electron arithmetic; per-species hints. |
+| Undo/Redo | `models/chemistry/lewis-history.ts` | Pure snapshot history (replaces ad-hoc arrays in the component). |
+| UI | `components/chemistry/LewisStudio.tsx` | Species picker, per-species SVG, rotated bond hit areas, Next molecule / redraw after PASS, **Guided Practice** label. |
+| Editor | `models/chemistry/lewis-editor.ts` | Lone pairs now cap at 4 (previously wrapped to 0); no-ops return the same object so they are not recorded in history. |
+
+`lewis-placement.ts` (CO₂ v0.3 site grammar) is no longer used by the UI except `octetInspection` (now duet-aware); it is retained with its regression tests.
+
+Layering respected: the chemistry modules import nothing from React/Three; `models/chemistry` imports only itself; `lib/*` untouched.
+
+## Playable molecules
+
+H₂O, CH₄, NH₃, H₂, HCN, CO₂ — all six end-to-end (start blank → build → commit → diagnose → revise → PASS → next / redraw). Skeleton is supplied (Guided Practice); learners do not choose the central atom or connectivity.
+
+## Science Gate (automated, `tests/lewis-species.test.mjs`)
+
+| Species | Valence e⁻ | Reference structure | Result |
+|---|---|---|---|
+| H₂O | 8 | H–O–H, O 2 LP | PASS; O=H diagnosed as `duet` naming H₁ |
+| CH₄ | 8 | 4 C–H, no LP | PASS; extra LP / double C–H → `electron-excess` |
+| NH₃ | 8 | 3 N–H, N 1 LP | PASS; no LP → deficit (6/8), 2 LP → excess |
+| H₂ | 2 | H–H | PASS; double bond / LP → excess; none → missing bond |
+| HCN | 10 | H–C≡N, N 1 LP | PASS; H–C=N with N 2 LP → `octet` (C has 6) |
+| CO₂ | 16 | O=C=O, 2 LP per O | PASS (regression); 3 charged cases kept |
+
+Also covered: shuffled atoms/bonds, swapped H ids, wrong skeleton/element/unknown species → `invalid-structure`, formal charges all zero and summing to the charge, duet-vs-octet targets in the inspector, bond-pair dot orientation for every bond and order, lone-pair count/spacing/clearance for 0–4 pairs on every atom, history undo/redo re-validation.
+
+## Verification record
+
+- `node --test tests/lewis*.test.mjs`: 90 pass, 0 fail (23 original CO₂ tests included).
+- `npm run build`: succeeded. `npm run lint`: 0 errors (2 pre-existing warnings in `StandardAtmosphereLab.tsx`).
+- Browser (Vite dev server from this worktree, in-app browser): H₂O end-to-end by real mouse clicks (empty submit → partial → PASS in dot mode); the other five solved and PASSed through DOM click events; wrong submissions checked for H₂ (excess), H₂O O=H (duet), HCN C=N (octet); Undo/Redo, erase mode, Enter/Delete/right-click on SVG targets; 375 px viewport with no horizontal scroll; line and dot modes; screenshots of NH₃, CH₄, CO₂, H₂O checked by eye.
+- **Not done:** real touch device, screen-reader pass, Safari/Firefox, Playwright e2e for Lewis. (The whole unit suite, `node --test tests/*.test.mjs`, passed 351/351 after the build.)
+
+## Open issues / honest limits
+
+1. Lone pairs sit at a fixed 57 px radius for all atoms; around H₂O's oxygen they read slightly detached from the atom circle (same as the accepted CO₂ look).
+2. A learner who adds >2 pairs near a crowded atom (e.g. carbon in CH₄) gets pairs placed closer together/near bonds. Counts remain correct; spacing is a minimum 22°.
+3. Hints are generic arithmetic scaffolds, not misconception-specific; only the three-step ladder exists.
+4. Switching molecules discards in-progress work without confirmation.
+5. Octet inspector only; no per-electron (radical) model, resonance, ions or hypervalent species, as scoped out.
+6. `?species=` deep links and a catalog entry are intentionally absent; the route stays `noindex`.
+7. The branch is behind `main` (PR #24 landed); not synced, to avoid mixing the merge into this review.
+
+## Suggested next Gate
+
+Owner hands-on review of the six tasks (desktop + phone), specifically: H₂O / NH₃ lone-pair look, CH₄ vertical-bond `··`, HCN triple colons. If accepted: sync with `main`, add a Playwright smoke test for the route, then consider a blank-canvas (learner-chosen skeleton) Discovery Mode as a separate gate.
