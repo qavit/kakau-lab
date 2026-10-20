@@ -193,6 +193,12 @@ unlisted labs such as `/fbd` are included (without a catalogue `number`), and th
 routes derive from `catalogLabs()`. The legacy `status` field is deprecated and no longer read by
 the catalog or sitemap. Unlisted routes must also declare `robots: { index: false }` in page metadata.
 
+Remaining legacy surface, kept deliberately (follow-up): `status` and `experimentalLabs()` still feed
+the owner-only preview section in `ModelCatalog` (`KAKAU_EXPERIMENTAL_PREVIEW=1`; covered by
+`rendered-html.test.mjs`), and FBD carries `status: "paused"` to stay out of that section. Removing
+them means deleting that preview section and the field together; do that in its own change. The
+unused `publishedLabs()` helper has already been removed.
+
 The registry also distinguishes *which app* implements a lab. `implementation.app` is either:
 
 - `"kakau-lab"` — a model that lives in this repo, with a local `route` the catalog renders as a

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { catalogLabs, experimentalLabs, labRegistry, publishedLabs, unlistedLabs } from "../lib/labs/registry.ts";
+import { catalogLabs, experimentalLabs, labRegistry, unlistedLabs } from "../lib/labs/registry.ts";
 
 const requiredFields = ["id", "title", "subject", "description", "topics", "level", "status", "maturity", "visibility"];
 
@@ -89,7 +89,6 @@ test("model 09 is the published local electrostatics route", () => {
   assert.equal(model09.implementation.app, "kakau-lab");
   assert.equal(model09.implementation.route, "/electrostatics");
   assert.equal(model09.status, "published");
-  assert.equal(publishedLabs().includes(model09), true);
   assert.equal(catalogLabs().includes(model09), true);
   assert.deepEqual(experimentalLabs(), []);
 });

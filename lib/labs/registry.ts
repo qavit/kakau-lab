@@ -264,12 +264,7 @@ export function unlistedLabs(registry: readonly LabManifest[] = labRegistry): re
   return registry.filter((lab) => lab.visibility === "unlisted");
 }
 
-/** @deprecated Reads legacy `status`; not a source of truth for the catalog. Use `catalogLabs()`. */
-export function publishedLabs(registry: readonly LabManifest[] = labRegistry): readonly LabManifest[] {
-  return registry.filter((lab) => lab.status === "published");
-}
-
-/** @deprecated Reads legacy `status`. Owner-preview only; nothing is currently `experimental` except FBD. */
+/** @deprecated Reads legacy `status`. Owner-preview only; nothing is currently `experimental` (FBD is `paused`). */
 export function experimentalLabs(registry: readonly LabManifest[] = labRegistry): readonly LabManifest[] {
   return registry.filter((lab) => lab.status === "experimental");
 }
