@@ -63,7 +63,7 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
         return [x,110];
       };
       return <g key={atom.id}>
-        <circle cx={x} cy="110" r="43" className={inspectId===atom.id?styles.inspectRing:styles.hiddenRing} pointerEvents="none"/>
+        <circle cx={x} cy="110" r="77" className={inspectId===atom.id?styles.inspectRing:styles.hiddenRing} pointerEvents="none"/>
         <g className={styles.hitTarget} {...action(atom.id+" atom",()=>inspectId!==null ? onInspect(atom.id) : onAtom(atom.id))}>
           <circle cx={x} cy="110" r="33" fill="transparent"/>
         </g>
@@ -111,7 +111,7 @@ export default function LewisStudio() {
     setUndo(h=>[...h,{diagram,placement}]);setRedo([]);setPlacement(next);
     setDiagram(applyPairPlacement(diagram,next));setSubmission(null);
   };
-  const onBond=(a:string,b:string)=>{if(tool==="bond"||tool==="erase")edit(d=>advanceBond(d,a,b,tool));};
+  const onBond=(a:string,b:string)=>{if(inspect===null && (tool==="bond"||tool==="erase"))edit(d=>advanceBond(d,a,b,tool));};
   const reset=()=>{setDiagram(initialCo2());setPlacement(initialPairPlacement());setSubmission(null);setAttempts(0);setFirst(null);setHint(0);setUndo([]);setRedo([]);setTool("bond");setInspect(null);};
   const commit=()=>{const result=evaluateCo2(diagram);setSubmission(result);setAttempts(attempts+1);if(first===null)setFirst(result.code);};
   return <main className={"lab-shell "+styles.shell}>
@@ -127,7 +127,7 @@ export default function LewisStudio() {
       <div className={styles.tools}><button aria-pressed={representation==="line"} className={representation==="line"?styles.selected:""} onClick={()=>setRepresentation("line")}>鍵線模式</button><button aria-pressed={representation==="dots"} className={representation==="dots"?styles.selected:""} onClick={()=>setRepresentation("dots")}>電子點模式</button><button aria-pressed={inspect!==null} onClick={()=>setInspect(inspect===null?"c":null)}>檢查八隅體</button></div>
       <Diagram data={diagram} tool={tool} locked={pass} placement={placement} representation={representation} inspectId={inspect} onAtom={onAtom} onInspect={setInspect} onBond={onBond}/>
       {inspect && <p className={styles.hint} aria-live="polite">{inspect}：鍵結電子 {octetInspection(diagram,inspect)?.bondingElectrons} ＋ 非鍵結電子 {octetInspection(diagram,inspect)?.nonbondingElectrons} ＝ {octetInspection(diagram,inspect)?.total} / 8</p>}
-      <p className={styles.note}>{tool==="bond"?t("點擊兩原子之間，依序建立單鍵、雙鍵、參鍵。","Click between atoms to add single, double or triple bonds."):tool==="pair"?t("點擊原子本身，系統自動安排下一對孤對電子。","Click an atom to auto-place the next lone pair."):t("點擊原子移除最近放置的電子對；點擊鍵降低鍵級。","Click an atom to erase the last lone pair or a bond to decrease order.")}</p>
+      <p className={styles.note}>{tool==="bond"?t("點擊兩原子之間，依序建立單鍵、雙鍵、參鍵。","Click between atoms to add single, double or triple bonds."):tool==="pair"?t("點擊原子自動配置孤對電子；排版約成 120°，僅為圖示，不代表真實電子位置。","Click an atom to auto-place lone pairs. Layout suggests 120° but is not a physical electron position."):t("點擊原子移除最近放置的電子對；點擊鍵降低鍵級。","Click an atom to erase the last lone pair or a bond to decrease order.")}</p>
       <div className={styles.history}><button disabled={pass||undo.length===0} onClick={useUndo}>{t("復原","Undo")}</button><button disabled={pass||redo.length===0} onClick={useRedo}>{t("重做","Redo")}</button></div><div className={styles.budget}><strong>{t("已使用價電子","Used valence electrons")}：{evaluated.usedElectrons} / {evaluated.expectedElectrons}</strong><span>{t("氧各 6 個、碳 4 個","O: 6 each; C: 4")}</span></div><p className={styles.note}>{t("鍵線表示共享電子對；青色兩點代表孤對電子。圖形位置不代表實際鍵角。","Bond lines represent bonding pairs; teal dots represent lone pairs. Positions do not represent bond angles.")}</p></section>
       <section className={styles.card}><h2>{t("提交與診斷","Commit & feedback")}</h2>
       <p className={styles.note}>{t("使用左側工具直接操作原子與鍵。鍵盤使用者可 Tab 選取，按 Enter 或空白鍵操作。","Use the tools on the left. Keyboard: Tab to select, Enter or Space to edit.")}</p>
