@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { advanceBond, type DrawTool } from "../../models/chemistry/lewis-editor";
+import { advanceBond } from "../../models/chemistry/lewis-editor";
 import KakauLabMark from "../KakauLabMark";
 import ThemeToggle from "../ThemeToggle";
 import { initialCo2, evaluateCo2, type LewisDiagram } from "../../models/chemistry/lewis";
@@ -18,19 +18,22 @@ const feedback = {
   pass:["完成！總共 16 個價電子，所有原子符合八隅體，形式電荷均為零。","Correct: 16 electrons, complete octets and zero formal charges."],
 } as const;
 const xPos: Record<string, number> = { "o-left": 65, c: 190, "o-right": 315 };
-function Diagram({ data, tool, locked, placement, representation, inspectId, onAtom, onBond, onInspect }: {
-  data: LewisDiagram; tool: DrawTool; locked: boolean; placement: PairPlacement; representation: "line"|"dots"; inspectId: string|null;
+function Diagram({ data, tool, locked, placement, representation, inspectId, onAtom, onBond, onInspect, onRemoveAtom, onRemoveBond }: {
+  data: LewisDiagram; locked: boolean; placement: PairPlacement; representation: "line"|"dots"; inspectId: string|null;
   onAtom: (id: string) => void; onInspect: (id: string) => void; onBond: (a: string, b: string) => void;
+  onRemoveAtom: (id: string) => void; onRemoveBond: (a: string, b: string) => void;
 }) {
-  const action = (label: string, callback: () => void) => ({
+  const action = (label: string, callback: () => void, remove: () => void) => ({
     role: "button" as const,
     tabIndex: locked && inspectId===null ? -1 : 0,
     "aria-label": label,
     onClick: () => { if (!locked || inspectId!==null) callback(); },
+    onContextMenu: (event: React.MouseEvent<SVGGElement>) => { event.preventDefault(); if(!locked && inspectId===null) remove(); },
     onKeyDown: (event: React.KeyboardEvent<SVGGElement>) => {
       if ((inspectId!==null || !locked) && (event.key === "Enter" || event.key === " ")) {
         event.preventDefault(); callback();
       }
+      if(!locked && inspectId===null && (event.key==="Backspace"||event.key==="Delete")) {event.preventDefault();remove();}
     },
   });
   return <svg className={styles.drawing} viewBox="0 0 380 220" role="group" aria-label="CO₂ structure construction workspace">
@@ -39,7 +42,7 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
       const right = Math.max(xPos[bond.a], xPos[bond.b]) - 28;
       const cx = (left + right) / 2;
       return <g key={bond.a + bond.b} className={styles.hitTarget}
-        {...action(bond.a + "–" + bond.b + ", bond order " + bond.order, () => onBond(bond.a, bond.b))}>
+        {...action(bond.a + "–" + bond.b + ", bond order " + bond.order, () => onBond(bond.a, bond.b), () => onRemoveBond(bond.a,bond.b))}>
         <rect x={left - 10} y={83} width={right - left + 20} height={55} rx={10} fill="transparent" />
         {Array.from({length:bond.order},(_,i) => representation==="line" ? <line key={i}
           x1={left} x2={right} y1={110+(i-(bond.order-1)/2)*12}
@@ -57,14 +60,14 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
       const x = xPos[atom.id];
       const sites = availableSites(atom.id);
       const coord = (site: PairSite): [number,number] => {
-        if(site==="top") return [atom.id==="c"?x:(atom.id==="o-left"?x-31:x+31),55];
-        if(site==="bottom") return [atom.id==="c"?x:(atom.id==="o-left"?x-31:x+31),165];
-        if(site==="outer") return [atom.id==="o-left"?x-55:x+55,110];
+        if(site==="top")return atom.id==="c" ? [x,53] : [x+(atom.id==="o-left"?-31:31),78];
+        if(site==="bottom")return atom.id==="c" ? [x,168] : [x+(atom.id==="o-left"?-31:31),142];
+        if(site==="outer")return [x+(atom.id==="o-left"?-57:57),110];
         return [x,110];
       };
       return <g key={atom.id}>
         <circle cx={x} cy="110" r="77" className={inspectId===atom.id?styles.inspectRing:styles.hiddenRing} pointerEvents="none"/>
-        <g className={styles.hitTarget} {...action(atom.id+" atom",()=>inspectId!==null ? onInspect(atom.id) : onAtom(atom.id))}>
+        <g className={styles.hitTarget} {...action(atom.id+" atom",()=>inspectId!==null ? onInspect(atom.id) : onAtom(atom.id),()=>onRemoveAtom(atom.id))}>
           <circle cx={x} cy="110" r="33" fill="transparent"/>
         </g>
         <circle cx={x} cy="110" r="27" fill="var(--surface-solid)"
@@ -75,9 +78,9 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
           const [px,py]=coord(site);
           const filled=(placement[atom.id]??[]).includes(site);
           return <g key={site} className={styles.hitTarget}
-            {...action(atom.id+" "+site+" lone-pair position "+(filled?"occupied":"empty"),()=>onAtom(atom.id))}>
+            {...action(atom.id+" "+site+" lone-pair position "+(filled?"occupied":"empty"),()=>inspectId!==null?onInspect(atom.id):onAtom(atom.id),()=>onRemoveAtom(atom.id))}>
             <circle cx={px} cy={py} r="19" fill="transparent" stroke="none"/>
-            {filled?<g fill="#008c94" pointerEvents="none"><circle cx={site==="outer"?px: px-5} cy={site==="outer"?py-5:py} r="3.6"/><circle cx={site==="outer"?px: px+5} cy={site==="outer"?py+5:py} r="3.6"/></g>:
+            {filled?<g fill="#008c94" pointerEvents="none"><circle cx={site==="outer"?px:atom.id==="c"?px-5:px-5} cy={site==="outer"?py-6:atom.id==="c"?py:site==="top"?py+5:py-5} r="3.6"/><circle cx={site==="outer"?px:atom.id==="c"?px+5:px+5} cy={site==="outer"?py+6:atom.id==="c"?py:site==="top"?py-5:py+5} r="3.6"/></g>:
             null}
             <title>{atom.element+" "+site+" electron-pair position"}</title>
           </g>;
@@ -89,7 +92,7 @@ function Diagram({ data, tool, locked, placement, representation, inspectId, onA
 export default function LewisStudio() {
   const [diagram,setDiagram]=useState(initialCo2);
   const [placement,setPlacement]=useState(initialPairPlacement);
-  const [tool,setTool]=useState<DrawTool>("bond");
+  const [eraseMode,setEraseMode]=useState(false);
   const [undo,setUndo]=useState<{ diagram: LewisDiagram; placement: PairPlacement }[]>([]);
   const [redo,setRedo]=useState<{ diagram: LewisDiagram; placement: PairPlacement }[]>([]);
   const [language,setLanguage]=useState<"zh"|"dual"|"en">("zh");
@@ -105,29 +108,28 @@ export default function LewisStudio() {
   const edit=(fn:(d:LewisDiagram)=>LewisDiagram)=>{if(pass)return;const next=fn(diagram);if(next===diagram)return;setUndo(h=>[...h,{diagram,placement}]);setRedo([]);setDiagram(next);setSubmission(null);};
   const useUndo=()=>{if(pass||!undo.length)return;setRedo(h=>[{diagram,placement},...h]);setDiagram(undo[undo.length-1].diagram);setPlacement(undo[undo.length-1].placement);setUndo(h=>h.slice(0,-1));setSubmission(null);};
   const useRedo=()=>{if(pass||!redo.length)return;setUndo(h=>[...h,diagram]);setDiagram(redo[0].diagram);setPlacement(redo[0].placement);setRedo(h=>h.slice(1));setSubmission(null);};
-  const onAtom=(id:string)=>{if(pass||tool==="bond"||inspect!==null)return;
-    const next=changePairCount(placement,id,tool==="pair"?1:-1);
+  const changeAtom=(id:string,delta:-1|1)=>{if(pass||inspect!==null)return;
+    const next=changePairCount(placement,id,delta);
     if(next===placement)return;
     setUndo(h=>[...h,{diagram,placement}]);setRedo([]);setPlacement(next);
     setDiagram(applyPairPlacement(diagram,next));setSubmission(null);
   };
-  const onBond=(a:string,b:string)=>{if(inspect===null && (tool==="bond"||tool==="erase"))edit(d=>advanceBond(d,a,b,tool));};
-  const reset=()=>{setDiagram(initialCo2());setPlacement(initialPairPlacement());setSubmission(null);setAttempts(0);setFirst(null);setHint(0);setUndo([]);setRedo([]);setTool("bond");setInspect(null);};
+  const onAtom=(id:string)=>changeAtom(id,eraseMode?-1:1);
+  const onRemoveAtom=(id:string)=>changeAtom(id,-1);
+  const onBond=(a:string,b:string)=>{if(inspect===null)edit(d=>advanceBond(d,a,b,eraseMode?"erase":"bond"));};
+  const onRemoveBond=(a:string,b:string)=>{if(inspect===null)edit(d=>advanceBond(d,a,b,"erase"));};
+  const reset=()=>{setDiagram(initialCo2());setPlacement(initialPairPlacement());setSubmission(null);setAttempts(0);setFirst(null);setHint(0);setUndo([]);setRedo([]);setEraseMode(false);setInspect(null);};
   const commit=()=>{const result=evaluateCo2(diagram);setSubmission(result);setAttempts(attempts+1);if(first===null)setFirst(result.code);};
   return <main className={"lab-shell "+styles.shell}>
     <header className="topbar"><div><Link href="/" className="lab-brand" aria-label="Kakau Lab"><KakauLabMark/></Link><div className="eyebrow">Chemistry · Lewis Studio POC</div><h1>{t("自己畫出 CO₂ 的路易斯結構","Construct the Lewis structure of CO₂")}</h1></div><div className="header-actions"><ThemeToggle/><button onClick={reset}>{t("重設","Reset")}</button></div></header>
     <div className={styles.intro}><p>{t("固定 O—C—O 骨架。請自己分配鍵級與孤對電子，再提交你的模型。","The O–C–O backbone is fixed. Choose bond orders and lone pairs, then submit.")}</p><label>{t("語言","Language")} <select value={language} onChange={e=>setLanguage(e.target.value as typeof language)}><option value="zh">繁體中文</option><option value="dual">中英雙語</option><option value="en">English</option></select></label></div>
     <div className={styles.grid}>
       <section className={styles.card}><h2>{t("你的電子點式","Your Lewis structure")}</h2>
-      <div className={styles.tools} role="group" aria-label={t("編輯工具","Drawing tools")}>
-        {([["bond","建立鍵","Bond"],["pair","孤對電子","Lone pair"],["erase","橡皮擦","Erase"]] as const).map(([value,zh,en])=><button key={value} type="button"
-          className={tool===value?styles.selected:""} aria-pressed={tool===value}
-          disabled={pass} onClick={()=>setTool(value)}>{t(zh,en)}</button>)}
-      </div>
+      <p className={styles.note}>{t("左鍵點原子增加孤對電子、點鍵增加鍵級；右鍵移除。觸控或鍵盤可使用刪除模式。","Click an atom to add a lone pair, a bond to increase order; right-click to remove. Use Erase mode for touch or keyboard.")}</p>
+      <div className={styles.tools}><button type="button" className={eraseMode?styles.selected:""} aria-pressed={eraseMode} disabled={pass} onClick={()=>setEraseMode(v=>!v)}>{t("刪除模式","Erase mode")}</button></div>
       <div className={styles.tools}><button aria-pressed={representation==="line"} className={representation==="line"?styles.selected:""} onClick={()=>setRepresentation("line")}>鍵線模式</button><button aria-pressed={representation==="dots"} className={representation==="dots"?styles.selected:""} onClick={()=>setRepresentation("dots")}>電子點模式</button><button aria-pressed={inspect!==null} onClick={()=>setInspect(inspect===null?"c":null)}>檢查八隅體</button></div>
-      <Diagram data={diagram} tool={tool} locked={pass} placement={placement} representation={representation} inspectId={inspect} onAtom={onAtom} onInspect={setInspect} onBond={onBond}/>
+      <Diagram data={diagram} locked={pass} placement={placement} representation={representation} inspectId={inspect} onAtom={onAtom} onRemoveAtom={onRemoveAtom} onInspect={setInspect} onBond={onBond} onRemoveBond={onRemoveBond}/>
       {inspect && <p className={styles.hint} aria-live="polite">{inspect}：鍵結電子 {octetInspection(diagram,inspect)?.bondingElectrons} ＋ 非鍵結電子 {octetInspection(diagram,inspect)?.nonbondingElectrons} ＝ {octetInspection(diagram,inspect)?.total} / 8</p>}
-      <p className={styles.note}>{tool==="bond"?t("點擊兩原子之間，依序建立單鍵、雙鍵、參鍵。","Click between atoms to add single, double or triple bonds."):tool==="pair"?t("點擊原子自動配置孤對電子；排版約成 120°，僅為圖示，不代表真實電子位置。","Click an atom to auto-place lone pairs. Layout suggests 120° but is not a physical electron position."):t("點擊原子移除最近放置的電子對；點擊鍵降低鍵級。","Click an atom to erase the last lone pair or a bond to decrease order.")}</p>
       <div className={styles.history}><button disabled={pass||undo.length===0} onClick={useUndo}>{t("復原","Undo")}</button><button disabled={pass||redo.length===0} onClick={useRedo}>{t("重做","Redo")}</button></div><div className={styles.budget}><strong>{t("已使用價電子","Used valence electrons")}：{evaluated.usedElectrons} / {evaluated.expectedElectrons}</strong><span>{t("氧各 6 個、碳 4 個","O: 6 each; C: 4")}</span></div><p className={styles.note}>{t("鍵線表示共享電子對；青色兩點代表孤對電子。圖形位置不代表實際鍵角。","Bond lines represent bonding pairs; teal dots represent lone pairs. Positions do not represent bond angles.")}</p></section>
       <section className={styles.card}><h2>{t("提交與診斷","Commit & feedback")}</h2>
       <p className={styles.note}>{t("使用左側工具直接操作原子與鍵。鍵盤使用者可 Tab 選取，按 Enter 或空白鍵操作。","Use the tools on the left. Keyboard: Tab to select, Enter or Space to edit.")}</p>
