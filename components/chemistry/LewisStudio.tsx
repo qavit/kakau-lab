@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { advanceBond, editLonePairs, type DrawTool } from "../../models/chemistry/lewis-editor";
+import { advanceBond, type DrawTool } from "../../models/chemistry/lewis-editor";
 import KakauLabMark from "../KakauLabMark";
 import ThemeToggle from "../ThemeToggle";
 import { initialCo2, evaluateCo2, type LewisDiagram } from "../../models/chemistry/lewis";
 import styles from "./LewisStudio.module.css";
+import { initialPairPlacement, togglePairSite, applyPairPlacement, availableSites, type PairPlacement, type PairSite } from "../../models/chemistry/lewis-placement";
 
 const feedback = {
   "invalid-structure":["結構資料錯誤，請重設。","Invalid structure: please reset."],
@@ -17,9 +18,9 @@ const feedback = {
   pass:["完成！總共 16 個價電子，所有原子符合八隅體，形式電荷均為零。","Correct: 16 electrons, complete octets and zero formal charges."],
 } as const;
 const xPos: Record<string, number> = { "o-left": 65, c: 190, "o-right": 315 };
-function Diagram({ data, tool, locked, onAtom, onBond }: {
-  data: LewisDiagram; tool: DrawTool; locked: boolean;
-  onAtom: (id: string) => void; onBond: (a: string, b: string) => void;
+function Diagram({ data, tool, locked, placement, onPair, onBond }: {
+  data: LewisDiagram; tool: DrawTool; locked: boolean; placement: PairPlacement;
+  onPair: (id: string, site: PairSite) => void; onBond: (a: string, b: string) => void;
 }) {
   const action = (label: string, callback: () => void) => ({
     role: "button" as const,
@@ -54,29 +55,41 @@ function Diagram({ data, tool, locked, onAtom, onBond }: {
     })}
     {data.atoms.map((atom) => {
       const x = xPos[atom.id];
-      const spots = [[x,60],[x,158],[atom.id==="o-right"?x+46:x-46,110],
-        [atom.id==="o-right"?x-46:x+46,55]];
-      return <g key={atom.id} className={styles.hitTarget}
-        {...action(atom.id + ", " + atom.element + ", lone pairs " + atom.lonePairs,
-          () => onAtom(atom.id))}>
-        <circle cx={x} cy={110} r={37} fill="transparent"/>
+      const sites = availableSites(atom.id);
+      const coord = (site: PairSite): [number,number] => {
+        if(site==="top") return [x,53];
+        if(site==="bottom") return [x,168];
+        if(site==="outer") return [atom.id==="o-left"?x-55:x+55,110];
+        return [x,110];
+      };
+      return <g key={atom.id}>
         <circle cx={x} cy="110" r="27" fill="var(--surface-solid)"
           stroke="var(--line-strong)" strokeWidth="1.5" pointerEvents="none"/>
         <text x={x} y="120" fontSize="28" textAnchor="middle"
           fill="var(--ink)" fontWeight="600" pointerEvents="none">{atom.element}</text>
-        {spots.slice(0,atom.lonePairs).map(([px,py],i)=><g key={i} fill="#008c94" pointerEvents="none">
-          <circle cx={px-5} cy={py} r="3.6"/><circle cx={px+5} cy={py} r="3.6"/>
-        </g>)}
-        <title>{atom.element + ", " + atom.lonePairs + " lone pairs"}</title>
+        {sites.map(site=>{
+          const [px,py]=coord(site);
+          const filled=(placement[atom.id]??[]).includes(site);
+          return <g key={site} className={styles.hitTarget}
+            {...action(atom.id+" "+site+" lone-pair position "+(filled?"occupied":"empty"),
+              ()=>onPair(atom.id,site))}>
+            <circle cx={px} cy={py} r="19" fill="transparent" stroke="none"/>
+            {filled?<g fill="#008c94" pointerEvents="none"><circle cx={px-5} cy={py} r="3.6"/><circle cx={px+5} cy={py} r="3.6"/></g>:
+            tool==="pair"&&!locked?<circle cx={px} cy={py} r="12" fill="none"
+              stroke="var(--line-strong)" strokeDasharray="3 4" pointerEvents="none"/>:null}
+            <title>{atom.element+" "+site+" electron-pair position"}</title>
+          </g>;
+        })}
       </g>;
     })}
   </svg>;
 }
 export default function LewisStudio() {
   const [diagram,setDiagram]=useState(initialCo2);
+  const [placement,setPlacement]=useState(initialPairPlacement);
   const [tool,setTool]=useState<DrawTool>("bond");
-  const [undo,setUndo]=useState<LewisDiagram[]>([]);
-  const [redo,setRedo]=useState<LewisDiagram[]>([]);
+  const [undo,setUndo]=useState<{ diagram: LewisDiagram; placement: PairPlacement }[]>([]);
+  const [redo,setRedo]=useState<{ diagram: LewisDiagram; placement: PairPlacement }[]>([]);
   const [language,setLanguage]=useState<"zh"|"dual"|"en">("zh");
   const [submission,setSubmission]=useState<ReturnType<typeof evaluateCo2>|null>(null);
   const [attempts,setAttempts]=useState(0);
@@ -85,12 +98,19 @@ export default function LewisStudio() {
   const pass=submission?.pass===true;
   const evaluated=evaluateCo2(diagram);
   const t=(zh:string,en:string)=>language==="en"?en:language==="dual"?zh+" / "+en:zh;
-  const edit=(fn:(d:LewisDiagram)=>LewisDiagram)=>{if(pass)return;const next=fn(diagram);if(next===diagram)return;setUndo(h=>[...h,diagram]);setRedo([]);setDiagram(next);setSubmission(null);};
-  const useUndo=()=>{if(pass||!undo.length)return;setRedo(h=>[diagram,...h]);setDiagram(undo[undo.length-1]);setUndo(h=>h.slice(0,-1));setSubmission(null);};
-  const useRedo=()=>{if(pass||!redo.length)return;setUndo(h=>[...h,diagram]);setDiagram(redo[0]);setRedo(h=>h.slice(1));setSubmission(null);};
-  const onAtom=(id:string)=>{if(tool==="pair"||tool==="erase")edit(d=>editLonePairs(d,id,tool));};
+  const edit=(fn:(d:LewisDiagram)=>LewisDiagram)=>{if(pass)return;const next=fn(diagram);if(next===diagram)return;setUndo(h=>[...h,{diagram,placement}]);setRedo([]);setDiagram(next);setSubmission(null);};
+  const useUndo=()=>{if(pass||!undo.length)return;setRedo(h=>[{diagram,placement},...h]);setDiagram(undo[undo.length-1].diagram);setPlacement(undo[undo.length-1].placement);setUndo(h=>h.slice(0,-1));setSubmission(null);};
+  const useRedo=()=>{if(pass||!redo.length)return;setUndo(h=>[...h,diagram]);setDiagram(redo[0].diagram);setPlacement(redo[0].placement);setRedo(h=>h.slice(1));setSubmission(null);};
+  const onPair=(id:string,site:PairSite)=>{if(pass||tool==="bond")return;
+    const occupied=(placement[id]??[]).includes(site);
+    if((tool==="pair"&&occupied)||(tool==="erase"&&!occupied))return;
+    const next=togglePairSite(placement,id,site);
+    if(next===placement)return;
+    setUndo(h=>[...h,{diagram,placement}]);setRedo([]);setPlacement(next);
+    setDiagram(applyPairPlacement(diagram,next));setSubmission(null);
+  };
   const onBond=(a:string,b:string)=>{if(tool==="bond"||tool==="erase")edit(d=>advanceBond(d,a,b,tool));};
-  const reset=()=>{setDiagram(initialCo2());setSubmission(null);setAttempts(0);setFirst(null);setHint(0);setUndo([]);setRedo([]);setTool("bond");};
+  const reset=()=>{setDiagram(initialCo2());setPlacement(initialPairPlacement());setSubmission(null);setAttempts(0);setFirst(null);setHint(0);setUndo([]);setRedo([]);setTool("bond");};
   const commit=()=>{const result=evaluateCo2(diagram);setSubmission(result);setAttempts(attempts+1);if(first===null)setFirst(result.code);};
   return <main className={"lab-shell "+styles.shell}>
     <header className="topbar"><div><Link href="/" className="lab-brand" aria-label="Kakau Lab"><KakauLabMark/></Link><div className="eyebrow">Chemistry · Lewis Studio POC</div><h1>{t("自己畫出 CO₂ 的路易斯結構","Construct the Lewis structure of CO₂")}</h1></div><div className="header-actions"><ThemeToggle/><button onClick={reset}>{t("重設","Reset")}</button></div></header>
@@ -102,8 +122,8 @@ export default function LewisStudio() {
           className={tool===value?styles.selected:""} aria-pressed={tool===value}
           disabled={pass} onClick={()=>setTool(value)}>{t(zh,en)}</button>)}
       </div>
-      <Diagram data={diagram} tool={tool} locked={pass} onAtom={onAtom} onBond={onBond}/>
-      <p className={styles.note}>{tool==="bond"?t("點擊兩原子之間，依序建立單鍵、雙鍵、參鍵。","Click between atoms to add single, double or triple bonds."):tool==="pair"?t("點擊原子，增加一對孤對電子。","Click an atom to add one lone pair."):t("點擊原子移除孤對電子，或點擊鍵降低鍵級。","Click an atom to remove a lone pair or a bond to decrease its order.")}</p>
+      <Diagram data={diagram} tool={tool} locked={pass} placement={placement} onPair={onPair} onBond={onBond}/>
+      <p className={styles.note}>{tool==="bond"?t("點擊兩原子之間，依序建立單鍵、雙鍵、參鍵。","Click between atoms to add single, double or triple bonds."):tool==="pair"?t("點擊原子周圍虛線位置放置一對電子。","Click a dotted site around an atom to place a lone pair."):t("點擊已放置的電子對移除，或點擊鍵降低鍵級。","Click an occupied electron-pair site to erase, or a bond to decrease its order.")}</p>
       <div className={styles.history}><button disabled={pass||undo.length===0} onClick={useUndo}>{t("復原","Undo")}</button><button disabled={pass||redo.length===0} onClick={useRedo}>{t("重做","Redo")}</button></div><div className={styles.budget}><strong>{t("已使用價電子","Used valence electrons")}：{evaluated.usedElectrons} / {evaluated.expectedElectrons}</strong><span>{t("氧各 6 個、碳 4 個","O: 6 each; C: 4")}</span></div><p className={styles.note}>{t("鍵線表示共享電子對；青色兩點代表孤對電子。圖形位置不代表實際鍵角。","Bond lines represent bonding pairs; teal dots represent lone pairs. Positions do not represent bond angles.")}</p></section>
       <section className={styles.card}><h2>{t("提交與診斷","Commit & feedback")}</h2>
       <p className={styles.note}>{t("使用左側工具直接操作原子與鍵。鍵盤使用者可 Tab 選取，按 Enter 或空白鍵操作。","Use the tools on the left. Keyboard: Tab to select, Enter or Space to edit.")}</p>
