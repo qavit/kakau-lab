@@ -90,10 +90,10 @@ CI 會在每個 PR 與 push 到 `main` 時執行 lint 與 `npm test`。部署只
 
 ## 授權與著作權
 
-**暫行聲明（provisional）：** 本 repo 的原始碼公開供閱讀與檢視，保留所有權利（All rights reserved）。目前未授予一般性的再利用、修改、散布或商業使用授權，也未採用 MIT、Apache-2.0 等開源授權。不限制 GitHub 服務條款本身允許的操作（例如在 GitHub 上檢視與 fork）。
+**聲明：** 本 repo 的原始碼公開供閱讀與檢視，保留所有權利（All rights reserved）。目前未授予一般性的再利用、修改、散布或商業使用授權，也未採用 MIT、Apache-2.0 等開源授權。不限制 GitHub 服務條款本身允許的操作（例如在 GitHub 上檢視與 fork）。
 
 - 第三方依賴與素材仍遵守各自的授權。
 - Kakau 的名稱、Logo 與品牌素材不自動納入程式碼的任何授權。
 - 想以本 repo 內容做其他用途，請先取得書面同意。
 
-第三方授權、素材來源與尚待確認事項見 [`COPYRIGHT.md`](COPYRIGHT.md)。該文件目前是**待 Owner 確認的候選稿**（含著作權署名候選文字），不是已定稿的法律聲明。
+著作權署名為 `Copyright © 2026 Sin-iu Ho. All rights reserved.`（Owner 已確認，原始碼著作財產權由 Owner 個人持有）。第三方授權與素材來源見 [`COPYRIGHT.md`](COPYRIGHT.md)；其中 Logo、OG 圖、預覽圖等素材的權利**尚未確認**，仍如實標示，該文件也未經法律審閱。

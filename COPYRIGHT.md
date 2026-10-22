@@ -1,6 +1,6 @@
 # Copyright and usage notice
 
-> **Status: provisional, pending Owner confirmation.** This records the Owner's interim policy (Public source / All rights reserved). The copyright line below is a **candidate**, not a confirmed or final legal statement, and has not been reviewed by counsel. This repository deliberately contains no open-source `LICENSE` file.
+> **Status:** Public source / All rights reserved, as decided by the Owner. The copyright notice below is confirmed by the Owner. Third-party licenses and the provenance of some assets (see below) are still being verified, and this file has not been reviewed by counsel. This repository deliberately contains no open-source `LICENSE` file.
 
 ## Interim policy
 
@@ -10,9 +10,11 @@
 - Third-party dependencies and assets remain under their own licenses.
 - The Kakau name, logo and brand assets are not licensed together with the code.
 
-Candidate notice (**not final; the formal English name and the allocation of rights are still to be confirmed by the Owner**):
+Copyright notice:
 
 > Copyright © 2026 Sin-iu Ho. All rights reserved.
+
+The Owner personally holds the copyright in the Kakau Lab source code; it has not been assigned to anyone else. This does not extend to third-party software or to assets whose ownership is marked unconfirmed below.
 
 ## Third-party software
 
@@ -32,8 +34,7 @@ No claim is made that every asset is Kakau-owned; items marked unconfirmed remai
 
 ## Open items for the Owner
 
-1. Confirm the formal English name and the allocation of rights (individual or entity) behind the candidate notice.
-2. Confirm ownership of the logo, share image and screenshots, and decide what to do with the unverified starter icons.
-3. Decide whether the all-rights-reserved position stays as is, and set a contribution policy before accepting outside contributions.
+1. Confirm ownership of the logo, share image and screenshots, and decide what to do with the unverified starter icons.
+2. Set a contribution policy before accepting outside contributions.
 
 Questions about reuse: open an issue on this repository.
