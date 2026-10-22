@@ -1,5 +1,7 @@
 # Lewis Studio — CO₂ vertical slice (exploratory POC)
 
+> **Status note (2026-10-23, docs-only):** This document is a dated development log. It was written while the work lived on an independent branch; PR #23 has since been **merged into `main`**, so phrases below such as "independent branch", "Draft PR #23", "Do not merge/deploy" and "the branch is behind `main`" describe the state at the time they were written. Current state: Lewis Studio is on `main` but **not deployed** (the route is `noindex`, has no catalog entry, and the page footer reads "awaiting teacher review"). Whether it is published is the Owner's decision after science and UX review; see [`ci-cd-v1-closeout.md`](ci-cd-v1-closeout.md).
+
 This lives under **Kakau Lab** on an independent branch. It is **not** a new Chemistry platform, a published Lab, or a proven learning intervention. The product source of truth remains [the Notion Product & Scientific Spec v0.1](https://app.notion.com/p/3ff494eeb1178140b751fcffec5668bf).
 
 ## Purpose
