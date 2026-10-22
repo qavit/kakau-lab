@@ -46,6 +46,10 @@ npm run deploy:dry                  # 只生成/檢查設定檔
 npx wrangler deploy --dry-run       # 完整打包但不上傳（不需要 Cloudflare 認證）
 ```
 
+### 自動部署（GitHub Actions）
+
+`.github/workflows/ci.yml`：每個 PR 與 push 到 `main` 都會跑 `npm run lint` 與 `npm test`；push 到 `main` 且檢查通過後，自動執行 `npm run deploy`。需要在 repo 的 Settings → Secrets and variables → Actions 設定 `CLOUDFLARE_API_TOKEN`（權限：Workers Scripts Edit）與 `CLOUDFLARE_ACCOUNT_ID`。合併即上線，沒有人工審查關卡；未審查的頁面請不要合併到 `main`。
+
 ### 驗證
 
 部署後 Cloudflare 會回一個 `https://kakau-lab.<subdomain>.workers.dev` 網址。最小驗收：catalog 回 200 且顯示 9 個模型、01–07 各自載入、Model 08 連到 `https://kakau.tw/lab/interference`、Model 09 的 `/electrostatics` 正常載入、Model 07 的 `/projectile/notes` 數學式有算繪。
