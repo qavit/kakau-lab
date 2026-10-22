@@ -63,7 +63,7 @@ npx wrangler deploy --dry-run       # 完整打包但不上傳（不需要 Cloud
 **失敗處理：**
 - lint／test 失敗：不會部署，修好後重跑。
 - 「main moved」：有新 commit 進來，重跑即可。
-- 部署步驟失敗：線上版本不變，看 log 後重跑。
+- 部署步驟失敗：不要假設線上版本沒變。先用 `npx wrangler deployments status` 或 Cloudflare 儀表板確認目前線上是哪一版，並檢查網站實際狀態，再決定重跑或 rollback。
 - smoke test 失敗：部署可能已完成但頁面異常，先看 Cloudflare 線上狀態，必要時用上方 Rollback 指令回到前一版。
 
 **首次設定（一次）：** 在 Cloudflare 建立 API token（My Profile → API Tokens → Create Token → 用 “Edit Cloudflare Workers” 範本，限定到此帳號；只需 Workers Scripts 的 Edit 權限）。在 GitHub repo 的 Settings → Secrets and variables → Actions 新增 `CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID`（Account ID 在 Cloudflare 儀表板 Workers & Pages 頁面右側）。不要把這兩個值寫進原始碼、文件或日誌。
