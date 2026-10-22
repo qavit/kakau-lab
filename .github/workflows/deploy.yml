@@ -1,0 +1,82 @@
+name: Deploy
+
+# Manual only. Nothing deploys on push or merge; the Owner decides when to publish.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Serialize deploys and never cancel one mid-flight. GitHub keeps only the newest
+# pending run, and the freshness check below stops a stale run from overwriting newer code.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  SITE_URL: https://lab.kakau.tw
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only main may be deployed
+        if: github.ref != 'refs/heads/main'
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          echo "::error::Deploy is allowed from main only (selected: $REF)."
+          exit 1
+
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Record commit to deploy
+        run: |
+          echo "DEPLOY_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "Deploying main at $(git rev-parse HEAD)"
+
+      - run: npm ci
+      - run: npm run lint
+      # `npm test` already runs `npm run build` before the unit tests.
+      - run: npm test
+
+      - name: Refuse to deploy a stale commit
+        run: |
+          git fetch --quiet origin main
+          latest=$(git rev-parse origin/main)
+          if [ "$latest" != "$DEPLOY_SHA" ]; then
+            echo "::error::main moved to $latest while checks ran; re-run the workflow to deploy the newest commit."
+            exit 1
+          fi
+
+      # Must be `npm run deploy` (its predeploy hook copies MathJax), never `vinext deploy`.
+      - name: Deploy to Cloudflare
+        run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Smoke test
+        run: |
+          for path in / /projectile /electrostatics; do
+            curl --fail --silent --show-error --output /dev/null \
+              --retry 5 --retry-delay 5 --retry-all-errors --max-time 20 \
+              "$SITE_URL$path"
+            echo "OK $path"
+          done
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Deploy ${{ job.status }}"
+            echo "- Commit: \`$DEPLOY_SHA\`"
+            echo "- Site: $SITE_URL"
+          } >> "$GITHUB_STEP_SUMMARY"
