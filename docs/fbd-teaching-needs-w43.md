@@ -1,6 +1,6 @@
 # FBD teaching-needs mapping (Officina W43, candidate)
 
-Status: **candidate mapping, not approved.** It is based on Officina's current 選修物理 I §4-1（力的向量性質）plan and its two-force PDF, both of which are unapproved teacher drafts. Nothing from those sources is copied here, and Lab has no runtime dependency on Officina. Officina's formal material quality gate is unchanged by this note.
+Status: **candidate mapping, not approved, and not a committed roadmap.** Officina is Kakau's separate teaching-content project; approval of its material is tracked outside this repository. It is based on Officina's current 選修物理 I §4-1（力的向量性質）plan and its two-force PDF, both of which are drafts that had not yet been approved when this note was written. Nothing from those sources is copied here, and Lab has no runtime dependency on Officina. Officina's formal material quality gate is unchanged by this note.
 
 The stationary-table → remove-support sequence is an engineering regression scenario, not the teaching pitch. It exists to exercise the learner/reference isolation and prediction-before-evidence contracts.
 

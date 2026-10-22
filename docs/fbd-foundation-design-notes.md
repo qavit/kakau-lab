@@ -1,6 +1,6 @@
 # FBD Foundation Design Notes
 
-> Implementation-facing notes for the FBD foundation, merged into `main` (PR #22) with its first horizontal-table learning slice; FBD is currently `paused` and `unlisted` in the registry. The current Kakau Lab FBD Stage 0 page in Notion remains the product/design source of truth. This file exists to keep the code foundation aligned with that product baseline; it is not a second product spec.
+> Implementation-facing notes for the FBD foundation, merged into `main` (PR #22) with its first horizontal-table learning slice; FBD is currently `paused` and `unlisted` in the registry. The product/design specification is maintained outside this repository (internal, not public). This file exists to keep the code foundation aligned with that product baseline; it is not a second product spec.
 
 ## Product thesis
 

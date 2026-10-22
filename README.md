@@ -1,118 +1,99 @@
 # Kakau Lab
 
-互動式科學模型平台。This repository was formerly named `qavit/AstroLab`.
+互動式科學模型平台。Interactive science models for classroom exploration — built around synchronized views, explicit assumptions and verifiable calculations.
 
-首個模組「太陽、天球與竿影」把地心天球、觀察者天空、季節日行跡與竿影放在同一份同步狀態中；目前 catalog 共有 9 個已發布的互動模型，見 `lib/labs/registry.ts`；Model 09「靜電學」（`/electrostatics`）已正式發布。
+- 正式網站 / Live site: <https://lab.kakau.tw>
+- 本 repo 原名 `qavit/AstroLab`。
 
-## Kakau Lab / Kakau Web 整合邊界
+> **公開原始碼，保留所有權利（Public source, all rights reserved）。** 原始碼公開供閱讀與檢視；目前**沒有**授予一般性的再利用、修改、散布或商業使用授權。詳見 [授權與著作權](#授權與著作權) 與 [`COPYRIGHT.md`](COPYRIGHT.md)。
 
-- **Kakau Web**（`https://kakau.tw`）：品牌、內容、資源與輕量原生 lab（例如雙點波源干涉 `https://kakau.tw/lab/interference`），扮演 SEO / 導客的角色。
-- **Kakau Lab app**（本 repo，目標網域 `https://lab.kakau.tw`）：較重的互動科學模型、React 狀態應用、Three.js 與多視圖同步視覺化。
+## 這是什麼
 
-兩者是刻意分開的 runtime。「整合產品」不代表「整合 framework」——本階段不合併 runtime、不搬移模型、不重寫既有的 interference lab。目前 `kakau.tw/lab/interference` 的網址維持不變，不搬到 `lab.kakau.tw`。詳見 `docs/architecture.md`。
+Kakau Lab 把較重的互動科學模型（React 狀態應用、Three.js、多視圖同步視覺化）放在同一個平台上。首個模組「太陽、天球與竿影」把地心天球、觀察者天空、季節日行跡與竿影放在同一份同步狀態中。
 
-## Local development
+### Kakau Lab 與 Kakau Web 的邊界
+
+- **Kakau Web**（<https://kakau.tw>）：品牌、內容、資源與輕量原生 lab（例如雙點波源干涉 <https://kakau.tw/lab/interference>），扮演 SEO／導客的角色。
+- **Kakau Lab**（本 repo，<https://lab.kakau.tw>）：較重的互動科學模型。
+
+兩者是刻意分開的 runtime：「整合產品」不代表「整合 framework」，不合併 runtime、不搬移模型，`kakau.tw/lab/interference` 的網址維持不變。詳見 [`docs/architecture.md`](docs/architecture.md)。
+
+## 模型概覽
+
+唯一的資料來源是 [`lib/labs/registry.ts`](lib/labs/registry.ts)；下表為 2026-10-23 對照 registry 人工核對的快照，**若與 registry 不一致，以 registry 為準**。
+
+| # | 模型 | 路徑 | 成熟度 | 可見度 |
+|---|---|---|---|---|
+| 01 | 太陽、天球與竿影 | `/solar` | beta | public |
+| 02 | 多導線磁場疊加 | `/magnetism` | prototype | unlisted |
+| 03 | 全球行星風系 | `/atmosphere` | prototype | unlisted |
+| 04 | 岩層位態 × 河谷地形 | `/geology` | prototype | unlisted |
+| 05 | 大氣垂直結構 | `/atmosphere-profile` | beta | public |
+| 06 | 科氏力效應 | `/coriolis` | prototype | unlisted |
+| 07 | 拋體運動 | `/projectile` | stable | public |
+| 08 | 雙點波源干涉 | <https://kakau.tw/lab/interference>（Kakau Web） | beta | public |
+| 09 | 靜電學 | `/electrostatics` | stable | public |
+| — | 自由體圖（FBD） | `/fbd` | prototype（paused） | unlisted |
+
+另有 Lewis Studio（`/chemistry/lewis`）：開發中的化學 Lewis 結構練習，**不在 registry、`noindex`、尚未發布**，頁尾標示「待教師驗收」。
+
+狀態用語（見 [`VERSIONING.md`](VERSIONING.md)、[`docs/architecture.md`](docs/architecture.md)）：
+
+- **maturity**：`prototype` → `beta` → `stable`，表示模型作為產品的成熟度。
+- **visibility**：`public` 可被索引並列於 catalog；`unlisted` 僅能由直接網址進入；`private` 不對外提供。
+- **paused**：暫停開發（目前只有 FBD）。`status` 欄位已棄用，過渡期間保留。
+
+## 本機開發
+
+需求：Node.js ≥ 22.13。
 
 ```bash
 npm install
-npm run dev
+npm run dev      # http://localhost:3000
+npm run lint
+npm test         # 包含 build 與單元測試
+npm run test:e2e # Playwright
 ```
 
-Open `http://localhost:3000`.
+CI 會在每個 PR 與 push 到 `main` 時執行 lint 與 `npm test`。部署只能手動觸發，見 [`docs/deployment.md`](docs/deployment.md)。
 
-## Deployment
+## 專案結構
 
-Kakau Lab 部署為一個自管的 Cloudflare Worker，名稱 `kakau-lab`。`wrangler.jsonc` 是唯一的部署設定來源：`vite.config.ts` 以 `configPath` 指向它，所以 dev 跑的 runtime 與 `wrangler deploy` 上線的設定是同一份。
+- `lib/science/`：純科學計算與座標轉換，不依賴 DOM 或渲染。
+- `lib/render/`：與模型無關的 Three.js 基礎層。
+- `lib/labs/registry.ts`：模型 registry，純資料。
+- `models/`：各模型的狀態、預設值、時間演化與衍生量。
+- `components/`、`app/`：互動視圖、控制介面與路由。
+- `tests/`：單元測試與 Playwright e2e。
 
-### 首次設定（每台機器一次）
+相依方向為單向：`lib/science`、`lib/render` 不依賴上層；`models` 只能 import `lib/science`；`components` 是唯一組合各層的地方。
 
-```bash
-npx wrangler login     # 開瀏覽器登入 Cloudflare，不需要把 token 放進指令或檔案
-npx wrangler whoami    # 確認帳號；若有多個帳號，設定 CLOUDFLARE_ACCOUNT_ID
-```
+## 科學模型的假設、近似與驗證
 
-### 部署
+每個模型都是教學用的理想化，不是精密工具。例如太陽模型的赤緯採課堂用的平滑近似式（全年誤差在 2° 以內），需要真實星曆時走 `lib/science/ephemeris.ts`（全平台唯一接觸 `astronomy-engine` 的檔案，由測試強制維持）。
 
-```bash
-npm run deploy
-```
+- 各模型的假設與適用範圍見應用內的說明頁（例如 `/about`、各模型的 Theory Notes）。
+- `LabManifest` 預留 `assumptions`／`approximations`／`validity`／`verification` 欄位，**尚未替既有模型補齊**。
+- 數值驗證以 `tests/` 內的回歸測試與參考資料為依據；測試通過代表程式未退化，**不等於**科學內容與教學設計已經過審查。
 
-**必須用 `npm run deploy`，不要直接跑 `npx vinext deploy`。** `vinext deploy` 會直接呼叫 Vite builder，不會經過 `npm run build`，因此 `prebuild` 的 MathJax 複製步驟不會執行；`npm run deploy` 的 `predeploy` hook 補上這一步。少了它，Model 07 的理論筆記在正式環境不會顯示任何數學式（`public/mathjax/` 是 gitignored 的建置產物，乾淨 clone 上並不存在）。`tests/deploy-config.test.mjs` 會擋住這個回歸。
+## 文件導覽
 
-不上傳、只驗證設定與打包產物：
+| 文件 | 內容 |
+|---|---|
+| [`docs/architecture.md`](docs/architecture.md) | 平台分層、相依方向、各模型的設計取捨、Kakau Lab／Web 邊界 |
+| [`docs/deployment.md`](docs/deployment.md) | Cloudflare Worker 部署、CI/CD、失敗處理、Rollback |
+| [`docs/ci-cd-v1-closeout.md`](docs/ci-cd-v1-closeout.md) | CI/CD v1 結案紀錄 |
+| [`docs/i18n-foundation.md`](docs/i18n-foundation.md) | 多語系基礎 |
+| [`VERSIONING.md`](VERSIONING.md) / [`CHANGELOG.md`](CHANGELOG.md) | 版本定義與對外變更紀錄 |
+| [`AGENTS.md`](AGENTS.md) | 貢獻與工作慣例 |
+| `docs/*.md`（其餘） | 各模型的開發紀錄與設計筆記，屬於**當時的工程紀錄**，不是產品路線圖 |
 
-```bash
-npm run deploy:dry                  # 只生成/檢查設定檔
-npx wrangler deploy --dry-run       # 完整打包但不上傳（不需要 Cloudflare 認證）
-```
+## 授權與著作權
 
-### CI/CD（GitHub Actions）
+**暫行聲明（provisional）：** 本 repo 的原始碼公開供閱讀與檢視，保留所有權利（All rights reserved）。目前未授予一般性的再利用、修改、散布或商業使用授權，也未採用 MIT、Apache-2.0 等開源授權。不限制 GitHub 服務條款本身允許的操作（例如在 GitHub 上檢視與 fork）。
 
-**CI**（`.github/workflows/ci.yml`）：每個 PR 與 push 到 `main` 都會跑 `npm ci`、`npm run lint`、`npm test`（`npm test` 已包含 `npm run build`，不另跑）。CI 只驗證程式，**不會部署**。
+- 第三方依賴與素材仍遵守各自的授權。
+- Kakau 的名稱、Logo 與品牌素材不自動納入程式碼的任何授權。
+- 想以本 repo 內容做其他用途，請先取得書面同意。
 
-**CD**（`.github/workflows/deploy.yml`）：只能手動觸發（`workflow_dispatch`），合併或 push 到 `main` 都不會自動部署。流程：確認選的是 `main` → checkout `main` 並記錄 commit SHA → lint 與 test（含 build）→ 確認 `main` 沒有在檢查期間前進（否則失敗，請重跑，避免舊版覆蓋新版）→ `npm run deploy`（保留 MathJax predeploy）→ 對 `https://lab.kakau.tw` 的 `/`、`/projectile`、`/electrostatics` 做 HTTP smoke test → 在 job summary 記錄部署的 SHA。部署用的 concurrency group 不取消進行中的部署。
-
-**SHA 防護的範圍：** 每次執行都 checkout 當下最新的 `main`，並在部署前再比對一次 `origin/main`；兩者不同就失敗。它防的是「檢查期間 `main` 前進」，不是完整的版本鎖：比對與上傳之間仍有極短的空窗，且不會驗證線上目前是哪一版。
-
-**Smoke test 的範圍：** 只確認 `/`、`/projectile`、`/electrostatics` 回 HTTP 200，不檢查頁面內容、數學式算繪或其他路由（包含 `/chemistry/lewis`）；它也無法分辨回應來自新版或舊版，SHA 只記在 job summary 裡。通過不代表功能或科學內容正確。
-
-**發布前須由 Owner 決定。** 測試通過只代表程式沒壞，不代表科學正確性與教學內容已驗收。未審查的頁面（例如標註 awaiting review 的 Lewis Studio）可以先合併進 `main`，但只有 Owner 判斷可以發布時才手動觸發部署。
-
-**發布步驟：** GitHub → Actions → Deploy → Run workflow（分支選 `main`）。
-
-**失敗處理：**
-- lint／test 失敗：不會部署，修好後重跑。
-- 「main moved」：有新 commit 進來，重跑即可。
-- 部署步驟失敗：不要假設線上版本沒變。先用 `npx wrangler deployments status` 或 Cloudflare 儀表板確認目前線上是哪一版，並檢查網站實際狀態，再決定重跑或 rollback。
-- smoke test 失敗：部署可能已完成但頁面異常，先看 Cloudflare 線上狀態，必要時用上方 Rollback 指令回到前一版。
-
-**首次設定（一次）：** 在 Cloudflare 建立 API token（My Profile → API Tokens → Create Token → 用 “Edit Cloudflare Workers” 範本，限定到此帳號；只需 Workers Scripts 的 Edit 權限）。在 GitHub repo 的 Settings → Secrets and variables → Actions 新增 `CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID`（Account ID 在 Cloudflare 儀表板 Workers & Pages 頁面右側）。不要把這兩個值寫進原始碼、文件或日誌。
-
-### 驗證
-
-部署後 Cloudflare 會回一個 `https://kakau-lab.<subdomain>.workers.dev` 網址。最小驗收：catalog 回 200 且顯示 9 個模型、01–07 各自載入、Model 08 連到 `https://kakau.tw/lab/interference`、Model 09 的 `/electrostatics` 正常載入、Model 07 的 `/projectile/notes` 數學式有算繪。
-
-### Rollback
-
-```bash
-npx wrangler deployments status         # 目前線上是哪一版
-npx wrangler deployments list           # 最近 10 次部署與其 version ID
-npx wrangler rollback <version-id>      # 回到該版本；省略 ID 則回到前一版
-```
-
-Cloudflare 保留既有版本，rollback 不需要重新建置。另一條路是 checkout 上一個已知良好的 commit 再跑一次 `npm run deploy`。
-
-### 備註
-
-- `compatibility_date` 釘選在 `2026-05-15`，對應安裝的 `workerd 1.20260515.1`，也就是所有 dev/build 實際跑過的 runtime。升級時應同步調整並重測。
-- 目前沒有宣告 D1／R2／KV 等 binding，因為這個應用不需要持久化狀態。
-- 沒有宣告 Cloudflare Images binding：`next/image` 僅用於匯出預覽且帶 `unoptimized`，不會走影像最佳化端點；要啟用時需先在帳號開通 Cloudflare Images，再於 `wrangler.jsonc` 加上 `images` binding。
-- `.openai/hosting.json` 是早期 OpenAI Site Creator 部署留下的歷史檔案，**已不參與任何生產設定**，保留僅為記錄。
-
-## Structure
-
-- `lib/science/`: 純科學計算與座標轉換，不依賴 DOM 或渲染
-- `lib/render/`: 與模型無關的 Three.js 基礎層（viewport、繪圖原件、拖曳、匯出）
-- `lib/labs/registry.ts`: Kakau Lab 的 model registry —— 純資料，不 import React / lucide-react / Three.js
-- `models/`: 各模型的狀態、預設值、時間演化與衍生量
-- `components/`: 同步互動視圖與控制介面（`ModelCatalog.tsx` 完全由 registry render）
-- `docs/architecture.md`: 平台分層、相依方向、各模型的設計取捨，以及 Kakau Lab / Kakau Web 的部署邊界
-
-太陽模型的赤緯仍採課堂用的平滑近似式（全年誤差在 2° 以內）。需要真實星曆的部分改走 `lib/science/ephemeris.ts` —— 全平台唯一接觸 `astronomy-engine` 的檔案，由測試強制維持。
-
-## Versioning
-
-各種「版本」（Lab 產品版本、model 版本、schema 版本、部署識別等）的定義與 bump 規則見 [`VERSIONING.md`](VERSIONING.md)；對外有意義的變更記錄在 [`CHANGELOG.md`](CHANGELOG.md)。
-
-## Model registry
-
-`lib/labs/registry.ts` 匯出 `LabManifest[]`，是 catalog 顯示、路由與未來跨產品聚合的唯一資料來源。Registry 本身是機器可讀的 pure data：icon、card art 等呈現細節一律以字串 key 儲存，由 `components/ModelCatalog.tsx` 這一層做字串到元件的 mapping。
-
-長期而言，每個 Kakau Lab model 應該能交代：
-
-- `assumptions`（模型假設了什麼）
-- `approximations`（哪裡是近似而非精確解）
-- `validity`（適用範圍）
-- `verification`（如何驗證 / 有哪些不變量）
-
-這四個欄位已經預留在 `LabManifest` 的型別中，但 Stage 0 沒有替既有 7 個模型補齊，屬於未來（Stage 0.1+）的工作，不是本階段的 blocker。
+完整說明、第三方授權清單與尚待確認事項見 [`COPYRIGHT.md`](COPYRIGHT.md)。該文件目前是**待 Owner 確認的候選稿**，不是已定稿的法律聲明。
