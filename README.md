@@ -46,9 +46,23 @@ npm run deploy:dry                  # 只生成/檢查設定檔
 npx wrangler deploy --dry-run       # 完整打包但不上傳（不需要 Cloudflare 認證）
 ```
 
-### 自動部署（GitHub Actions）
+### CI/CD（GitHub Actions）
 
-`.github/workflows/ci.yml`：每個 PR 與 push 到 `main` 都會跑 `npm run lint` 與 `npm test`；push 到 `main` 且檢查通過後，自動執行 `npm run deploy`。需要在 repo 的 Settings → Secrets and variables → Actions 設定 `CLOUDFLARE_API_TOKEN`（權限：Workers Scripts Edit）與 `CLOUDFLARE_ACCOUNT_ID`。合併即上線，沒有人工審查關卡；未審查的頁面請不要合併到 `main`。
+**CI**（`.github/workflows/ci.yml`）：每個 PR 與 push 到 `main` 都會跑 `npm ci`、`npm run lint`、`npm test`（`npm test` 已包含 `npm run build`，不另跑）。CI 只驗證程式，**不會部署**。
+
+**CD**（`.github/workflows/deploy.yml`）：只能手動觸發（`workflow_dispatch`），合併或 push 到 `main` 都不會自動部署。流程：確認選的是 `main` → checkout `main` 並記錄 commit SHA → lint 與 test（含 build）→ 確認 `main` 沒有在檢查期間前進（否則失敗，請重跑，避免舊版覆蓋新版）→ `npm run deploy`（保留 MathJax predeploy）→ 對 `https://lab.kakau.tw` 的 `/`、`/projectile`、`/electrostatics` 做 HTTP smoke test → 在 job summary 記錄部署的 SHA。部署用的 concurrency group 不取消進行中的部署。
+
+**發布前須由 Owner 決定。** 測試通過只代表程式沒壞，不代表科學正確性與教學內容已驗收。未審查的頁面（例如標註 awaiting review 的 Lewis Studio）可以先合併進 `main`，但只有 Owner 判斷可以發布時才手動觸發部署。
+
+**發布步驟：** GitHub → Actions → Deploy → Run workflow（分支選 `main`）。
+
+**失敗處理：**
+- lint／test 失敗：不會部署，修好後重跑。
+- 「main moved」：有新 commit 進來，重跑即可。
+- 部署步驟失敗：線上版本不變，看 log 後重跑。
+- smoke test 失敗：部署可能已完成但頁面異常，先看 Cloudflare 線上狀態，必要時用上方 Rollback 指令回到前一版。
+
+**首次設定（一次）：** 在 Cloudflare 建立 API token（My Profile → API Tokens → Create Token → 用 “Edit Cloudflare Workers” 範本，限定到此帳號；只需 Workers Scripts 的 Edit 權限）。在 GitHub repo 的 Settings → Secrets and variables → Actions 新增 `CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID`（Account ID 在 Cloudflare 儀表板 Workers & Pages 頁面右側）。不要把這兩個值寫進原始碼、文件或日誌。
 
 ### 驗證
 
