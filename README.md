@@ -35,12 +35,12 @@ Kakau Lab 把較重的互動科學模型（React 狀態應用、Three.js、多�
 | 09 | 靜電學 | `/electrostatics` | stable | public |
 | — | 自由體圖（FBD） | `/fbd` | prototype（paused） | unlisted |
 
-另有 Lewis Studio（`/chemistry/lewis`）：開發中的化學 Lewis 結構練習，**不在 registry、`noindex`、尚未發布**，頁尾標示「待教師驗收」。
+另有 Lewis Studio（`/chemistry/lewis`）：開發中的化學 Lewis 結構練習。原始碼已設定 `noindex`、未列入 registry，頁尾標示「待教師驗收」；截至 2026-10-23 **尚未部署**（線上該路徑回 404）。部署後 `noindex` 只是請搜尋引擎不要索引，並不限制存取。
 
 狀態用語（見 [`VERSIONING.md`](VERSIONING.md)、[`docs/architecture.md`](docs/architecture.md)）：
 
 - **maturity**：`prototype` → `beta` → `stable`，表示模型作為產品的成熟度。
-- **visibility**：`public` 可被索引並列於 catalog；`unlisted` 僅能由直接網址進入；`private` 不對外提供。
+- **visibility**：`public` 可被搜尋引擎索引並列於 catalog；`unlisted` 不列在一般 catalog，**但沒有任何存取限制，知道網址的人都能開啟，也可能被搜尋引擎或他人連結找到**；`private` 不對外提供。
 - **paused**：暫停開發（目前只有 FBD）。`status` 欄位已棄用，過渡期間保留。
 
 ## 本機開發
@@ -96,4 +96,4 @@ CI 會在每個 PR 與 push 到 `main` 時執行 lint 與 `npm test`。部署只
 - Kakau 的名稱、Logo 與品牌素材不自動納入程式碼的任何授權。
 - 想以本 repo 內容做其他用途，請先取得書面同意。
 
-完整說明、第三方授權清單與尚待確認事項見 [`COPYRIGHT.md`](COPYRIGHT.md)。該文件目前是**待 Owner 確認的候選稿**，不是已定稿的法律聲明。
+第三方授權、素材來源與尚待確認事項見 [`COPYRIGHT.md`](COPYRIGHT.md)。該文件目前是**待 Owner 確認的候選稿**（含著作權署名候選文字），不是已定稿的法律聲明。

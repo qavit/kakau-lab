@@ -8,9 +8,9 @@ scenarios and the seeded Monte Carlo case construction below are copied verbatim
 (``field_at`` .. ``simulate``, ``interp``, ``scenarios`` and the RNG sequence in
 ``monte_carlo_cases``; ``simulate_bounded`` and ``compare`` are trimmed to the
 metrics used by the self-check, arithmetic unchanged) from the Owner-approved independent
-reference harness ``validate_envelope.py`` attached to the Notion page
+reference harness ``validate_envelope.py`` from the internal validation record
 "Electrostatic Field Studio v0.1 | Numerical Envelope Validation (D-01-D-04)"
-(file upload 3e2494ee-b117-8114-b9ba-00b23289a0b2, 2026-09-21).
+(2026-09-21). The harness is not stored in this repository.
 
 Only fixture emission and the self-check are new. This script is test tooling;
 it is never imported by production code. It uses only the Python standard library.
@@ -508,8 +508,8 @@ def self_check(cases, reference_dt):
 
 def main():
     provenance = {
-        "source": "Notion: Electrostatic Field Studio v0.1 | Numerical Envelope Validation (D-01-D-04)",
-        "harness": "validate_envelope.py (Notion file upload 3e2494ee-b117-8114-b9ba-00b23289a0b2)",
+        "source": "Electrostatic Field Studio v0.1 | Numerical Envelope Validation (D-01-D-04), internal validation record, 2026-09-21",
+        "harness": "validate_envelope.py (independent reference harness, 2026-09-21; not stored in this repository)",
         "generator": "tests/fixtures/electrostatic/generate_reference.py",
         "coulombConstant": K,
         "domain_m": list(DOMAIN),

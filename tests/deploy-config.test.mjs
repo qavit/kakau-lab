@@ -45,3 +45,9 @@ test("deploying vendors MathJax, which a bare vite build would omit", async () =
     "the built client bundle must carry the self-hosted MathJax bundle",
   );
 });
+
+test("the self-hosted MathJax bundle ships with its Apache-2.0 license text", async () => {
+  const license = await readFile(new URL("../dist/client/mathjax/LICENSE", import.meta.url), "utf8");
+  assert.match(license, /Apache License/);
+  await assert.doesNotReject(access(new URL("../dist/client/mathjax/NOTICE.txt", import.meta.url)));
+});
