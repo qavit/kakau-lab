@@ -52,6 +52,10 @@ npx wrangler deploy --dry-run       # 完整打包但不上傳（不需要 Cloud
 
 **CD**（`.github/workflows/deploy.yml`）：只能手動觸發（`workflow_dispatch`），合併或 push 到 `main` 都不會自動部署。流程：確認選的是 `main` → checkout `main` 並記錄 commit SHA → lint 與 test（含 build）→ 確認 `main` 沒有在檢查期間前進（否則失敗，請重跑，避免舊版覆蓋新版）→ `npm run deploy`（保留 MathJax predeploy）→ 對 `https://lab.kakau.tw` 的 `/`、`/projectile`、`/electrostatics` 做 HTTP smoke test → 在 job summary 記錄部署的 SHA。部署用的 concurrency group 不取消進行中的部署。
 
+**SHA 防護的範圍：** 每次執行都 checkout 當下最新的 `main`，並在部署前再比對一次 `origin/main`；兩者不同就失敗。它防的是「檢查期間 `main` 前進」，不是完整的版本鎖：比對與上傳之間仍有極短的空窗，且不會驗證線上目前是哪一版。
+
+**Smoke test 的範圍：** 只確認 `/`、`/projectile`、`/electrostatics` 回 HTTP 200，不檢查頁面內容、數學式算繪或其他路由（包含 `/chemistry/lewis`）；它也無法分辨回應來自新版或舊版，SHA 只記在 job summary 裡。通過不代表功能或科學內容正確。
+
 **發布前須由 Owner 決定。** 測試通過只代表程式沒壞，不代表科學正確性與教學內容已驗收。未審查的頁面（例如標註 awaiting review 的 Lewis Studio）可以先合併進 `main`，但只有 Owner 判斷可以發布時才手動觸發部署。
 
 **發布步驟：** GitHub → Actions → Deploy → Run workflow（分支選 `main`）。
