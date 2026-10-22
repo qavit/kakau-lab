@@ -23,6 +23,15 @@ export function diagnose(diagram: LewisDiagram, evaluation: LewisEvaluation): Bi
   }
 }
 
+/** Local shell tally from the existing evaluation: hydrogen is held to its duet, others to the octet. Never a verdict on the whole structure. */
+export function shellStatus(diagram: LewisDiagram, evaluation: LewisEvaluation): Bilingual | null {
+  if (evaluation.code === "invalid-structure" || evaluation.code === "missing-bond") return null;
+  const species = SPECIES[diagram.speciesId];
+  const met = species.atoms.filter((a) => evaluation.shells[a.id] === evaluation.targets[a.id]).length;
+  const caveat: Bilingual = ["這只檢查各原子的電子數，不代表整體結構正確，仍須核對價電子總數與形式電荷。", "This only checks each atom's electron count, not the whole structure; total electrons and formal charges still matter."];
+  return [`${met} / ${species.atoms.length} 個原子達到雙電子（氫）或八隅體。${caveat[0]}`, `${met} / ${species.atoms.length} atoms reach their duet (H) or octet. ${caveat[1]}`];
+}
+
 export function budgetNote(diagram: LewisDiagram): Bilingual {
   const species = SPECIES[diagram.speciesId];
   const parts = [...new Set(species.atoms.map((a) => a.element))].map((e) => {

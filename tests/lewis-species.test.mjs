@@ -116,3 +116,17 @@ test("atomLabel disambiguates repeated elements only", () => {
   assert.equal(atomLabel(SPECIES.h2o, "h2"), "H₂");
   assert.equal(atomLabel(SPECIES.hcn, "h"), "H");
 });
+
+test("shellStatus tallies atoms against duet (H) / octet and never claims the structure is correct", async () => {
+  const { shellStatus } = await import("../models/chemistry/lewis-feedback.ts");
+  const { evaluateLewis } = await import("../models/chemistry/lewis.ts");
+  const { build } = await import("./fixtures/lewis-build.mjs");
+  const status = (d) => shellStatus(d, evaluateLewis(d));
+  assert.equal(status(build("h2o")), null); // missing bonds: no shell data yet
+  const d = build("h2o", { "o-h1": 1, "o-h2": 1 }, { o: 2 });
+  assert.match(status(d)[1], /^3 \/ 3 atoms/);
+  // Electron total wrong (an extra lone pair on O) yet H still meets its duet: local count must not read as success.
+  const over = build("h2o", { "o-h1": 1, "o-h2": 1 }, { o: 3 });
+  assert.match(status(over)[1], /^2 \/ 3 atoms/);
+  assert.match(status(over)[1], /not the whole structure/);
+});

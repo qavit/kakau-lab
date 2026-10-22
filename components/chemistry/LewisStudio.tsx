@@ -8,7 +8,7 @@ import { initialDiagram, evaluateLewis, type LewisCode, type LewisDiagram, type 
 import { SPECIES, SPECIES_ORDER, atomLabel } from "../../models/chemistry/lewis-species";
 import { ATOM_CLEARANCE, LAYOUTS, PAIR_RADIUS, bondPairDots, viewBoxOf, directionDegrees, lonePairAngles, tangentPair } from "../../models/chemistry/lewis-layout";
 import { commit, createHistory, redo, undo } from "../../models/chemistry/lewis-history";
-import { budgetNote, diagnose, hints } from "../../models/chemistry/lewis-feedback";
+import { budgetNote, diagnose, hints, shellStatus } from "../../models/chemistry/lewis-feedback";
 import { octetInspection } from "../../models/chemistry/lewis-placement";
 import styles from "./LewisStudio.module.css";
 
@@ -126,6 +126,7 @@ export default function LewisStudio() {
   const centreAtom = species.atoms.reduce((best, a) =>
     species.bonds.filter(([x, y]) => x === a.id || y === a.id).length > species.bonds.filter(([x, y]) => x === best.id || y === best.id).length ? a : best).id;
   const nextSpecies = SPECIES_ORDER[(SPECIES_ORDER.indexOf(speciesId) + 1) % SPECIES_ORDER.length];
+  const shell = shellStatus(diagram, evaluated);
   const inspected = inspect ? octetInspection(diagram, inspect) : null;
 
   return <main className={"lab-shell " + styles.shell}>
@@ -143,6 +144,7 @@ export default function LewisStudio() {
         <div className={styles.budget}><strong>{t("已使用價電子", "Used valence electrons")}：{evaluated.usedElectrons} / {evaluated.expectedElectrons}</strong><span>{pick(language, budgetNote(diagram))}</span></div>
         <p className={styles.note}>{t("鍵線表示共享電子對；青色兩點代表孤對電子。圖形位置只是 Lewis 記法，不代表實際鍵角。", "Bond lines represent bonding pairs; teal dots represent lone pairs. Positions are Lewis notation, not bond angles.")}</p></section>
       <section className={styles.card}><h2>{t("提交與診斷", "Commit & feedback")}</h2>
+        {shell && <p className={styles.note} aria-live="polite">{pick(language, shell)}</p>}
         <p className={styles.note}>{t("使用左側工具直接操作原子與鍵。鍵盤使用者可 Tab 選取，按 Enter 或空白鍵操作。", "Use the tools on the left. Keyboard: Tab to select, Enter or Space to edit.")}</p>
         <div className={styles.actions}>{pass ? <><button className="primary-action" onClick={() => start(nextSpecies)}>{t("下一題：", "Next: ")}{SPECIES[nextSpecies].formula}</button><button onClick={() => start(speciesId)}>{t("從空白再畫一次", "Draw again from memory")}</button></> : <><button className="primary-action" onClick={commitDrawing}>{t("提交我的結構", "Commit my drawing")}</button><button onClick={() => setHint(Math.min(3, hint + 1))}>{t("提示", "Hint")} {hint ? hint + "/3" : ""}</button></>}</div>
         {hint > 0 && !pass && <p className={styles.hint}>{pick(language, hintList[hint - 1])}</p>}
