@@ -37,7 +37,11 @@ export function directionFromDegrees(degrees: number): Vec2 {
 }
 
 export function forceComponents(force: ForceVector): Vec2 | null {
-  if (force.magnitudeN === null || force.magnitudeN < 0) {
+  if (
+    force.magnitudeN === null
+    || !Number.isFinite(force.magnitudeN)
+    || force.magnitudeN < 0
+  ) {
     return null;
   }
   const direction = normalize(force.direction);
