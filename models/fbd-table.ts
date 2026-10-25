@@ -150,7 +150,12 @@ export function recordTablePrediction(state: TableLearningState, prediction: Tab
     || !["table", "earth", "none"].includes(prediction.lostInteraction)
     || !["earth", "table", "none"].includes(prediction.remainingInteraction)
     || !["stay", "down", "up"].includes(prediction.motion)) return state;
-  return { ...state, phase: "rebuild", prediction: { ...prediction, reason: prediction.reason.trim() } };
+  return { ...state, phase: "rebuild", prediction: {
+    lostInteraction: prediction.lostInteraction,
+    remainingInteraction: prediction.remainingInteraction,
+    motion: prediction.motion,
+    reason: prediction.reason.trim(),
+  } };
 }
 
 /** Model evidence is intentionally separate from learner state and revealed only after comparison passes. */
