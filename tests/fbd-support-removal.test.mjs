@@ -89,3 +89,15 @@ test("symbolic evidence uses upward-positive sign convention and does not create
   assert.throws(() => releasedTableEvidence(-1));
   assert.equal(initialTableLearning().learner.diagram.forces.length, 0);
 });
+
+test("recorded predictions keep only the declared fields", () => {
+  const initial = baseline();
+  const changed = removeTableSupport(compareTable(commitTable(initial)));
+  const predicting = { ...changed, phase: "predict" };
+  const recorded = recordTablePrediction(predicting, {
+    lostInteraction: "table", remainingInteraction: "earth", motion: "down", reason: " 失去支撐 ", answerKey: "leak",
+  });
+  assert.deepEqual(recorded.prediction, {
+    lostInteraction: "table", remainingInteraction: "earth", motion: "down", reason: "失去支撐",
+  });
+});
