@@ -86,3 +86,13 @@ test("commit freezes a snapshot, compare requires commit, revise preserves learn
   assert.deepEqual(revised.learner, built.learner);
   assert.ok(!JSON.stringify(revised).includes("canonical"));
 });
+
+test("revise is only available after a submission and cannot skip the guided phases", () => {
+  const initial = initialTableLearning();
+  for (const phase of ["scene", "system", "interactions", "forces", "change", "predict", "rebuild"]) {
+    const state = { ...initial, phase };
+    assert.equal(reviseTable(state), state, `revise must not move phase ${phase}`);
+  }
+  const released = { ...initial, phase: "compared", supportPresent: false, submission: { diagram: initial.learner.diagram, assumption: "unknown" } };
+  assert.equal(reviseTable(released).phase, "rebuild");
+});

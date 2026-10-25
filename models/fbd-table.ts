@@ -130,6 +130,7 @@ export function compareTable(state: TableLearningState): TableLearningState {
   return state.phase === "committed" && state.submission ? { ...state, phase: "compared" } : state;
 }
 export function reviseTable(state: TableLearningState): TableLearningState {
+  if (state.phase !== "committed" && state.phase !== "compared") return state;
   return { ...state, phase: state.supportPresent ? "forces" : "rebuild", submission: null };
 }
 
