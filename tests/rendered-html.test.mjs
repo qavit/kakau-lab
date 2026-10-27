@@ -422,11 +422,15 @@ test("server-renders the hydrogen-atom model page", async () => {
   assert.equal(response.status, 200);
   const html = await response.text();
   assert.match(html, /<title>氫原子能階與光譜｜Kakau Lab<\/title>/);
-  assert.match(html, /玻耳軌道/);
-  assert.match(html, /能階圖/);
-  assert.match(html, /巴耳末系（Balmer）/);
-  assert.match(html, /光子能量/);
   assert.match(html, /模型目錄/);
+  // First visit: the student chooses how to explore before any diagram, so neither mode's answer-bearing content is rendered.
+  assert.match(html, /data-testid="intent-choice"/);
+  assert.match(html, /帶著問題探索/);
+  assert.match(html, /自由探索/);
+  assert.match(html, /data-testid="choose-guided"/);
+  assert.match(html, /data-testid="choose-free"/);
+  assert.match(html, /data-mode="intent"/);
+  assert.doesNotMatch(html, /玻耳軌道|巴耳末系（Balmer）|Hβ|data-testid="guided-card"/);
 });
 
 test("server-renders the Coriolis-force model page", async () => {

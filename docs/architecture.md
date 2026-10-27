@@ -137,6 +137,26 @@ continuum, emission as bright lines on a dark ground. The Bohr picture's limits 
 l or m, no fine structure) are stated in the lab's footnote; quantum orbitals are a possible later
 model, not part of this one.
 
+### Hydrogen entry and the guided spectral activity
+
+The first visit to `/hydrogen` shows a two-way choice (guided or free) instead of the lab. Every
+switch between modes starts the destination from its own initial state — the free atom
+(`initialHydrogenState`) or the guided atom (`guidedPhysicsState`) plus a fresh learning state — so a
+guess or the electron's level never carries across. Nothing is stored and there is no URL schema.
+
+The single guided activity, "where does the ~486 nm line come from?", keeps learning state in
+`models/hydrogen-learning.ts`, separate from `HydrogenState`: its functions neither receive nor return
+the physical state, so choosing or comparing a guess can never move the electron or fire a transition.
+Comparing a guess only calls `transition(upper, 2)` from the science layer. The evidence policy
+(`evidencePolicy`) is visibility only: before the student asks for evidence the orbit view, energy
+diagram, transition readout and level names are not rendered at all (not hidden by CSS), so they cannot
+leak through the accessibility tree, a tooltip or keyboard focus. The guided spectrum is built from the
+Balmer series itself, not from the selected transition, and its lines are unselectable until the
+evidence phase. In the evidence phase the atom can emit the photon, through the same `fireBlock` rule as
+free exploration. Line brightness is schematic: no populations, selection rules or transition
+probabilities are modelled. The spectrum strip measures its width and draws in real pixels, so labels
+stay readable on phones.
+
 ## The electrostatics model
 
 `/electrostatics` (catalogue number 09, still `experimental` in the registry) is the

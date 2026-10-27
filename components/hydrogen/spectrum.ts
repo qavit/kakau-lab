@@ -40,17 +40,25 @@ export function visibleOverlap(window: SpectrumWindow): SpectrumWindow | null {
 
 /**
  * Which lines get a printed value: left to right, a label is kept only if it sits at least
- * `minGap` axis units from the last kept one. Dropping a label is preferred to overlapping two.
+ * `minGap` axis units from every label already kept. Dropping a label is preferred to overlapping
+ * two. Lines in `forced` are placed first, so a line the student must be able to find is never
+ * the one dropped; if two forced lines collide, the left one wins.
  */
-export function labelledLines(positions: readonly number[], minGap: number): boolean[] {
-  const order = positions.map((x, i) => ({ x, i })).sort((a, b) => a.x - b.x);
+export function labelledLines(positions: readonly number[], minGap: number, forced: readonly number[] = []): boolean[] {
   const keep = new Array<boolean>(positions.length).fill(false);
-  let last = -Infinity;
-  for (const { x, i } of order) {
-    if (x - last >= minGap) {
+  const kept: number[] = [];
+  const place = (i: number) => {
+    if (kept.every((x) => Math.abs(positions[i] - x) >= minGap)) {
       keep[i] = true;
-      last = x;
+      kept.push(positions[i]);
     }
-  }
+  };
+  [...forced].sort((a, b) => positions[a] - positions[b]).forEach(place);
+  positions
+    .map((x, i) => ({ x, i }))
+    .sort((a, b) => a.x - b.x)
+    .forEach(({ i }) => {
+      if (!keep[i]) place(i);
+    });
   return keep;
 }
