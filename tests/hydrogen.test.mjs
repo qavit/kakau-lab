@@ -4,10 +4,13 @@ import test from "node:test";
 
 import * as h from "../lib/science/hydrogen.ts";
 import {
+  HYDROGEN_PRESETS,
   advanceHydrogen,
   deriveHydrogenModel,
+  fireBlock,
   fireTransition,
   initialHydrogenState,
+  minimumShownLevels,
   placeElectron,
   selectTransition,
   setMaxLevel,
@@ -93,25 +96,61 @@ test("visible colours exist exactly inside 380–750 nm", () => {
   assert.ok(b2 > r2 && g2 > 0, "Hβ is blue-green");
 });
 
-test("selectTransition repairs invalid input and parks the electron at the starting level", () => {
+test("selectTransition repairs invalid input but never moves the electron", () => {
   const state = initialHydrogenState();
   const inverted = selectTransition(state, 2, 4);
   assert.ok(inverted.upper > inverted.lower);
-  const huge = selectTransition(state, 99, 1);
-  assert.equal(huge.upper, state.maxN);
+  assert.equal(selectTransition(state, 99, 1).upper, h.MAX_LEVEL);
   const nan = selectTransition(state, Number.NaN, Number.NaN);
   assert.ok(nan.upper > nan.lower && nan.lower >= 1);
-  assert.equal(selectTransition(state, 4, 2, "emission").electronLevel, 4);
-  assert.equal(selectTransition(state, 4, 2, "absorption").electronLevel, 2);
+  for (const mode of ["emission", "absorption"]) {
+    for (const [u, l] of [[4, 2], [2, 1], [7, 1]]) {
+      assert.equal(selectTransition(state, u, l, mode).electronLevel, state.electronLevel, `${mode} ${u}→${l}`);
+    }
+  }
 });
 
-test("shrinking the shown levels pulls the selected transition inside", () => {
-  const wide = selectTransition(initialHydrogenState(), 5, 2);
+test("every preset selects exactly the transition it names, whatever level count is shown", () => {
+  for (const maxN of [3, 4, 5, 6, 7]) {
+    const narrow = setMaxLevel({ ...initialHydrogenState(), electronLevel: 1, upper: 2, lower: 1 }, maxN);
+    for (const [key, preset] of Object.entries(HYDROGEN_PRESETS)) {
+      const next = selectTransition(narrow, preset.upper, preset.lower);
+      assert.equal(next.upper, preset.upper, `${key} upper at maxN=${maxN}`);
+      assert.equal(next.lower, preset.lower, `${key} lower at maxN=${maxN}`);
+      assert.ok(next.maxN >= next.upper, `${key} stays inside the diagram`);
+    }
+  }
+  const hbeta = selectTransition({ ...initialHydrogenState(), maxN: 3, upper: 2, lower: 1, electronLevel: 1 }, 4, 2);
+  assert.deepEqual([hbeta.upper, hbeta.lower, hbeta.maxN], [4, 2, 4]);
+});
+
+test("the shown level count cannot hide the selected transition or the electron", () => {
+  const wide = placeElectron(selectTransition({ ...initialHydrogenState(), maxN: 7 }, 5, 2), 6);
+  assert.equal(minimumShownLevels(wide), 6);
   const narrow = setMaxLevel(wide, 3);
-  assert.equal(narrow.maxN, 3);
-  assert.ok(narrow.upper <= 3 && narrow.upper > narrow.lower);
-  assert.equal(setMaxLevel(wide, 1).maxN, 3);
-  assert.equal(setMaxLevel(wide, 99).maxN, 7);
+  assert.equal(narrow.maxN, 6, "raised to the floor, nothing else moves");
+  assert.deepEqual([narrow.upper, narrow.lower, narrow.electronLevel], [5, 2, 6]);
+  assert.equal(setMaxLevel(initialHydrogenState(), 1).maxN, 3);
+  assert.equal(setMaxLevel(initialHydrogenState(), 99).maxN, 7);
+});
+
+test("a transition fires only from its starting level, and says why when it cannot", () => {
+  const ground = placeElectron(selectTransition(initialHydrogenState(), 3, 2, "emission"), 1);
+  assert.deepEqual(fireBlock(ground), { reason: "electron-not-at-start", requiredLevel: 3 });
+  assert.equal(fireTransition(ground), ground, "no photon, no state change");
+  const absorbing = selectTransition(initialHydrogenState(), 3, 2, "absorption");
+  assert.deepEqual(fireBlock(absorbing), { reason: "electron-not-at-start", requiredLevel: 2 });
+  assert.equal(fireTransition(absorbing), absorbing);
+  assert.equal(fireBlock(initialHydrogenState()), null);
+});
+
+test("fire is ignored while a photon is in flight, and a new selection drops that photon without moving the electron", () => {
+  const fired = fireTransition(selectTransition(initialHydrogenState(), 3, 2, "emission"));
+  assert.deepEqual(fireBlock(fired), { reason: "in-flight" });
+  assert.equal(fireTransition(fired), fired);
+  const reselected = selectTransition(fired, 4, 2);
+  assert.equal(reselected.photonProgress, null);
+  assert.equal(reselected.electronLevel, fired.electronLevel);
 });
 
 test("emission drops the electron at once and sends the photon out", () => {
@@ -127,13 +166,17 @@ test("emission drops the electron at once and sends the photon out", () => {
 });
 
 test("absorption keeps the electron down until the photon arrives, then lifts it", () => {
-  const fired = fireTransition(selectTransition(initialHydrogenState(), 3, 2, "absorption"));
+  const ready = placeElectron(selectTransition(initialHydrogenState(), 3, 2, "absorption"), 2);
+  const fired = fireTransition(ready);
   assert.equal(fired.electronLevel, 2);
+  assert.equal(fired.photonProgress, 0);
   const mid = advanceHydrogen(fired, 0.5);
   assert.equal(mid.electronLevel, 2, "no jump while the photon is still travelling");
   const done = advanceHydrogen(mid, 5);
   assert.equal(done.electronLevel, 3);
   assert.equal(done.photonProgress, null);
+  // Having absorbed, the same atom can now emit the same line.
+  assert.equal(fireBlock(selectTransition(done, 3, 2, "emission")), null);
 });
 
 test("pausing freezes the electron and any photon; bad time steps are ignored", () => {
@@ -154,14 +197,19 @@ test("orbit angle advances n³ times slower on level n and stays within one turn
 });
 
 test("deriveHydrogenModel reports the selected photon and the electron's own level", () => {
-  const readout = deriveHydrogenModel(selectTransition(initialHydrogenState(), 4, 2));
+  const state = placeElectron(selectTransition(initialHydrogenState(), 4, 2), 4);
+  const readout = deriveHydrogenModel(state);
   assert.equal(readout.levels.length, 5);
   assert.equal(readout.selected.upper, 4);
   assert.equal(readout.seriesName, "Balmer");
   assert.equal(readout.series.length, 3);
   assert.equal(readout.electron.n, 4);
   assert.equal(readout.ready, true);
-  const fired = deriveHydrogenModel(fireTransition(selectTransition(initialHydrogenState(), 4, 2)));
+  assert.equal(readout.blocked, null);
+  const viewing = deriveHydrogenModel(selectTransition(initialHydrogenState(), 4, 2));
+  assert.equal(viewing.ready, false, "viewing a transition does not stage the electron");
+  assert.deepEqual(viewing.blocked, { reason: "electron-not-at-start", requiredLevel: 4 });
+  const fired = deriveHydrogenModel(fireTransition(state));
   assert.equal(fired.inFlight, true);
   assert.equal(fired.ready, false);
 });
@@ -174,4 +222,24 @@ test("layering: the science file imports nothing, the model imports science only
   assert.doesNotMatch(science, /^import /m);
   assert.doesNotMatch(model, /from "(react|three)|components\/|lib\/render/);
   assert.match(model, /from "\.\.\/lib\/science\/hydrogen\.ts"/);
+});
+
+test("the spectrum window follows non-visible series instead of leaving the strip empty", async () => {
+  const { spectrumWindow, niceTicks, visibleOverlap, labelledLines } = await import("../components/hydrogen/spectrum.ts");
+  const wavelengthsOf = (lower) => [...h.seriesLines(lower, 5).map((l) => l.wavelength), h.seriesLimitWavelength(lower)];
+  for (const lower of [1, 2, 3]) {
+    const w = spectrumWindow("auto", wavelengthsOf(lower));
+    for (const nm of wavelengthsOf(lower)) assert.ok(nm >= w.min && nm <= w.max, `series ${lower}: ${nm} nm inside window`);
+  }
+  assert.equal(visibleOverlap(spectrumWindow("auto", wavelengthsOf(1))), null, "Lyman window has no visible band");
+  const paschenEdge = visibleOverlap(spectrumWindow("auto", wavelengthsOf(3)));
+  assert.ok(!paschenEdge || paschenEdge.max - paschenEdge.min < 20, "Paschen window reaches at most the red edge of the visible band");
+  const balmer = visibleOverlap(spectrumWindow("auto", wavelengthsOf(2)));
+  assert.ok(balmer && balmer.min >= 380 && balmer.max <= 750, "Balmer window overlaps the visible band");
+  assert.deepEqual(spectrumWindow("visible", wavelengthsOf(1)), { min: 380, max: 750 });
+  assert.deepEqual(spectrumWindow("auto", []), { min: 380, max: 750 });
+  assert.deepEqual(niceTicks(90, 130), [90, 100, 110, 120, 130]);
+  assert.deepEqual(niceTicks(5, 5), []);
+  const kept = labelledLines([100, 104, 300, 301, 600], 50);
+  assert.deepEqual(kept, [true, false, true, false, true]);
 });

@@ -127,12 +127,12 @@ The nucleus is treated as infinitely heavy (R∞, a₀), so Hα comes out at 656
 656.47 nm vacuum value; the roughly 0.05 % reduced-mass correction is left out on purpose and said
 so on the page and in the tests' tolerance.
 
-`models/hydrogen.ts` owns the state machine. A jump is discontinuous, so it is never interpolated:
+`models/hydrogen.ts` owns the state machine. Looking at a transition and making it happen are separate: `selectTransition` never moves the electron, and `fireTransition` refuses (`fireBlock` says why) unless the electron already sits on the starting level — emission from the upper level, absorption from the lower. Choosing a preset above the shown range widens the diagrams instead of substituting a different transition, and the shown level count cannot drop below what the selection and electron occupy. A jump is discontinuous, so it is never interpolated:
 an emitting electron drops at once and the photon leaves, while an absorbing electron stays put until
 the photon arrives and is then lifted. Orbit angle advances at ω ∝ 1/n³ for display only. The
 orbit view is drawn at true n² scale (the largest shown orbit fills the frame) rather than
 compressed, and the energy diagram spreads crowded labels near the ionisation limit with leader
-lines instead of letting them overlap. Absorption mode renders the spectrum as dark lines on a
+lines instead of letting them overlap. The spectrum axis fits the selected series (Lyman in the ultraviolet, Paschen in the infrared) with the visible band marked, or can be pinned to 380–750 nm; the orbit view can switch to a schematic rₙ ∝ n scale, labelled as such. Absorption mode renders the spectrum as dark lines on a
 continuum, emission as bright lines on a dark ground. The Bohr picture's limits (no orbitals, no
 l or m, no fine structure) are stated in the lab's footnote; quantum orbitals are a possible later
 model, not part of this one.

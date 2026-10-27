@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { Atom, Pause, Play, RotateCcw, Zap } from "lucide-react";
-import { BOHR_RADIUS_PM, visibleRgb, type Direction, type Region, type Transition } from "@/lib/science/hydrogen";
+import { visibleRgb, type Direction, type Region, type Transition } from "@/lib/science/hydrogen";
 import {
   HYDROGEN_PRESETS,
   MAX_SHOWN_LEVELS,
@@ -12,12 +12,21 @@ import {
   deriveHydrogenModel,
   fireTransition,
   initialHydrogenState,
+  minimumShownLevels,
   placeElectron,
   selectTransition,
   setMaxLevel,
   type HydrogenReadout,
   type HydrogenState,
 } from "@/models/hydrogen";
+import {
+  VISIBLE_MIN_NM,
+  labelledLines,
+  niceTicks,
+  spectrumWindow,
+  visibleOverlap,
+  type SpectrumRangeMode,
+} from "@/components/hydrogen/spectrum";
 import KakauLabMark from "@/components/KakauLabMark";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -56,16 +65,21 @@ const SIZE = 480;
 const CENTER = SIZE / 2;
 const ORBIT_EDGE = 228;
 
-/** Orbit radii are drawn to true n² scale: the largest shown orbit fills the frame, the rest follow. */
-function OrbitView({ state, readout, onPlace }: { state: HydrogenState; readout: HydrogenReadout; onPlace: (n: number) => void }) {
-  const pxPerPm = ORBIT_EDGE / (state.maxN * state.maxN * BOHR_RADIUS_PM);
-  const radiusPx = (pm: number) => pm * pxPerPm;
-  const electronRadius = radiusPx(readout.electron.radius);
+type OrbitScale = "true" | "schematic";
+
+/**
+ * True scale draws rₙ ∝ n², so the largest shown orbit fills the frame and the inner ones shrink
+ * with it. Schematic scale draws rₙ ∝ n so every orbit stays legible; it says so on the diagram.
+ */
+function OrbitView({ state, readout, scale, onPlace }: { state: HydrogenState; readout: HydrogenReadout; scale: OrbitScale; onPlace: (n: number) => void }) {
+  const radiusPx = (n: number) => (scale === "true" ? (n * n * ORBIT_EDGE) / (state.maxN * state.maxN) : (n * ORBIT_EDGE) / state.maxN);
+  const nucleusRadius = Math.max(2, Math.min(5, radiusPx(1) * 0.5));
+  const electronRadius = radiusPx(readout.electron.n);
   const ex = CENTER + electronRadius * Math.cos(state.orbitAngle);
   const ey = CENTER - electronRadius * Math.sin(state.orbitAngle);
 
   const photonAngle = -Math.PI / 4;
-  const lowerRadius = radiusPx(readout.levels[state.lower - 1].radius);
+  const lowerRadius = radiusPx(state.lower);
   let photonX = 0;
   let photonY = 0;
   if (state.photonProgress !== null) {
@@ -77,8 +91,8 @@ function OrbitView({ state, readout, onPlace }: { state: HydrogenState; readout:
 
   return (
     <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width="100%" height="100%" role="img" aria-label={`玻耳氫原子軌道圖，電子在 n = ${state.electronLevel} 軌道`}>
-      {readout.levels.map(({ n, radius }) => {
-        const r = radiusPx(radius);
+      {readout.levels.map(({ n }) => {
+        const r = radiusPx(n);
         const active = n === state.electronLevel;
         const inTransition = n === state.upper || n === state.lower;
         const label = n === state.maxN || r > 20;
@@ -103,7 +117,7 @@ function OrbitView({ state, readout, onPlace }: { state: HydrogenState; readout:
           </g>
         );
       })}
-      <circle cx={CENTER} cy={CENTER} r={5} fill="#e0795f" />
+      <circle cx={CENTER} cy={CENTER} r={nucleusRadius} fill="#e0795f" />
       <text x={CENTER + 9} y={CENTER - 8} fill="#e0a08f" fontSize={11}>p⁺</text>
 
       {state.photonProgress !== null ? (
@@ -121,6 +135,10 @@ function OrbitView({ state, readout, onPlace }: { state: HydrogenState; readout:
             {formatWavelength(readout.selected.wavelength)}
           </text>
         </g>
+      ) : null}
+
+      {scale === "schematic" ? (
+        <text x={10} y={SIZE - 10} fill="#f2c66d" fontSize={12}>示意比例：半徑 ∝ n（非 n²）</text>
       ) : null}
 
       <circle cx={ex} cy={ey} r={7} fill="#f2c66d" stroke="#fff3cf" strokeWidth={1.5} />
@@ -230,45 +248,119 @@ function EnergyView({
   );
 }
 
-const BAND_MIN = 380;
-const BAND_MAX = 750;
 const STRIP_W = 1000;
+const STRIP_TOP = 28;
+const STRIP_H = 50;
+/** Dim stand-ins for the part of a continuum the eye cannot see. */
+const CONTINUUM_UV = "#2a2050";
+const CONTINUUM_IR = "#40201c";
 
-function SpectrumStrip({ readout, mode, onPick }: { readout: HydrogenReadout; mode: Direction; onPick: (t: Transition) => void }) {
-  const x = (nm: number) => ((nm - BAND_MIN) / (BAND_MAX - BAND_MIN)) * STRIP_W;
-  const stops = Array.from({ length: 38 }, (_, i) => BAND_MIN + (i * (BAND_MAX - BAND_MIN)) / 37);
-  const visibleLines = readout.series.filter((line) => line.region === "visible");
+function onActivate(action: () => void) {
+  return (event: KeyboardEvent) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      action();
+    }
+  };
+}
+
+function SpectrumStrip({
+  readout,
+  mode,
+  range,
+  onPick,
+}: {
+  readout: HydrogenReadout;
+  mode: Direction;
+  range: SpectrumRangeMode;
+  onPick: (t: Transition) => void;
+}) {
   const absorption = mode === "absorption";
+  const win = spectrumWindow(range, [...readout.series.map((line) => line.wavelength), readout.seriesLimit]);
+  const x = (nm: number) => ((nm - win.min) / (win.max - win.min)) * STRIP_W;
+  const inWindow = (nm: number) => nm >= win.min && nm <= win.max;
+  const shown = readout.series.filter((line) => inWindow(line.wavelength));
+  const hidden = readout.series.length - shown.length;
+  const overlap = visibleOverlap(win);
+  const ticks = niceTicks(win.min, win.max);
+  const keepLabel = labelledLines(shown.map((line) => x(line.wavelength)), 62);
+  const sample = (nm: number) => {
+    const color = visibleRgb(nm);
+    return color ? rgb(color) : nm < VISIBLE_MIN_NM ? CONTINUUM_UV : CONTINUUM_IR;
+  };
+  const stops = Array.from({ length: 48 }, (_, i) => win.min + (i * (win.max - win.min)) / 47);
+
   return (
-    <svg viewBox={`0 0 ${STRIP_W} 92`} width="100%" role="img" aria-label={absorption ? "吸收光譜：連續光譜中的暗線" : "發射光譜：暗背景上的亮線"}>
+    <svg viewBox={`0 0 ${STRIP_W} 124`} width="100%" role="group" aria-label={absorption ? "吸收光譜：連續光譜中的暗線" : "發射光譜：暗背景上的亮線"}>
       <defs>
         <linearGradient id="hydrogen-continuum" x1="0" x2="1" y1="0" y2="0">
           {stops.map((nm) => (
-            <stop key={nm} offset={`${((nm - BAND_MIN) / (BAND_MAX - BAND_MIN)) * 100}%`} stopColor={rgb(visibleRgb(nm) ?? [0, 0, 0])} />
+            <stop key={nm} offset={`${((nm - win.min) / (win.max - win.min)) * 100}%`} stopColor={sample(nm)} />
           ))}
         </linearGradient>
       </defs>
-      <rect x={0} y={8} width={STRIP_W} height={50} rx={3} fill={absorption ? "url(#hydrogen-continuum)" : "#050d14"} />
-      {visibleLines.map((line) => {
+      <rect x={0} y={STRIP_TOP} width={STRIP_W} height={STRIP_H} rx={3} fill={absorption ? "url(#hydrogen-continuum)" : "#050d14"} />
+
+      {inWindow(readout.seriesLimit) ? (
+        <line x1={x(readout.seriesLimit)} y1={STRIP_TOP} x2={x(readout.seriesLimit)} y2={STRIP_TOP + STRIP_H} stroke="#f2c66d" strokeWidth={1.5} strokeDasharray="4 4" />
+      ) : null}
+
+      {shown.map((line, i) => {
         const lx = x(line.wavelength);
         const selected = line.upper === readout.selected.upper;
+        const lineColor = absorption ? "#050d14" : photonColor(line);
         return (
-          <g key={line.upper} style={{ cursor: "pointer" }} onClick={() => onPick(line)}>
-            <rect x={lx - 8} y={8} width={16} height={50} fill="transparent" />
-            <rect x={lx - (selected ? 2.5 : 1.5)} y={8} width={selected ? 5 : 3} height={50} fill={absorption ? "#050d14" : photonColor(line)} />
+          <g
+            key={line.upper}
+            role="button"
+            tabIndex={0}
+            aria-label={`選擇躍遷 ${line.upper} 到 ${line.lower}，${formatWavelength(line.wavelength)}，${REGION_ZH[line.region]}`}
+            aria-pressed={selected}
+            style={{ cursor: "pointer", outline: "none" }}
+            onClick={() => onPick(line)}
+            onKeyDown={onActivate(() => onPick(line))}
+          >
+            <rect x={lx - 9} y={STRIP_TOP - 4} width={18} height={STRIP_H + 8} fill="transparent" />
+            {selected ? <rect x={lx - 5} y={STRIP_TOP} width={10} height={STRIP_H} fill="none" stroke="#f2c66d" strokeWidth={1.2} /> : null}
+            <rect x={lx - (selected ? 2.5 : 1.5)} y={STRIP_TOP} width={selected ? 5 : 3} height={STRIP_H} fill={lineColor} />
+            {keepLabel[i] ? (
+              <text x={Math.min(STRIP_W - 30, Math.max(30, lx))} y={STRIP_TOP - 8} textAnchor="middle" fill={selected ? "#f2c66d" : "#c9dae2"} fontSize={14} fontWeight={selected ? 700 : 400}>
+                {line.wavelength.toFixed(line.wavelength < 200 ? 1 : 0)}
+              </text>
+            ) : null}
           </g>
         );
       })}
-      {[400, 500, 600, 700].map((nm) => (
+
+      {overlap ? (
+        <g aria-label="可見光波段">
+          <defs>
+            <linearGradient id="hydrogen-band" x1={x(overlap.min)} x2={x(overlap.max)} y1="0" y2="0" gradientUnits="userSpaceOnUse">
+              {Array.from({ length: 24 }, (_, i) => overlap.min + (i * (overlap.max - overlap.min)) / 23).map((nm) => (
+                <stop key={nm} offset={`${((nm - overlap.min) / (overlap.max - overlap.min)) * 100}%`} stopColor={sample(nm)} />
+              ))}
+            </linearGradient>
+          </defs>
+          <rect x={x(overlap.min)} y={STRIP_TOP + STRIP_H + 4} width={x(overlap.max) - x(overlap.min)} height={5} fill="url(#hydrogen-band)" />
+          {x(overlap.max) - x(overlap.min) > 90 ? (
+            <text x={(x(overlap.min) + x(overlap.max)) / 2} y={STRIP_TOP + STRIP_H + 24} textAnchor="middle" fill="#9fc2d3" fontSize={13}>可見光 380–750 nm</text>
+          ) : null}
+        </g>
+      ) : null}
+
+      {ticks.map((nm) => (
         <g key={nm}>
-          <line x1={x(nm)} y1={58} x2={x(nm)} y2={64} stroke="#8fa6b3" />
-          <text x={x(nm)} y={78} textAnchor="middle" fill="#9fc2d3" fontSize={15}>{nm} nm</text>
+          <line x1={x(nm)} y1={STRIP_TOP + STRIP_H} x2={x(nm)} y2={STRIP_TOP + STRIP_H + 3} stroke="#8fa6b3" />
+          <text x={Math.min(STRIP_W - 24, Math.max(24, x(nm)))} y={118} textAnchor="middle" fill="#9fc2d3" fontSize={14}>{nm}</text>
         </g>
       ))}
-      {visibleLines.length === 0 ? (
-        <text x={STRIP_W / 2} y={38} textAnchor="middle" fill="#8fa6b3" fontSize={15}>
-          此系列沒有落在可見光（380–750 nm）的譜線
-        </text>
+      <text x={STRIP_W} y={104} textAnchor="end" fill="#8fa6b3" fontSize={13}>波長（nm）</text>
+
+      {hidden > 0 ? (
+        <text x={STRIP_W - 8} y={STRIP_TOP + STRIP_H / 2 + 5} textAnchor="end" fill="#f2c66d" fontSize={14}>另有 {hidden} 條譜線在此範圍之外</text>
+      ) : null}
+      {shown.length === 0 && hidden === 0 ? (
+        <text x={STRIP_W / 2} y={STRIP_TOP + STRIP_H / 2 + 5} textAnchor="middle" fill="#8fa6b3" fontSize={15}>此系列在目前顯示的能階中沒有譜線</text>
       ) : null}
     </svg>
   );
@@ -276,6 +368,8 @@ function SpectrumStrip({ readout, mode, onPick }: { readout: HydrogenReadout; mo
 
 export default function HydrogenLab() {
   const [state, setState] = useState<HydrogenState>(initialHydrogenState);
+  const [orbitScale, setOrbitScale] = useState<OrbitScale>("true");
+  const [spectrumRange, setSpectrumRange] = useState<SpectrumRangeMode>("auto");
   const readout = useMemo(() => deriveHydrogenModel(state), [state]);
 
   useEffect(() => {
@@ -323,9 +417,9 @@ export default function HydrogenLab() {
         <section className="viewport-card hydrogen-card">
           <div className="card-label">
             <span>1</span>
-            <div><strong>玻耳軌道</strong><small>半徑依 rₙ = n²a₀ 等比例繪製；點軌道可移動電子</small></div>
+            <div><strong>玻耳軌道</strong><small>{orbitScale === "true" ? "半徑依 rₙ = n²a₀ 等比例繪製" : "示意比例（rₙ ∝ n），非真實比例"}；點軌道可移動電子</small></div>
           </div>
-          <div className="canvas-host hydrogen-canvas"><OrbitView state={state} readout={readout} onPlace={place} /></div>
+          <div className="canvas-host hydrogen-canvas"><OrbitView state={state} readout={readout} scale={orbitScale} onPlace={place} /></div>
         </section>
         <section className="viewport-card hydrogen-card">
           <div className="card-label">
@@ -339,9 +433,14 @@ export default function HydrogenLab() {
       <section className="viewport-card hydrogen-spectrum-card">
         <div className="card-label">
           <span>3</span>
-          <div><strong>{seriesLabel(readout.seriesName)}的{state.mode === "emission" ? "發射" : "吸收"}譜線</strong><small>終態 n = {state.lower}；{state.mode === "emission" ? "亮線落在暗背景上" : "暗線缺在連續光譜中"}</small></div>
+          <div><strong>{seriesLabel(readout.seriesName)}的{state.mode === "emission" ? "發射" : "吸收"}譜線</strong><small>終態 n = {state.lower}；{state.mode === "emission" ? "亮線落在暗背景上" : "暗線缺在連續光譜中"}；虛線為系限（n→∞）</small></div>
         </div>
-        <div className="hydrogen-strip"><SpectrumStrip readout={readout} mode={state.mode} onPick={(t) => pick(t.upper, t.lower)} /></div>
+        <div className="hydrogen-range" role="group" aria-label="光譜波長範圍">
+          <button className={spectrumRange === "auto" ? "active" : ""} aria-pressed={spectrumRange === "auto"} onClick={() => setSpectrumRange("auto")}>自動範圍</button>
+          <button className={spectrumRange === "visible" ? "active" : ""} aria-pressed={spectrumRange === "visible"} onClick={() => setSpectrumRange("visible")}>可見光 380–750</button>
+        </div>
+        <div className="hydrogen-strip"><SpectrumStrip readout={readout} mode={state.mode} range={spectrumRange} onPick={(t) => pick(t.upper, t.lower)} /></div>
+        <p className="hydrogen-strip-note">一個氫原子一次只做一次躍遷；整條光譜是大量原子各自躍遷的總和。「可見」只表示肉眼看得到，紫外線與紅外線的光子同樣存在。</p>
       </section>
 
       <div className="hydrogen-metrics">
@@ -363,9 +462,21 @@ export default function HydrogenLab() {
         <div className="hydrogen-row">
           <button className={state.mode === "emission" ? "active" : ""} onClick={() => setState((s) => selectTransition(s, s.upper, s.lower, "emission"))}>發射（高→低）</button>
           <button className={state.mode === "absorption" ? "active" : ""} onClick={() => setState((s) => selectTransition(s, s.upper, s.lower, "absorption"))}>吸收（低→高）</button>
-          <button className="primary-action" onClick={() => setState((s) => fireTransition(s))}>
-            <Zap size={14} /> {readout.inFlight ? "重新" : ""}{verb}
+          <button className="primary-action" onClick={() => setState((s) => fireTransition(s))} disabled={readout.blocked !== null} aria-describedby="hydrogen-fire-status">
+            <Zap size={14} /> {verb}
           </button>
+        </div>
+        <div className="hydrogen-status" id="hydrogen-fire-status" role="status">
+          {readout.blocked?.reason === "electron-not-at-start" ? (
+            <>
+              <span>電子在 n={state.electronLevel}；{modeLabel}此躍遷需要電子先在 n={readout.blocked.requiredLevel}。</span>
+              <button onClick={() => place(readout.startLevel)}>設定電子在 n={readout.startLevel}</button>
+            </>
+          ) : readout.blocked?.reason === "in-flight" ? (
+            <span>光子飛行中……</span>
+          ) : (
+            <span>電子在 n={state.electronLevel}，可以{verb}。</span>
+          )}
         </div>
 
         <div className="hydrogen-control-grid">
@@ -380,8 +491,15 @@ export default function HydrogenLab() {
             <span className="hydrogen-field-label">顯示能階數</span>
             <div className="hydrogen-row hydrogen-row--tight">
               {Array.from({ length: MAX_SHOWN_LEVELS - MIN_SHOWN_LEVELS + 1 }, (_, i) => MIN_SHOWN_LEVELS + i).map((n) => (
-                <button key={n} className={state.maxN === n ? "active" : ""} onClick={() => setState((s) => setMaxLevel(s, n))}>{n}</button>
+                <button key={n} className={state.maxN === n ? "active" : ""} disabled={n < minimumShownLevels(state)} title={n < minimumShownLevels(state) ? `需顯示到 n=${minimumShownLevels(state)} 才能容納目前的躍遷與電子` : undefined} onClick={() => setState((s) => setMaxLevel(s, n))}>{n}</button>
               ))}
+            </div>
+          </div>
+          <div className="hydrogen-control-block">
+            <span className="hydrogen-field-label">軌道比例</span>
+            <div className="hydrogen-row hydrogen-row--tight">
+              <button className={orbitScale === "true" ? "active" : ""} aria-pressed={orbitScale === "true"} onClick={() => setOrbitScale("true")}>等比例 n²</button>
+              <button className={orbitScale === "schematic" ? "active" : ""} aria-pressed={orbitScale === "schematic"} onClick={() => setOrbitScale("schematic")}>示意 n</button>
             </div>
           </div>
         </div>
@@ -394,9 +512,9 @@ export default function HydrogenLab() {
       </section>
 
       <p className="hydrogen-note">
-        {readout.ready ? `電子在 n=${state.electronLevel}，可進行${modeLabel}躍遷。` : `電子目前在 n=${state.electronLevel}，不是此躍遷的起始能階（n=${state.mode === "emission" ? state.upper : state.lower}）；按下「${verb}」會從起始能階重新開始。`}
+        這張圖描述單一氫原子：電子一次只在一個能階。發射需要電子先在高能階，吸收需要電子先在低能階，而且吸收的光子能量必須恰等於能階差；把電子激發到高能階的來源（如碰撞或先前吸收）不在模型之內。
         {" "}玻耳模型假設電子沿固定圓軌道運行、能量量子化，並忽略氫核質量的有限修正（造成約 0.05 % 的波長差）。電子公轉速度為示意，實際約 10¹⁶ 圈／秒；真實電子沒有軌跡，只有機率分布。
-        {selected.region !== "visible" ? " 此譜線在可見光之外，肉眼看不到，圖中顏色只表示它在可見光的紫外線側或紅外線側。" : ""}
+        {selected.region !== "visible" ? " 此譜線在可見光之外，肉眼看不到；圖中顏色只表示它在可見光的紫外線側或紅外線側。" : ""}
       </p>
 
       <div className="lab-footer">

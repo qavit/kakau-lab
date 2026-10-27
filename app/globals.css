@@ -617,10 +617,15 @@ html[data-mode="dark"] .layer-drawer,html[data-mode="dark"] .export-modal,html[d
 .hydrogen-row button:disabled { cursor:not-allowed; opacity:.48; transform:none; }
 .hydrogen-row--tight { padding:0; }
 .hydrogen-row--tight button { min-width:34px; padding:6px 0; }
-.hydrogen-control-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; align-items:start; padding:12px 13px 14px; }
+.hydrogen-control-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; align-items:start; padding:12px 13px 14px; }
 .hydrogen-control-block label>span,.hydrogen-field-label { display:flex; justify-content:space-between; gap:10px; margin-bottom:7px; color:var(--muted); font-size:12px; }
 .hydrogen-control-block label b { color:var(--ink); font-size:13px; }
 .hydrogen-control-block small { display:block; margin-top:8px; color:var(--muted); font-size:11px; line-height:1.45; }
+.hydrogen-range { position:absolute; z-index:2; right:16px; top:14px; display:flex; gap:4px; }
+.hydrogen-range button { padding:4px 9px; font-size:12px; }
+.hydrogen-strip-note { margin:6px 2px 0; color:#9fb6c3; font-size:12px; line-height:1.55; }
+.hydrogen-status { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:8px 13px 0; color:var(--body); font-size:12px; }
+.hydrogen-status button { padding:3px 9px; font-size:12px; }
 .hydrogen-note { margin:10px 2px 0; color:var(--muted); font-size:12px; letter-spacing:.02em; line-height:1.6; }
 .hydrogen-lab svg g[role=button]:focus-visible { outline:2px solid #f2c66d; outline-offset:2px; }
-@media(max-width:900px){ .hydrogen-stage-grid{grid-template-columns:1fr}.hydrogen-card{min-height:440px}.hydrogen-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.hydrogen-metrics>div{border-bottom:1px solid var(--line)}.hydrogen-control-grid{grid-template-columns:1fr} }
+@media(max-width:900px){ .hydrogen-range{position:static;padding:58px 18px 0;margin-bottom:-52px}.hydrogen-stage-grid{grid-template-columns:1fr}.hydrogen-card{min-height:440px}.hydrogen-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.hydrogen-metrics>div{border-bottom:1px solid var(--line)}.hydrogen-control-grid{grid-template-columns:1fr} }

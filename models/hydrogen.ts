@@ -68,42 +68,65 @@ function clampInt(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, Math.round(value)));
 }
 
-/** Choose a transition. Out-of-range or inverted input is repaired, never thrown; the electron returns to the starting level. */
+/**
+ * Choose which transition to look at. This is a *view* operation: it never moves the electron, so
+ * a student can inspect any pair of levels without the model inventing the energy to get there.
+ * Input is repaired, never thrown. A preset above the shown range widens the diagrams to fit it
+ * rather than being quietly turned into a different transition. A photon already in flight belonged
+ * to the previous selection and is dropped.
+ */
 export function selectTransition(state: HydrogenState, upper: number, lower: number, mode: Direction = state.mode): HydrogenState {
-  const nextUpper = clampInt(upper, MIN_LEVEL + 1, state.maxN);
+  const nextUpper = clampInt(upper, MIN_LEVEL + 1, MAX_SHOWN_LEVELS);
   const nextLower = clampInt(lower, MIN_LEVEL, nextUpper - 1);
   return {
     ...state,
     upper: nextUpper,
     lower: nextLower,
     mode,
-    electronLevel: startLevel(nextUpper, nextLower, mode),
+    maxN: Math.max(state.maxN, nextUpper),
     photonProgress: null,
   };
 }
 
-/** Change how many levels are shown; a selected transition that no longer fits is pulled inside. */
-export function setMaxLevel(state: HydrogenState, maxN: number): HydrogenState {
-  const next = { ...state, maxN: clampInt(maxN, MIN_SHOWN_LEVELS, MAX_SHOWN_LEVELS) };
-  return selectTransition(next, state.upper, state.lower);
+/** The fewest levels the diagrams may show without hiding the selected transition or the electron. */
+export function minimumShownLevels(state: Pick<HydrogenState, "upper" | "electronLevel">): number {
+  return Math.max(MIN_SHOWN_LEVELS, state.upper, state.electronLevel);
 }
 
-/** Put the electron on any level directly — the way a student drags it up the energy ladder. */
+/** Change how many levels are shown. It cannot go below what the selection and electron occupy; it is raised to that floor instead of moving either. */
+export function setMaxLevel(state: HydrogenState, maxN: number): HydrogenState {
+  return { ...state, maxN: clampInt(maxN, minimumShownLevels(state), MAX_SHOWN_LEVELS) };
+}
+
+/** Put the electron on a shown level — setting the atom's initial condition, as a student would by dragging it up the ladder. */
 export function placeElectron(state: HydrogenState, level: number): HydrogenState {
   return { ...state, electronLevel: clampInt(level, MIN_LEVEL, state.maxN), photonProgress: null };
 }
 
+export type FireBlock =
+  | { reason: "in-flight" }
+  | { reason: "electron-not-at-start"; requiredLevel: number };
+
 /**
- * Fire the selected transition from its starting level. An emitting electron drops immediately
- * and the photon leaves; an absorbing electron stays put until the photon arrives (see `advance`).
- * Firing while a photon is already in flight, or from the wrong level, restarts from the start level.
+ * Why the selected transition cannot happen right now, or null if it can. Emission needs the
+ * electron already on the upper level; absorption needs it on the lower level. The model does not
+ * say where the missing energy came from — it only refuses to emit from a level the electron is not on.
+ */
+export function fireBlock(state: HydrogenState): FireBlock | null {
+  if (state.photonProgress !== null) return { reason: "in-flight" };
+  const requiredLevel = startLevel(state.upper, state.lower, state.mode);
+  return state.electronLevel === requiredLevel ? null : { reason: "electron-not-at-start", requiredLevel };
+}
+
+/**
+ * Fire the selected transition. An emitting electron drops immediately and the photon leaves; an
+ * absorbing electron stays put until the photon arrives (see `advanceHydrogen`). When `fireBlock`
+ * reports a reason, the state is returned unchanged.
  */
 export function fireTransition(state: HydrogenState): HydrogenState {
-  const start = startLevel(state.upper, state.lower, state.mode);
-  if (state.mode === "emission") {
-    return { ...state, electronLevel: state.lower, photonProgress: 0 };
-  }
-  return { ...state, electronLevel: start, photonProgress: 0 };
+  if (fireBlock(state)) return state;
+  if (state.mode === "emission") return { ...state, electronLevel: state.lower, photonProgress: 0 };
+  return { ...state, photonProgress: 0 };
 }
 
 /**
@@ -148,6 +171,9 @@ export function deriveHydrogenModel(state: HydrogenState) {
     seriesLimit: seriesLimitWavelength(state.lower),
     /** Whether the electron is at the level the selected transition starts from. */
     ready: state.electronLevel === startLevel(state.upper, state.lower, state.mode),
+    /** Why the transition cannot fire now, or null. */
+    blocked: fireBlock(state),
+    startLevel: startLevel(state.upper, state.lower, state.mode),
     inFlight: state.photonProgress !== null,
   };
 }
