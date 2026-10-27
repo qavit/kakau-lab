@@ -115,6 +115,28 @@ account of the one curve that is not a closed form: why quadratic drag has none,
 scheme and step size are, and how the integrator is calibrated against the exact solution it
 generalizes. It follows the `/about` page's pattern, which until now the solar model alone used.
 
+## The hydrogen-atom model
+
+`/hydrogen` (catalogue number 10, `prototype` and `unlisted`) is a Bohr-model lab: one selected
+transition drives a true-to-scale orbit diagram, an energy-level diagram and a line spectrum.
+`lib/science/hydrogen.ts` is closed-form and imports nothing: level energies, orbit radii, speeds,
+transition photons, series lines and limits, and an independent Rydberg-formula wavelength that a
+test checks against the energy route for every level pair.
+
+The nucleus is treated as infinitely heavy (R∞, a₀), so Hα comes out at 656.11 nm rather than the
+656.47 nm vacuum value; the roughly 0.05 % reduced-mass correction is left out on purpose and said
+so on the page and in the tests' tolerance.
+
+`models/hydrogen.ts` owns the state machine. A jump is discontinuous, so it is never interpolated:
+an emitting electron drops at once and the photon leaves, while an absorbing electron stays put until
+the photon arrives and is then lifted. Orbit angle advances at ω ∝ 1/n³ for display only. The
+orbit view is drawn at true n² scale (the largest shown orbit fills the frame) rather than
+compressed, and the energy diagram spreads crowded labels near the ionisation limit with leader
+lines instead of letting them overlap. Absorption mode renders the spectrum as dark lines on a
+continuum, emission as bright lines on a dark ground. The Bohr picture's limits (no orbitals, no
+l or m, no fine structure) are stated in the lab's footnote; quantum orbitals are a possible later
+model, not part of this one.
+
 ## The electrostatics model
 
 `/electrostatics` (catalogue number 09, still `experimental` in the registry) is the

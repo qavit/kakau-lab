@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ArrowUpRight,
+  Atom,
   Layers,
   Magnet,
   Mountain,
@@ -19,6 +20,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 /** Maps the registry's string icon keys to actual components. The registry itself stays free of React/lucide. */
 const icons: Record<string, LucideIcon> = {
   orbit: Orbit,
+  atom: Atom,
   magnet: Magnet,
   wind: Wind,
   mountain: Mountain,

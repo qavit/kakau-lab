@@ -8,6 +8,8 @@ History is intentionally not backfilled beyond the recent milestones below.
 
 ## Unreleased
 
+- Hydrogen Atom Lab prototype (`/hydrogen`, model 10, unlisted): Bohr orbit diagram, energy-level diagram and
+  line spectrum driven by one transition state. Emission and absorption modes, Lyman/Balmer/Paschen series.
 - Light, dark and follow-system appearance across the catalog and every Lab, with a three-way switch in each
   header. The choice is stored in `localStorage` (`mode`) and applied via `<html data-mode>` before first paint,
   matching Kakau Notes. Dark mode swaps in an ivory Kakau Lab wordmark.

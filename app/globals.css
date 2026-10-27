@@ -596,3 +596,31 @@ html[data-mode="dark"] .layer-drawer,html[data-mode="dark"] .export-modal,html[d
   .projectile-topbar .header-actions { justify-content:flex-start; }
   .projectile-topbar .theme-switcher button { padding:7px; }
 }
+
+/* Hydrogen atom lab */
+.hydrogen-stage-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.hydrogen-card { min-height:520px; }
+.hydrogen-canvas { padding:56px 14px 12px; }
+.hydrogen-canvas svg { display:block; max-height:100%; margin:auto; }
+.hydrogen-spectrum-card { margin-top:14px; min-height:0; padding:62px 18px 14px; }
+.hydrogen-strip svg { display:block; }
+.hydrogen-metrics { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); margin-top:12px; border:1px solid var(--line); border-radius:7px; overflow:hidden; background:var(--surface); }
+.hydrogen-metrics>div { min-width:0; padding:11px 12px; border-right:1px solid var(--line); }
+.hydrogen-metrics>div:last-child { border:0; }
+.hydrogen-metrics span,.hydrogen-metrics strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.hydrogen-metrics span { color:var(--muted); font-size:11px; }
+.hydrogen-metrics strong { margin-top:5px; font-family:Georgia,"Noto Serif TC",serif; font-size:17px; font-weight:500; }
+.hydrogen-controls { margin-top:12px; }
+.hydrogen-controls .control-panel-heading button { padding:5px 9px; font-size:12px; }
+.hydrogen-row { display:flex; flex-wrap:wrap; gap:5px; padding:12px 13px 0; }
+.hydrogen-row button { flex:1; min-width:64px; }
+.hydrogen-row button:disabled { cursor:not-allowed; opacity:.48; transform:none; }
+.hydrogen-row--tight { padding:0; }
+.hydrogen-row--tight button { min-width:34px; padding:6px 0; }
+.hydrogen-control-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; align-items:start; padding:12px 13px 14px; }
+.hydrogen-control-block label>span,.hydrogen-field-label { display:flex; justify-content:space-between; gap:10px; margin-bottom:7px; color:var(--muted); font-size:12px; }
+.hydrogen-control-block label b { color:var(--ink); font-size:13px; }
+.hydrogen-control-block small { display:block; margin-top:8px; color:var(--muted); font-size:11px; line-height:1.45; }
+.hydrogen-note { margin:10px 2px 0; color:var(--muted); font-size:12px; letter-spacing:.02em; line-height:1.6; }
+.hydrogen-lab svg g[role=button]:focus-visible { outline:2px solid #f2c66d; outline-offset:2px; }
+@media(max-width:900px){ .hydrogen-stage-grid{grid-template-columns:1fr}.hydrogen-card{min-height:440px}.hydrogen-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.hydrogen-metrics>div{border-bottom:1px solid var(--line)}.hydrogen-control-grid{grid-template-columns:1fr} }

@@ -16,15 +16,15 @@ test("registry numbers are unique", () => {
   assert.equal(new Set(numbers).size, numbers.length);
 });
 
-test("registry numbers 01 through 09 are all present", () => {
+test("registry numbers 01 through 10 are all present", () => {
   const numbers = new Set(labRegistry.map((lab) => lab.number));
-  for (let n = 1; n <= 9; n += 1) {
+  for (let n = 1; n <= 10; n += 1) {
     assert.ok(numbers.has(String(n).padStart(2, "0")), `missing number ${n}`);
   }
 });
 
-test("inventory holds labs 01-09 plus the uncatalogued FBD", () => {
-  assert.equal(labRegistry.length, 10);
+test("inventory holds labs 01-10 plus the uncatalogued FBD", () => {
+  assert.equal(labRegistry.length, 11);
   const fbd = labRegistry.find((lab) => lab.id === "fbd");
   assert.ok(fbd);
   assert.equal(fbd.number, undefined);
@@ -43,6 +43,7 @@ test("maturity and visibility matrix is exact", () => {
     "projectile-motion": "stable/public",
     "two-source-interference": "beta/public",
     electrostatics: "stable/public",
+    "hydrogen-atom": "prototype/unlisted",
     fbd: "prototype/unlisted",
   });
 });
@@ -52,7 +53,7 @@ test("catalogLabs selects exactly the five public non-prototype labs in product 
     catalogLabs().map((lab) => lab.id),
     ["solar-sphere", "standard-atmosphere-profile", "projectile-motion", "two-source-interference", "electrostatics"],
   );
-  const excluded = ["magnetic-field-superposition", "planetary-wind-systems", "valley-bedding", "coriolis-effect", "fbd"];
+  const excluded = ["magnetic-field-superposition", "planetary-wind-systems", "valley-bedding", "coriolis-effect", "hydrogen-atom", "fbd"];
   assert.deepEqual(unlistedLabs().map((lab) => lab.id).sort(), [...excluded].sort());
 });
 

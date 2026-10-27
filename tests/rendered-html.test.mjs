@@ -60,10 +60,10 @@ test("server-renders the Kakau Lab model catalog", async () => {
   assert.match(html, /太陽、天球與竿影/);
   assert.match(html, /大氣垂直結構/);
   assert.match(html, /拋體運動/);
-  for (const hidden of ["全球行星風系", "岩層位態", "多導線磁場疊加", "科氏力效應", "自由體圖", "風場粒子"]) {
+  for (const hidden of ["全球行星風系", "岩層位態", "多導線磁場疊加", "科氏力效應", "氫原子能階與光譜", "自由體圖", "風場粒子"]) {
     assert.doesNotMatch(html, new RegExp(hidden), `${hidden} must not be in the production catalog`);
   }
-  for (const href of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/fbd"]) {
+  for (const href of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/hydrogen", "/fbd"]) {
     assert.doesNotMatch(html, new RegExp(`href="${href}"`));
   }
   assert.match(html, /雙點波源干涉/);
@@ -98,14 +98,14 @@ test("sitemap lists only catalog-eligible local labs and supporting pages", asyn
   for (const path of ["/solar", "/atmosphere-profile", "/projectile", "/electrostatics"]) {
     assert.ok(paths.includes(path), `${path} should be in the sitemap`);
   }
-  for (const path of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/fbd", "/lab/interference"]) {
+  for (const path of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/hydrogen", "/fbd", "/lab/interference"]) {
     assert.ok(!paths.includes(path), `${path} must not be in the sitemap`);
   }
   assert.doesNotMatch(xml, /kakau\.tw\/lab\/interference/);
 });
 
 test("unlisted lab routes stay reachable but are noindex", async () => {
-  for (const path of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/fbd"]) {
+  for (const path of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/hydrogen", "/fbd"]) {
     const response = await render(path);
     assert.equal(response.status, 200, path);
     const html = await response.text();
@@ -134,6 +134,7 @@ test("resolves Open Graph and Twitter image URLs against the production origin",
 test("every page with its own openGraph still carries a share image", async () => {
   const expected = {
     "/coriolis": SITE_OG,
+    "/hydrogen": SITE_OG,
     "/electrostatics": SITE_OG,
     "/projectile": SITE_OG,
     "/atmosphere-profile": SITE_OG,
@@ -414,6 +415,18 @@ test("keeps valley-rule science independent of its synchronized views", async ()
   assert.match(view, /from "@\/lib\/science\/geology"/);
   assert.match(view, /from "@\/models\/geology"/);
   assert.match(view, /from "@\/lib\/render\/viewport"/);
+});
+
+test("server-renders the hydrogen-atom model page", async () => {
+  const response = await render("/hydrogen");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /<title>氫原子能階與光譜｜Kakau Lab<\/title>/);
+  assert.match(html, /玻耳軌道/);
+  assert.match(html, /能階圖/);
+  assert.match(html, /巴耳末系（Balmer）/);
+  assert.match(html, /光子能量/);
+  assert.match(html, /模型目錄/);
 });
 
 test("server-renders the Coriolis-force model page", async () => {
