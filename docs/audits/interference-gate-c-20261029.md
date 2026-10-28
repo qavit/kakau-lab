@@ -108,4 +108,4 @@ Owner **尚未接受**任何本輪新差異。F22 人工驗收、其他瀏覽器
 
 ## 12. Gate D Readiness and Handoff
 
-本地 route 可 smoke，harness 在 production 404；Registry 仍指 Front。Gate D **未 Ready**：先補 F22 人工驗收與必要修復、確認 production metadata／canonical／OG／JSON-LD、Front redirect（含尾斜線和 query string）、sitemap、搜尋／外鏈基線、rollback。Owner 需審核未驗證事項並另行核准 Gate D。Front 正式頁、Registry、redirect、canonical、sitemap 均未修改；未 push、PR、merge 或 deploy。沒有可靠本輪實際工時紀錄，不填工時。
+本地 route 可 smoke，harness 在 production 404；Registry 仍指 Front。正式 `https://kakau.tw/lab/interference` 的即時連線檢查因網頁工具無法存取而 **NOT VERIFIED**，但本地 Front 原始碼及 Git 狀態未變；`https://lab.kakau.tw/interference` 未部署，亦未實測。Gate D **未 Ready**：先補 F22 人工驗收與必要修復、確認 production metadata／canonical／OG／JSON-LD、Front redirect（含尾斜線和 query string）、sitemap、搜尋／外鏈基線、rollback。Owner 需審核未驗證事項並另行核准 Gate D。Front 正式頁、Registry、redirect、canonical、sitemap 均未修改；未 push、PR、merge 或 deploy。沒有可靠本輪實際工時紀錄，不填工時。
