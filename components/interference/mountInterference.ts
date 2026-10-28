@@ -206,7 +206,7 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     if (activeActivity === "measure" && textbook && snapped) {
       if (snapped.kind === "constructive") { activityState.measureConstructive = true; activityState.measureValues.constructive = format(sample.absolutePathDifference / params.wavelength); }
       if (snapped.kind === "destructive") { activityState.measureDestructive = true; activityState.measureValues.destructive = format(sample.absolutePathDifference / params.wavelength); }
-      if (activityState.measureStep === "explore" && activityState.measureConstructive && activityState.measureDestructive) { activityState.measureStep = "conclude"; query<HTMLElement>('[data-activity="measure"] [data-activity-step="explore"]')!.hidden = true; query<HTMLElement>('[data-activity="measure"] [data-activity-step="conclude"]')!.hidden = false; }
+      if (activityState.measureStep === "explore" && activityState.measureConstructive && activityState.measureDestructive) { activityState.measureStep = "conclude"; query<HTMLElement>('[data-activity="measure"] [data-activity-step="explore"]')!.classList.add("is-done"); query<HTMLElement>('[data-activity="measure"] [data-activity-step="conclude"]')!.hidden = false; }
       text("[data-measure-progress]", `已觀察：波腹 ${activityState.measureConstructive ? 1 : 0}/1，波節 ${activityState.measureDestructive ? 1 : 0}/1`);
       text('[data-observed="constructive"]', activityState.measureValues.constructive || "未觀察");
       text('[data-observed="destructive"]', activityState.measureValues.destructive || "未觀察");

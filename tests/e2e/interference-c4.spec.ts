@@ -143,3 +143,68 @@ test("dialog inline math keeps the text baseline and long derivations scroll wit
   expect(info.longScrolls).toBe(true);
   expect(await noOverflow(page)).toBe(true);
 });
+
+test("activity 1 keeps finished steps visible as the lesson advances @c4", async ({ page }) => {
+  await open(page, 1440, 900);
+  const steps = page.locator('[data-activity="measure"] [data-activity-step]');
+  const plot = await page.locator("[data-interference-plot]").boundingBox();
+  await page.mouse.click(plot!.x + plot!.width * .62, plot!.y + plot!.height * .3);
+  await expect(page.locator('[data-activity-step="explore"]')).toBeVisible();
+  await expect(page.locator('[data-activity-step="place"]')).toHaveClass(/is-done/);
+  // Wander P over the field until both condition types have been snapped to.
+  const fractions: Array<[number, number]> = [[.5, .2], [.55, .3], [.45, .4], [.5, .5], [.6, .45], [.7, .6], [.35, .3], [.3, .7], [.8, .5]];
+  for (const [fx, fy] of fractions) {
+    if (await page.locator('[data-activity-step="conclude"]').isVisible()) break;
+    await page.mouse.move(plot!.x + plot!.width * fx, plot!.y + plot!.height * fy);
+    await page.mouse.down();
+    await page.mouse.move(plot!.x + plot!.width * (fx + .02), plot!.y + plot!.height * (fy + .01), { steps: 3 });
+    await page.mouse.up();
+  }
+  await expect(page.locator('[data-activity-step="conclude"]')).toBeVisible();
+  await expect(steps.filter({ visible: true })).toHaveCount(3);
+  await expect(page.locator('[data-activity-step="explore"]')).toHaveClass(/is-done/);
+  expect(await noOverflow(page)).toBe(true);
+  await shot(page, "activity1-cumulative-steps", '[data-activity="measure"]');
+});
+
+test("advanced mode keeps phase conditions distinct from zero amplitude and returns to textbook @c4", async ({ page }) => {
+  await open(page, 1440, 900);
+  await page.locator("details.if-advanced summary").click();
+  await expect(page.locator("[data-mode-status]")).toHaveText("課本模式");
+  await setRange(page, "amplitude2", "0.5");
+  await expect(page.locator("[data-mode-status]")).toHaveText("進階模式");
+  await expect(page.locator("[data-advanced-warning]")).toBeVisible();
+  await expect(page.locator("[data-advanced-warning]")).toContainText("相消條件上也未必是零振幅");
+  await expect(page.locator("[data-counts-advanced]")).toBeVisible();
+  await setRange(page, "phase2", "180");
+  await page.locator("[data-control=attenuation]").check();
+  await expect(page.locator("[data-mode-status]")).toHaveText("進階模式");
+  await shot(page, "advanced-unequal-antiphase-attenuation");
+  await page.locator('[data-action="reset-parameters"]').click();
+  await expect(page.locator("[data-mode-status]")).toHaveText("課本模式");
+  await expect(page.locator("[data-advanced-warning]")).toBeHidden();
+  await expect(page.locator("[data-counts-advanced]")).toBeHidden();
+  await expect(page.locator('[data-output="wavelength"]')).toHaveText("1.00");
+});
+
+test("projection round-trip preserves parameters, P and the active activity @c4", async ({ page }) => {
+  await open(page, 1440, 900);
+  await setRange(page, "wavelength", "0.8");
+  await setRange(page, "separation", "3");
+  await page.locator('[data-activity-tab="time"]').click();
+  await page.locator('input[name="time-choice"][value="static"]').check();
+  const plot = await page.locator("[data-interference-plot]").boundingBox();
+  await page.mouse.click(plot!.x + plot!.width * .62, plot!.y + plot!.height * .3);
+  const point = await page.locator("[data-point-position]").textContent();
+  await page.locator('[data-action="projection"]').click();
+  await page.locator('[data-action="play-pause"]').click();
+  await page.waitForTimeout(300);
+  await page.locator('[data-action="play-pause"]').click();
+  await page.locator('[data-action="projection"]').click();
+  await expect(page.locator('[data-output="wavelength"]')).toHaveText("0.80");
+  await expect(page.locator('[data-output="separation"]')).toHaveText("3.00");
+  await expect(page.locator("[data-point-position]")).toHaveText(point!);
+  await expect(page.locator('[data-activity-tab="time"]')).toHaveAttribute("aria-current", "step");
+  await expect(page.locator('input[name="time-choice"][value="static"]')).toBeChecked();
+  await expect(page.locator("[data-geometry-sr]")).toContainText("d/λ = 3.75");
+});

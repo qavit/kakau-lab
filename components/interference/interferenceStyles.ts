@@ -141,7 +141,8 @@ html[data-mode="dark"] .interference-lab{--if-term-c:#f0b84a;--if-term-d:#5fd0e0
 .checklist li.is-done{border-color:var(--if-good);background:var(--ok-bg)}.checklist li.is-done .checklist__box{border-color:var(--if-good);background:var(--if-good);box-shadow:inset 0 0 0 2px var(--if-panel)}
 .checklist__value{grid-column:2;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.74rem;font-weight:700;color:var(--if-good)}
 .term{font-weight:750}.term--constructive{color:var(--if-term-c)}.term--destructive{color:var(--if-term-d)}
-.select-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.3rem .6rem;margin:.35rem 0;font-size:.8rem}
+/* The sentence (text + inline math) flows normally; the select sits under it, so math is never its own flex item. */
+.select-row{display:block;margin:.5rem 0;font-size:.8rem;line-height:1.7}.select-row select{display:block;width:100%;margin-top:.25rem}
 .select-row select,.number-row input{border:1px solid var(--line-strong);border-radius:.3rem;background:var(--field-bg);padding:.35rem .45rem;font-size:.85rem;color:var(--ink)}
 .number-row{display:flex;flex-wrap:wrap;gap:.6rem 1rem;margin:.4rem 0}.number-row label{display:inline-flex;align-items:center;gap:.45rem;font-size:.82rem;font-weight:650}.number-row input{width:4.6rem;margin-left:0}
 .choices{display:grid;gap:.35rem;margin:.4rem 0;border:0;padding:0}.choices legend{margin-bottom:.25rem;padding:0;font-size:.78rem;font-weight:700;color:var(--body)}
