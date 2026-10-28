@@ -1,0 +1,50 @@
+[
+  {
+    "pair": "body on panel",
+    "foreground": "#243244",
+    "background": "#ffffff",
+    "ratio": 13.01
+  },
+  {
+    "pair": "body on shell",
+    "foreground": "#243244",
+    "background": "#f5f6f4",
+    "ratio": 12.0
+  },
+  {
+    "pair": "selected tab",
+    "foreground": "#ffffff",
+    "background": "#29394c",
+    "ratio": 11.77
+  },
+  {
+    "pair": "constructive line on plot",
+    "foreground": "#c7770b",
+    "background": "#f7f6f1",
+    "ratio": 3.2
+  },
+  {
+    "pair": "destructive line on plot",
+    "foreground": "#168b8a",
+    "background": "#f7f6f1",
+    "ratio": 3.81
+  },
+  {
+    "pair": "focus outline on panel",
+    "foreground": "#174c70",
+    "background": "#ffffff",
+    "ratio": 9.11
+  },
+  {
+    "pair": "focus outline on shell",
+    "foreground": "#174c70",
+    "background": "#f5f6f4",
+    "ratio": 8.41
+  },
+  {
+    "pair": "button border on panel",
+    "foreground": "#7b8994",
+    "background": "#ffffff",
+    "ratio": 3.59
+  }
+]

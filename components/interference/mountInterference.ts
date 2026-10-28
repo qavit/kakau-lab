@@ -63,7 +63,7 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
   };
   const query = <T extends HTMLElement>(s: string) => container.querySelector<T>(s);
   const layer = (name: string) => svg.querySelector<SVGGElement>(`[data-layer="${name}"]`)!;
-  const text = (selector: string, value: string) => { const node = query(selector); if (node) node.textContent = value; };
+  const text = (selector: string, value: string) => { const node = query(selector); if (node && node.textContent !== value) node.textContent = value; };
   const attr = (el: Element, name: string, value: string) => el.setAttribute(name, value);
   const svgNode = (name: string, attributes: Record<string, string>) => {
     const node = doc.createElementNS(NS, name);
@@ -112,7 +112,7 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     const values = query<HTMLElement>("[data-point-values]");
     const empty = query<HTMLElement>("[data-point-empty]");
     const clear = query<HTMLButtonElement>('[data-action="clear-point"]');
-    if (!selectedPoint) { if (values) values.hidden = true; if (empty) empty.hidden = false; if (clear) clear.hidden = true; return; }
+    if (!selectedPoint) { const hadPoint = query<HTMLElement>("[data-point-position]")?.textContent?.startsWith("P ("); if (values) values.hidden = true; if (empty) empty.hidden = false; if (clear) clear.hidden = true; text("[data-point-position]", "尚未放置 P"); if (hadPoint) text("[data-point-announcement]", "觀測點 P 已清除。"); return; }
     if (values) values.hidden = false; if (empty) empty.hidden = true; if (clear) clear.hidden = false;
     const p = project(selectedPoint);
     const { source1, source2 } = sourcePositions(params.separation);
@@ -144,6 +144,7 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
         ? sample.classification === "constructive" ? "相長（波腹）" : "相消（波節）"
         : textbook ? "非波腹／波節條件位置" : "進階模式：依 Δφ 與 |C| 判讀";
     text('[data-readout="classification"]', classification);
+    text("[data-point-announcement]", `觀測點 P：路徑差 ${format(sample.pathDifference)}，${classification}。`);
     const curve = container.querySelector<SVGPathElement>("[data-waveform-curve]");
     if (curve) {
       const maxAmplitude = Math.max(params.amplitude1 + params.amplitude2, .01);
@@ -161,6 +162,8 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
 
   const renderField = () => {
     if (disposed) return;
+    const viewName = { displacement: "瞬時位移", intensity: "強度", amplitude: "合成振幅", phase: "合成相位" }[view];
+    text("[data-field-summary]", `目前顯示${viewName}。橘色實線是相長條件，青色虛線是相消條件；兩個波源位於中央線左右。可用 P 取得路徑差和分類讀值。`);
     const rect = plot.getBoundingClientRect();
     const cssSize = Math.max(80, Math.min(rect.width || 480, rect.height || rect.width || 480));
     const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
@@ -240,6 +243,8 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     listen(plot,"pointerup",endDrag as EventListener); listen(plot,"pointercancel",endDrag as EventListener);
     listen(plot,"dblclick",()=>{selectedPoint=null;renderPoint();});
     listen(plot,"keydown",((event:KeyboardEvent)=>{
+      if (event.target !== plot) return;
+      if (!selectedPoint && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); selectedPoint={x:0,y:0}; renderPoint(); return; }
       if (!selectedPoint) return;
       if (event.key === "Escape" || event.key === "Delete" || event.key === "Backspace") { event.preventDefault(); selectedPoint=null; renderPoint(); return; }
       const step=event.shiftKey ? .25 : .05; const p={...selectedPoint};

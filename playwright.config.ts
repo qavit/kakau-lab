@@ -2,9 +2,11 @@ import { defineConfig, devices } from "@playwright/test";
 
 const baseURL = process.env.BASE_URL ?? "http://127.0.0.1:3000";
 const includeSoak = process.env.PLAYWRIGHT_SOAK === "1";
+const includeCrossBrowser = process.env.PLAYWRIGHT_CROSS_BROWSER === "1";
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR ?? "test-results",
   fullyParallel: false,
   timeout: 30_000,
   expect: { timeout: 7_000 },
@@ -40,5 +42,10 @@ export default defineConfig({
       grepInvert: /@soak/,
       use: { ...devices["Pixel 5"] },
     },
+    ...(includeCrossBrowser ? (["firefox", "webkit"] as const).map(name => ({
+      name,
+      grep: /@cross-browser/,
+      use: { ...devices[name === "firefox" ? "Desktop Firefox" : "Desktop Safari"], viewport: { width: 1280, height: 900 } },
+    })) : []),
   ],
 });

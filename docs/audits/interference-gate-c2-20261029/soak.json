@@ -1,0 +1,53 @@
+{
+  "browser": "Playwright Chromium",
+  "elapsedSeconds": 602,
+  "samples": [
+    {
+      "elapsedSeconds": 0,
+      "frame": 2
+    },
+    {
+      "elapsedSeconds": 60,
+      "frame": 3610
+    },
+    {
+      "elapsedSeconds": 120,
+      "frame": 7206
+    },
+    {
+      "elapsedSeconds": 180,
+      "frame": 10814
+    },
+    {
+      "elapsedSeconds": 240,
+      "frame": 14416
+    },
+    {
+      "elapsedSeconds": 300,
+      "frame": 18025
+    },
+    {
+      "elapsedSeconds": 360,
+      "frame": 21626
+    },
+    {
+      "elapsedSeconds": 421,
+      "frame": 25259
+    },
+    {
+      "elapsedSeconds": 481,
+      "frame": 28857
+    },
+    {
+      "elapsedSeconds": 541,
+      "frame": 32471
+    },
+    {
+      "elapsedSeconds": 601,
+      "frame": 36073
+    }
+  ],
+  "pausedFrame": 36076,
+  "frameAfterPause": 36076,
+  "pageErrors": []
+}

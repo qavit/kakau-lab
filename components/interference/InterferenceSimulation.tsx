@@ -58,7 +58,7 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
       .interference-control{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center}.interference-control input{grid-column:1/-1;width:100%;accent-color:#526d82}
       .interference-plot{position:relative;width:min(100%,560px);aspect-ratio:1;margin:auto;background:#f7f6f1;border:1px solid #cbd3d9;touch-action:none;overflow:hidden}
       .interference-plot canvas,.interference-plot svg{position:absolute;inset:0;width:100%;height:100%}.interference-plot svg{pointer-events:auto;touch-action:none}
-      .interference-plot [data-layer="measurement"]{pointer-events:none}.interference-controls button{padding:7px 10px;border:1px solid #c5cdd3;border-radius:6px;background:#fff;color:inherit;cursor:pointer}
+      .interference-plot [data-layer="measurement"]{pointer-events:none}.interference-controls button{padding:7px 10px;border:1px solid #7b8994;border-radius:6px;background:#fff;color:inherit;cursor:pointer}
       .interference-time{display:grid;grid-template-columns:auto auto 1fr;gap:10px;align-items:center;margin-top:14px}.interference-time input{width:100%}
       .interference-readout dl{display:grid;grid-template-columns:1fr auto;gap:5px;margin:0}.interference-readout dt,.interference-readout dd{margin:0}
       .interference-controls button[data-action="clear-point"]{justify-self:start}
@@ -70,20 +70,24 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
       .interference-dialog{max-width:min(640px,calc(100vw - 24px));max-height:85vh;overflow:auto;border:1px solid #cbd3d9;border-radius:12px;padding:20px}
       .interference-dialog h3{margin:1em 0 .25em}.interference-dialog p{margin:.6em 0;line-height:1.7}.interference-dialog button{margin-top:1em}
       .interference-plot-hint{position:absolute;bottom:8px;left:8px;right:8px;z-index:2;background:#fffef0;color:#243244;padding:5px 8px;border-radius:6px;pointer-events:none}.interference-plot-hint button{pointer-events:auto;margin-left:8px}
+      .interference-lab :is(button,input,select,summary,[data-interference-plot]):focus-visible{outline:3px solid #174c70;outline-offset:3px}
+      .interference-field-summary{margin-top:8px!important;line-height:1.6}
       @media(prefers-reduced-motion:reduce){.interference-lab *, .interference-lab *::before, .interference-lab *::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
       @media(max-width:1000px){.interference-layout{grid-template-columns:minmax(0,1fr) minmax(190px,260px)}.interference-activities{grid-column:1/-1}}
       @media(max-width:700px){.interference-activities{min-width:0}.interference-tabs button{flex:1}.interference-plot{width:100%}.interference-layout{grid-template-columns:1fr}.interference-controls{grid-template-columns:1fr 1fr}.interference-controls h2,.interference-controls fieldset{grid-column:1/-1}.interference-time{grid-template-columns:auto auto}.interference-time label{grid-column:1/-1}.interference-projection .interference-plot{width:100%;max-width:85vh}}
     `}</style>
-    <header><h1>雙點波源干涉</h1><p>選擇波場表徵、調整參數，點擊圖面放置觀測點 P。</p><button type="button" data-action="reset-parameters">重設參數</button><button type="button" data-action="projection" aria-pressed="false" onClick={toggleProjection}>投影模式</button></header>
+    <header><h1>雙點波源干涉</h1><p>選擇波場表徵、調整參數；點擊圖面或按 Enter 放置觀測點 P。</p><button type="button" data-action="reset-parameters">重設參數</button><button type="button" data-action="projection" aria-pressed="false" onClick={toggleProjection}>投影模式</button></header>
     <div className="interference-layout">
       <div>
         <div data-interference-host>
-          <div className="interference-plot" data-interference-plot tabIndex={0} role="application" aria-label="波場與觀測點。點擊建立 P，方向鍵移動，Shift 加大步距，Delete 清除。">
-            <canvas data-interference-canvas aria-label="雙點波源瞬時場 Canvas" />
+          <div className="interference-plot" data-interference-plot tabIndex={0} role="application" aria-label="波場與觀測點。按 Enter 或空白鍵在中央建立 P，方向鍵移動，Shift 加大步距，Delete 清除。" aria-describedby="interference-field-summary">
+            <canvas data-interference-canvas aria-hidden="true" />
             <svg data-interference-overlay viewBox="0 0 600 600" aria-hidden="true"><g data-layer="wavefronts"/><g data-layer="conditions"/><g data-layer="measurement"/><g data-layer="sources"/></svg>
             <p className="interference-plot-hint" data-plot-hint><span>點一下放 P，按住可拖曳，點兩下移除</span><button type="button" aria-label="關閉操作說明" onClick={dismissPlotHint}>×</button></p>
           </div>
           <p data-point-position aria-live="polite">尚未放置 P</p>
+          <p data-point-announcement aria-live="polite" />
+          <p id="interference-field-summary" className="interference-field-summary" data-field-summary>目前顯示瞬時位移。橘色實線是相長條件，青色虛線是相消條件；兩個波源位於中央線左右。可用 P 取得路徑差和分類讀值。</p>
         </div>
         <div className="interference-time">
           <button type="button" data-action="play-pause" aria-pressed="false">▶ 播放</button>
@@ -110,7 +114,7 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
         <label><input data-control="constructive" type="checkbox" defaultChecked/> 波腹條件線</label>
         <label><input data-control="destructive" type="checkbox" defaultChecked/> 波節條件線</label>
         <button type="button" data-action="clear-point" hidden>清除 P</button>
-        <section className="interference-readout" data-testid="selected-point-panel"><h2>觀測點 P</h2><p data-point-empty>點擊波場建立 P，可拖曳移動。</p><div data-point-values hidden>
+        <section className="interference-readout" data-testid="selected-point-panel"><h2>觀測點 P</h2><p data-point-empty>點擊波場或在圖面按 Enter 建立 P；可拖曳或用方向鍵移動。</p><div data-point-values hidden>
           <dl><dt>r₁</dt><dd data-readout="r1">—</dd><dt>r₂</dt><dd data-readout="r2">—</dd><dt>Δr = r₂ − r₁</dt><dd data-readout="path">—</dd><dt>|Δr| / λ</dt><dd data-readout="pathRatio">—</dd><dt>Δφ</dt><dd data-readout="phase-difference">—</dd><dt>合成振幅 |C|</dt><dd data-readout="amplitude">—</dd><dt>瞬時位移 ψ(P,t)</dt><dd data-readout="displacement">—</dd><dt>分類</dt><dd data-readout="classification">—</dd></dl>
           <svg className="interference-waveform" viewBox="0 0 240 90" role="img" aria-label="觀測點 P 一週期位移波形" data-waveform><path data-waveform-curve d=""/><circle data-waveform-marker cx="0" cy="45" r="4"/></svg>
         </div></section>
@@ -122,7 +126,7 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
         <h3 id="activity-measure-title" tabIndex={-1}>這個點為什麼相長或相消？</h3>
         <p>等振幅、同相、無衰減的課本模式中，波腹線上的點振動最強，波節線上的點幾乎不動。它們的位置有什麼共同點？</p>
         <p data-textbook-required hidden>此活動使用課本條件（等振幅、同相、無衰減）判讀。<button type="button" data-activity-action="setup-textbook">切回課本模式</button></p>
-        <div data-activity-step="place"><p><b>1｜放置觀測點</b>　在圖上點一下建立 P；圖上會標出 r₁、r₂，讀值區會計算路徑差 Δr。</p></div>
+        <div data-activity-step="place"><p><b>1｜放置觀測點</b>　在圖上點一下或聚焦圖面後按 Enter 建立 P；圖上會標出 r₁、r₂，讀值區會計算路徑差 Δr。</p></div>
         <div data-activity-step="explore" hidden><p><b>2｜移動並吸附</b>　拖曳 P 到波腹線和波節線，記錄兩種線上的 |Δr|/λ。</p><p data-measure-progress aria-live="polite">已觀察：波腹 0/1，波節 0/1</p><ul><li>波腹線：<span data-observed="constructive">未觀察</span></li><li>波節線：<span data-observed="destructive">未觀察</span></li></ul></div>
         <div data-activity-step="conclude" hidden><p><b>3｜整理規律</b>　你發現波腹線與波節線的 |Δr|/λ 有什麼不同？</p><label>波腹線上的 |Δr|/λ 都是 <select data-answer="measure-constructive"><option value="">選擇…</option><option value="integer">整數</option><option value="half">半整數</option><option value="none">沒有規律</option></select></label><label>波節線上的 |Δr|/λ 都是 <select data-answer="measure-destructive"><option value="">選擇…</option><option value="integer">整數</option><option value="half">半整數</option><option value="none">沒有規律</option></select></label><button type="button" data-activity-action="measure-check">核對</button><p className="interference-feedback" data-feedback="measure" aria-live="polite"></p></div>
         <div data-activity-step="done" hidden><TexBlock>{String.raw`|\Delta r|=m\lambda,\quad |\Delta r|=(m+\tfrac12)\lambda`}</TexBlock><p>路徑差每多一個 λ，相位差就多 2π；兩列波因此再次同相或反相抵達。</p><button type="button" data-open-dialog="hyperbola">為什麼距離差固定會是雙曲線？</button></div>
