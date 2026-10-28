@@ -219,6 +219,7 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
   };
   const onPointerDown = (event: PointerEvent) => {
     if (disposed) return;
+    if (typeof (event.target as Element | null)?.closest === "function" && (event.target as Element).closest("[data-plot-hint]")) return;
     const rect = svg.getBoundingClientRect(); const p = pointFromEvent(event);
     const px = ((p.x+4)/8)*rect.width, py=((4-p.y)/8)*rect.height;
     const existing = selectedPoint ? { x: ((selectedPoint.x+4)/8)*rect.width, y: ((4-selectedPoint.y)/8)*rect.height } : null;

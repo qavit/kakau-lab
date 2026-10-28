@@ -1,0 +1,14 @@
+
+Running 2 tests using 2 workers
+
+(node:62733) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:62734) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/2] [mobile-chromium] › tests/e2e/interference-gate-c.spec.ts:36:1 › Gate C mobile sidebar defaults closed and can be reopened @mobile
+[2/2] [desktop-chromium] › tests/e2e/interference-gate-c.spec.ts:5:1 › Gate C dialog content and stored preferences survive reload
+  2 passed (1.7s)

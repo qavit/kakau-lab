@@ -3,6 +3,7 @@
 import { useEffect, useRef, type MouseEvent } from "react";
 import { mountInterference } from "@/components/interference/mountInterference";
 import { MathProvider, TexBlock } from "@/components/math/MathJax";
+import InterferenceDialogs from "@/components/interference/InterferenceDialogs";
 
 interface InterferenceSimulationProps { enabled?: boolean }
 
@@ -12,6 +13,16 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
     const container = containerRef.current;
     if (!enabled || !container) return;
     const controller = mountInterference(container);
+    const aside = container.querySelector<HTMLElement>(".interference-activities");
+    const toggle = container.querySelector<HTMLButtonElement>('[data-action="toggle-activities"]');
+    const hint = container.querySelector<HTMLElement>("[data-plot-hint]");
+    try {
+      const stored = localStorage.getItem("kakau-lab-interference-sidebar");
+      const open = stored === "open" || (stored !== "closed" && matchMedia("(min-width: 1024px)").matches);
+      if (aside) aside.dataset.collapsed = String(!open);
+      if (toggle) { toggle.setAttribute("aria-expanded", String(open)); toggle.textContent = open ? "收合活動側欄" : "展開活動側欄"; }
+      if (hint) hint.hidden = localStorage.getItem("kakau-lab-interference-plot-hint") === "dismissed";
+    } catch { /* storage may be unavailable */ }
     return () => controller.dispose();
   }, [enabled]);
   const toggleProjection = (event: MouseEvent<HTMLButtonElement>) => {
@@ -28,6 +39,14 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
     aside.dataset.collapsed = String(collapsed);
     event.currentTarget.setAttribute("aria-expanded", String(!collapsed));
     event.currentTarget.textContent = collapsed ? "展開活動側欄" : "收合活動側欄";
+    try { localStorage.setItem("kakau-lab-interference-sidebar", collapsed ? "closed" : "open"); } catch { /* storage may be unavailable */ }
+  };
+  const dismissPlotHint = () => {
+    const root = containerRef.current;
+    const hint = root?.querySelector<HTMLElement>("[data-plot-hint]");
+    if (hint) hint.hidden = true;
+    try { localStorage.setItem("kakau-lab-interference-plot-hint", "dismissed"); } catch { /* storage may be unavailable */ }
+    root?.querySelector<HTMLElement>("[data-interference-plot]")?.focus();
   };
 
   return <MathProvider><section ref={containerRef} className="interference-lab" aria-label="雙點波源干涉模擬器" data-testid="interference-host">
@@ -49,6 +68,9 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
       .interference-activity[hidden],[data-activity-step][hidden]{display:none}.interference-activity{padding-top:10px}.interference-activity label{display:block;margin:7px 0}.interference-activity input[type=number]{width:5em;margin-left:8px}
       .interference-feedback{min-height:1.5em}.interference-waveform{width:100%;max-width:260px;height:96px;border:1px solid #d9dfe4}.interference-waveform path{fill:none;stroke:#376f9d;stroke-width:2}.interference-waveform circle{fill:#c7770b}
       .interference-dialog{max-width:min(640px,calc(100vw - 24px));max-height:85vh;overflow:auto;border:1px solid #cbd3d9;border-radius:12px;padding:20px}
+      .interference-dialog h3{margin:1em 0 .25em}.interference-dialog p{margin:.6em 0;line-height:1.7}.interference-dialog button{margin-top:1em}
+      .interference-plot-hint{position:absolute;bottom:8px;left:8px;right:8px;z-index:2;background:#fffef0;color:#243244;padding:5px 8px;border-radius:6px;pointer-events:none}.interference-plot-hint button{pointer-events:auto;margin-left:8px}
+      @media(prefers-reduced-motion:reduce){.interference-lab *, .interference-lab *::before, .interference-lab *::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
       @media(max-width:1000px){.interference-layout{grid-template-columns:minmax(0,1fr) minmax(190px,260px)}.interference-activities{grid-column:1/-1}}
       @media(max-width:700px){.interference-activities{min-width:0}.interference-tabs button{flex:1}.interference-plot{width:100%}.interference-layout{grid-template-columns:1fr}.interference-controls{grid-template-columns:1fr 1fr}.interference-controls h2,.interference-controls fieldset{grid-column:1/-1}.interference-time{grid-template-columns:auto auto}.interference-time label{grid-column:1/-1}.interference-projection .interference-plot{width:100%;max-width:85vh}}
     `}</style>
@@ -59,6 +81,7 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
           <div className="interference-plot" data-interference-plot tabIndex={0} role="application" aria-label="波場與觀測點。點擊建立 P，方向鍵移動，Shift 加大步距，Delete 清除。">
             <canvas data-interference-canvas aria-label="雙點波源瞬時場 Canvas" />
             <svg data-interference-overlay viewBox="0 0 600 600" aria-hidden="true"><g data-layer="wavefronts"/><g data-layer="conditions"/><g data-layer="measurement"/><g data-layer="sources"/></svg>
+            <p className="interference-plot-hint" data-plot-hint><span>點一下放 P，按住可拖曳，點兩下移除</span><button type="button" aria-label="關閉操作說明" onClick={dismissPlotHint}>×</button></p>
           </div>
           <p data-point-position aria-live="polite">尚未放置 P</p>
         </div>
@@ -111,9 +134,6 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
       <div className="interference-activity-actions"><button type="button" data-activity-nav="prev">← 上一個</button><button type="button" data-activity-nav="next">下一個 →</button></div>
       </aside>
     </div>
-    <dialog className="interference-dialog" data-dialog="hyperbola"><h2>距離差與雙曲線</h2><p>以兩波源為焦點，到焦點的距離差固定的軌跡是雙曲線。當 |Δr|=d 時退化成波源外側半直線；若 |Δr|&gt;d 則不存在。</p><TexBlock>{String.raw`\frac{x^2}{a^2}-\frac{y^2}{b^2}=1`}</TexBlock><button type="button" data-close-dialog>關閉</button></dialog>
-    <dialog className="interference-dialog" data-dialog="counts"><h2>線數公式</h2><p>課本條件下包含退化邊界線：d=3λ 時波腹線 7 條、波節線 6 條。</p><TexBlock>{String.raw`N_{腹}=2\lfloor d/\lambda\rfloor+1,\quad N_{節}=2\lfloor d/\lambda+1/2\rfloor`}</TexBlock><button type="button" data-close-dialog>關閉</button></dialog>
-    <dialog className="interference-dialog" data-dialog="antiphase"><h2>初相位差與干涉條件</h2><p>中央 Δr=0 時，φ₂−φ₁=π 會使兩波反相抵達。但振幅不等時相消不等於零振幅。</p><button type="button" data-close-dialog>關閉</button></dialog>
-    <dialog className="interference-dialog" data-dialog="time"><h2>為什麼波在動、條件線不動？</h2><p>Δφ = kΔr + (φ₂−φ₁) 不含時間；瞬時位移改變，穩態相位差條件不變。</p><button type="button" data-close-dialog>關閉</button></dialog>
+    <InterferenceDialogs />
   </section></MathProvider>;
 }

@@ -60,6 +60,14 @@ test("integer and half-integer separation boundaries preserve source line-count 
   assert.deepEqual(textbookLineCounts(2.5, 1), { antinodes: 5, nodes: 6 });
   assert.deepEqual(textbookLineCounts(3 - 1e-6, 1), { antinodes: 5, nodes: 6 });
   assert.deepEqual(textbookLineCounts(3, 1), { antinodes: 7, nodes: 6 });
+  for (const [ratio, antinodes, nodes] of [
+    [2.5 - 2e-9, 5, 4], [2.5, 5, 6], [2.5 + 2e-9, 5, 6],
+    [3 - 2e-9, 5, 6], [3, 7, 6], [3 + 2e-9, 7, 6],
+  ]) {
+    assert.deepEqual(textbookLineCounts(ratio, 1), { antinodes, nodes });
+    assert.equal(phaseConditionLevels(parameters({ separation: ratio }), "constructive").length, antinodes);
+    assert.equal(phaseConditionLevels(parameters({ separation: ratio }), "destructive").length, nodes);
+  }
 });
 
 test("unequal anti-phase amplitudes leave their amplitude difference at the center", () => {

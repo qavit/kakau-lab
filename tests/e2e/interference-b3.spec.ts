@@ -105,6 +105,8 @@ test("activity controls fit a narrow touch viewport @mobile", async ({ page }) =
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/interference-lifecycle");
   const host = page.getByTestId("interference-host");
+  await expect(host.locator("[data-interference-runtime]")).toHaveCount(1);
+  await host.locator('[data-action="toggle-activities"]').tap();
   await host.locator('[data-activity-tab="count"]').tap();
   await host.locator('[data-answer="count-predict-antinodes"]').fill("7");
   await host.locator('[data-answer="count-predict-nodes"]').fill("6");

@@ -1,0 +1,11 @@
+
+> kakau-lab@0.1.0 lint
+> eslint . --ignore-pattern dist --ignore-pattern .next
+
+
+/Users/jacques/Documents/Kakau/kakau-lab/components/StandardAtmosphereLab.tsx
+  248:9  warning  The 'plot' conditional could make the dependencies of useCallback Hook (at line 252) change on every render. To fix this, wrap the initialization of 'plot' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  248:9  warning  The 'plot' conditional could make the dependencies of useCallback Hook (at line 258) change on every render. To fix this, wrap the initialization of 'plot' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+✖ 2 problems (0 errors, 2 warnings)
+
