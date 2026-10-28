@@ -114,3 +114,32 @@ test("playback does not retypeset kinematics formulas @c4", async ({ page }) => 
   const after = await page.locator(".if-kinematics").evaluate(el => ({ svgs: el.querySelectorAll("svg").length, html: el.innerHTML.length }));
   expect(after).toEqual(before);
 });
+
+for (const [width, height] of [[1440, 900], [390, 844], [320, 720]] as const) {
+  test(`short formulas have no phantom scrollbar at ${width}px @c4`, async ({ page }) => {
+    await open(page, width, height);
+    await page.locator("[data-interference-plot]").scrollIntoViewIfNeeded();
+    const plot = await page.locator("[data-interference-plot]").boundingBox();
+    await page.mouse.click(plot!.x + plot!.width * .62, plot!.y + plot!.height * .3);
+    await page.locator("details.if-advanced summary").click();
+    await expect(page.locator(".measure-formulas .if-math mjx-container svg").first()).toBeVisible();
+    const clipped = await page.evaluate(() => [...document.querySelectorAll<HTMLElement>(".if-math")]
+      .filter(el => el.getClientRects().length && el.scrollWidth > el.clientWidth + 1).map(el => el.textContent?.slice(0, 20)));
+    expect(clipped).toEqual([]);
+    expect(await noOverflow(page)).toBe(true);
+  });
+}
+
+test("dialog inline math keeps the text baseline and long derivations scroll with a hint @c4", async ({ page }) => {
+  await open(page, 320, 720);
+  await page.evaluate(() => (document.querySelector('[data-open-dialog="hyperbola"]') as HTMLElement).click());
+  const dialog = page.locator('.interference-dialog[open]');
+  await expect(dialog.locator("mjx-container svg").first()).toBeVisible();
+  const info = await dialog.evaluate(el => ({
+    inlineOverflow: [...el.querySelectorAll<HTMLElement>("mjx-container:not([display=true])")].map(m => getComputedStyle(m).overflowX).filter(v => v !== "visible"),
+    longScrolls: [...el.querySelectorAll<HTMLElement>("mjx-container[display=true]")].some(m => m.scrollWidth > m.clientWidth + 1 && getComputedStyle(m).overflowX === "auto" && getComputedStyle(m).backgroundImage.includes("gradient")),
+  }));
+  expect(info.inlineOverflow).toEqual([]);
+  expect(info.longScrolls).toBe(true);
+  expect(await noOverflow(page)).toBe(true);
+});

@@ -85,6 +85,8 @@ html[data-mode="dark"] .interference-lab{--if-term-c:#f0b84a;--if-term-d:#5fd0e0
 .rail-counts{margin:.45rem 0 0}.rail-counts--advanced div{display:flex;justify-content:space-between;gap:.5rem;padding:.3rem 0;border-bottom:1px dotted var(--line-strong);font-size:.8rem}
 .rail-counts--advanced dt{display:flex;align-items:center;gap:.4rem;margin:0}.rail-counts--advanced dd{margin:0;font-family:ui-monospace,monospace;font-weight:700}.rail-counts--advanced p{margin:.4rem 0 0;font-size:.72rem;line-height:1.5;color:var(--body)}
 .if-math{font-size:.9rem;line-height:1.2;overflow-x:auto;overflow-y:hidden}.if-math mjx-container{margin:0!important;min-width:0}.if-math mjx-container svg{max-width:none}
+/* MathJax's visually hidden MathML is absolutely positioned and as wide as the text; it would add a phantom scrollbar to short formulas. */
+.interference-lab mjx-assistive-mml{width:1px!important;max-width:1px;overflow:hidden}
 .rail-ratio{min-height:2.7rem}.rail-counts:not(.rail-counts--advanced) .rail-count{min-height:3.5rem}.measure-formula>.if-math{min-height:1.7rem}.measure-formula--key>.if-math{min-height:2.5rem}
 .measure-formulas{display:grid;gap:.15rem;margin-top:.45rem}
 .measure-formula{display:flex;align-items:center;gap:.45rem;min-height:1.45rem;white-space:nowrap}
@@ -162,7 +164,11 @@ html[data-mode="dark"] .interference-lab{--if-term-c:#f0b84a;--if-term-d:#5fd0e0
 .interference-dialog>h2{position:sticky;top:0;z-index:1;margin:0;padding:.9rem 1.25rem;border-bottom:1px solid var(--line);background:var(--if-panel);font-size:1.08rem;font-weight:750}
 .interference-dialog>:not(h2){margin-left:1.25rem;margin-right:1.25rem;max-width:calc(100% - 2.5rem);overflow-wrap:anywhere}
 .interference-dialog p,.interference-dialog li{font-size:.9rem;line-height:1.85;color:var(--body)}.interference-dialog h3{margin:1.1rem 1.25rem .2rem;font-size:.95rem;font-weight:750}
-.interference-dialog mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
+.interference-dialog mjx-container[display="true"]{max-width:100%;overflow-x:auto;overflow-y:hidden}
+/* Inline math must not be a scroll container: overflow other than visible moves its baseline to the bottom edge. */
+.interference-dialog mjx-container:not([display="true"]){overflow:visible}
+/* Long derivations scroll sideways; edge shadows (drawn only where content is cut off) show that there is more. */
+.interference-dialog mjx-container[display="true"]{background:linear-gradient(to right,var(--if-panel),var(--if-panel)) left center/1.2rem 100% no-repeat local,linear-gradient(to left,var(--if-panel),var(--if-panel)) right center/1.2rem 100% no-repeat local,radial-gradient(farthest-side at 0 50%,rgba(0,0,0,.22),transparent) left center/.6rem 100% no-repeat scroll,radial-gradient(farthest-side at 100% 50%,rgba(0,0,0,.22),transparent) right center/.6rem 100% no-repeat scroll}
 .interference-dialog button[data-close-dialog]{margin-top:1rem;margin-bottom:1.25rem}
 .interference-lab mjx-container[display="true"]{max-width:100%;overflow-x:auto;overflow-y:hidden}
 /* projection: field first; toolbar and activities step aside, measurement rail and time bar stay */
