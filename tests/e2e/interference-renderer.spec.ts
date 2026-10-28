@@ -26,6 +26,7 @@ test("renderer shows the field and keeps controls, measurement and lifecycle in 
     const input = element as HTMLInputElement; input.value = "0.5"; input.dispatchEvent(new Event("input", { bubbles: true }));
   });
   expect(await canvas.evaluate((element) => (element as HTMLCanvasElement).toDataURL())).toBe(stationaryPattern);
+  await host.getByRole("button", { name: "更多" }).click();
   for (const mode of ["amplitude", "phase", "displacement"]) await host.locator(`input[name="interference-view"][value="${mode}"]`).check();
 
   const wavelength = host.locator('[data-control="wavelength"]');
@@ -80,6 +81,7 @@ test("renderer fits a touch viewport and can place a measurement point @mobile",
   const host = page.getByTestId("interference-host");
   const plot = host.locator("[data-interference-plot]");
   await expect(host.locator("canvas[data-interference-canvas]")).toBeVisible();
+  await expect(host.locator("[data-interference-runtime]")).toHaveAttribute("data-interference-frame", /.+/);
   const bounds = await plot.boundingBox();
   if (!bounds) throw new Error("Plot has no visible bounds");
   const pixelRatio = await host.locator("canvas[data-interference-canvas]").evaluate((element) => {
