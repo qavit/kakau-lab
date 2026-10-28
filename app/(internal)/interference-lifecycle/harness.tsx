@@ -12,7 +12,7 @@ export default function InterferenceLifecycleHarness() {
       <button type="button" onClick={() => setEnabled((value) => !value)} data-testid="toggle-interference">
         {enabled ? "Unmount controller" : "Mount controller"}
       </button>
-      <InterferenceSimulation enabled={enabled} />
+      {enabled ? <InterferenceSimulation /> : null}
     </main>
   );
 }
