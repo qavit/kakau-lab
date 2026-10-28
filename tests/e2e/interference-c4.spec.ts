@@ -53,7 +53,7 @@ const checkTitles = (page: Page) => page.evaluate(() => {
 });
 
 for (const [width, height] of [[1440, 900], [390, 844], [320, 720]] as const) {
-  test(`activity step titles with inline math flow as text at ${width}px @c4`, async ({ page }) => {
+  test(`activity step titles with inline math flow as text at ${width}px @c4 @cross-browser`, async ({ page }) => {
     await open(page, width, height);
     for (const id of TABS) {
       await page.locator(`[data-activity-tab="${id}"]`).click();
@@ -78,7 +78,7 @@ test("activity 3 title survives 200% text size without overflow @c4", async ({ p
   await shot(page, "activity3-title-390-200pct", '[data-activity="antiphase"]');
 });
 
-test("wave speed updates v, f, λ, T, MathJax formula and sr text while paused @c4", async ({ page }) => {
+test("wave speed updates v, f, λ, T, MathJax formula and sr text while paused @c4 @cross-browser", async ({ page }) => {
   await open(page, 1440, 900);
   await page.locator("details.if-advanced summary").click();
   await expect(page.locator('[data-action="play-pause"]')).toHaveAttribute("aria-pressed", "false");
@@ -116,7 +116,7 @@ test("playback does not retypeset kinematics formulas @c4", async ({ page }) => 
 });
 
 for (const [width, height] of [[1440, 900], [390, 844], [320, 720]] as const) {
-  test(`short formulas have no phantom scrollbar at ${width}px @c4`, async ({ page }) => {
+  test(`short formulas have no phantom scrollbar at ${width}px @c4 @cross-browser`, async ({ page }) => {
     await open(page, width, height);
     await page.locator("[data-interference-plot]").scrollIntoViewIfNeeded();
     const plot = await page.locator("[data-interference-plot]").boundingBox();
@@ -144,7 +144,7 @@ test("dialog inline math keeps the text baseline and long derivations scroll wit
   expect(await noOverflow(page)).toBe(true);
 });
 
-test("activity 1 keeps finished steps visible as the lesson advances @c4", async ({ page }) => {
+test("activity 1 keeps finished steps visible as the lesson advances @c4 @cross-browser", async ({ page }) => {
   await open(page, 1440, 900);
   const steps = page.locator('[data-activity="measure"] [data-activity-step]');
   const plot = await page.locator("[data-interference-plot]").boundingBox();
@@ -167,7 +167,7 @@ test("activity 1 keeps finished steps visible as the lesson advances @c4", async
   await shot(page, "activity1-cumulative-steps", '[data-activity="measure"]');
 });
 
-test("advanced mode keeps phase conditions distinct from zero amplitude and returns to textbook @c4", async ({ page }) => {
+test("advanced mode keeps phase conditions distinct from zero amplitude and returns to textbook @c4 @cross-browser", async ({ page }) => {
   await open(page, 1440, 900);
   await page.locator("details.if-advanced summary").click();
   await expect(page.locator("[data-mode-status]")).toHaveText("課本模式");
@@ -187,7 +187,7 @@ test("advanced mode keeps phase conditions distinct from zero amplitude and retu
   await expect(page.locator('[data-output="wavelength"]')).toHaveText("1.00");
 });
 
-test("projection round-trip preserves parameters, P and the active activity @c4", async ({ page }) => {
+test("projection round-trip preserves parameters, P and the active activity @c4 @cross-browser", async ({ page }) => {
   await open(page, 1440, 900);
   await setRange(page, "wavelength", "0.8");
   await setRange(page, "separation", "3");
