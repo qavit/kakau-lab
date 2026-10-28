@@ -52,15 +52,13 @@ for (const [width, height] of [[1440, 900], [1280, 800]] as const) {
 
 test("formulas update live, textbook counts and advanced mode stay distinct @c3", async ({ page }) => {
   await open(page, 1440, 900, "open");
-  const slot = (name: string) => page.locator(`[data-slot="${name}"]`).first();
-  await expect(slot("ratio")).toHaveText("2.00");
-  await expect(slot("antinodes")).toHaveText("5");
-  await expect(slot("nodes")).toHaveText("4");
+  const geometry = page.locator("[data-geometry-sr]");
+  const svgs = page.locator(".if-rail mjx-container svg");
+  await expect(svgs.first()).toBeVisible(); // real MathJax SVG, not CSS or text
+  await expect(geometry).toHaveText("d/λ = 2.00，波腹線 5 條，波節線 4 條。");
   const setRange = (name: string, value: string) => page.locator(`[data-control="${name}"]`).evaluate((el, v) => { const input = el as HTMLInputElement; input.value = v; input.dispatchEvent(new Event("input", { bubbles: true })); }, value);
   await setRange("separation", "3");
-  await expect(slot("ratio")).toHaveText("3.00");
-  await expect(slot("antinodes")).toHaveText("7");
-  await expect(slot("nodes")).toHaveText("6");
+  await expect(geometry).toHaveText("d/λ = 3.00，波腹線 7 條，波節線 6 條。");
   await expect(page.locator("[data-mode-status]")).toHaveText("課本模式");
   const before = await rect(page, ".if-rail");
   await setRange("separation", "3.5");
@@ -82,7 +80,9 @@ test("measurement rail: empty prompt, P readouts, classification and waveform @c
   const plotBefore = await rect(page, "[data-interference-plot]");
   await placePoint(page);
   expect(await rect(page, "[data-interference-plot]")).toEqual(plotBefore); // placing P never moves the field
-  for (const name of ["r1", "r2", "path", "pathRatio"]) await expect(page.locator(`[data-slot="${name}"]`).first()).not.toHaveText("0.00");
+  await expect(page.locator(".if-rail [data-point-values] mjx-container svg").first()).toBeVisible();
+  await expect(page.locator("[data-measure-sr]")).toContainText("r₁ =");
+  await expect(page.locator("[data-measure-sr]")).not.toContainText("0.00，r₂");
   await expect(page.locator("[data-classification-title]")).not.toBeEmpty();
   await expect(page.locator('[data-readout="phase-difference"]')).toContainText("°");
   await expect(page.locator("[data-waveform]")).toBeVisible();
@@ -96,14 +96,14 @@ test("measurement rail: empty prompt, P readouts, classification and waveform @c
 test("activity 2 masks the live counts until the answer is revealed @c3", async ({ page }) => {
   await open(page, 1440, 900, "open");
   await page.locator('[data-activity-tab="count"]').click();
-  await expect(page.locator('[data-slot="antinodes"]').first()).toHaveText("?");
+  await expect(page.locator("[data-geometry-sr]")).toContainText("線數暫時遮住");
   await page.locator('[data-answer="count-predict-antinodes"]').fill("7");
   await page.locator('[data-answer="count-predict-nodes"]').fill("6");
   await page.locator('[data-activity-action="count-lock"]').click();
   await page.locator('[data-answer="count-antinodes"]').fill("7");
   await page.locator('[data-answer="count-nodes"]').fill("6");
   await page.locator('[data-activity-action="count-check"]').click();
-  await expect(page.locator('[data-slot="antinodes"]').first()).toHaveText("7");
+  await expect(page.locator("[data-geometry-sr]")).toContainText("波腹線 7 條");
   await shot(page, "desktop-1440-activity-count-done");
 });
 
@@ -184,4 +184,45 @@ test("mobile formulas and dialog scroll locally without widening the page @c3", 
   expect(box && box.x >= 0 && box.x + box.width <= 320).toBe(true);
   expect(await noHorizontalOverflow(page)).toBe(true);
   await shot(page, "mobile-320-dialog");
+});
+
+test("rail, activities and dialogs are real MathJax SVG and update without node growth @c3", async ({ page }) => {
+  await open(page, 1440, 900, "open");
+  const svgs = page.locator('[data-testid="interference-host"] mjx-container svg');
+  await expect(page.locator(".if-rail mjx-container svg").first()).toBeVisible();
+  await expect(page.locator(".if-rail .rail-ratio mjx-container svg")).toHaveCount(1);
+  await expect(page.locator(".if-rail .rail-count mjx-container svg")).toHaveCount(2);
+  await expect(page.locator('[data-dialog="counts"] mjx-container svg').first()).toBeAttached();
+  await expect(page.locator('[data-activity="measure"] mjx-container svg').first()).toBeAttached();
+  const noCssFakes = await page.locator(".if-rail").evaluate((rail) => rail.querySelectorAll(".if-frac, .if-floor, [data-slot]").length);
+  expect(noCssFakes).toBe(0);
+
+  // parameter change retypesets the formula with the new number
+  const ratioBefore = await page.locator(".rail-ratio mjx-container").innerHTML();
+  await page.locator('[data-control="separation"]').evaluate((el) => { const i = el as HTMLInputElement; i.value = "3"; i.dispatchEvent(new Event("input", { bubbles: true })); });
+  await expect.poll(async () => page.locator(".rail-ratio mjx-container").innerHTML()).not.toBe(ratioBefore);
+  await expect(page.locator("[data-geometry-sr]")).toContainText("d/λ = 3.00");
+
+  // playback: no re-typesetting, no SVG growth, formula DOM untouched
+  await placePoint(page);
+  await expect(page.locator(".measure-formulas mjx-container svg").first()).toBeVisible();
+  const count = await svgs.count();
+  const railHtml = await page.locator(".if-rail .measure-formulas").innerHTML();
+  await page.locator('[data-action="play-pause"]').click();
+  await page.waitForTimeout(1500);
+  await page.locator('[data-action="play-pause"]').click();
+  expect(await svgs.count()).toBe(count);
+  expect(await page.locator(".if-rail .measure-formulas").innerHTML()).toBe(railHtml);
+  await shot(page, "math-desktop-1440");
+});
+
+test("MathJax formulas stay readable in dark theme and on mobile @c3", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await open(page, 390, 844);
+  await placePoint(page);
+  await expect(page.locator(".if-rail .rail-ratio mjx-container svg")).toBeVisible();
+  expect(await noHorizontalOverflow(page)).toBe(true);
+  const fill = await page.locator(".if-rail .rail-ratio mjx-container svg").first().evaluate((el) => getComputedStyle(el).color);
+  expect(fill).not.toBe("rgb(0, 0, 0)");
+  await shot(page, "math-mobile-390-dark", true);
 });

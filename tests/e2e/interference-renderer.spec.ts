@@ -38,7 +38,7 @@ test("renderer shows the field and keeps controls, measurement and lifecycle in 
   if (!bounds) throw new Error("Plot has no visible bounds");
   await page.mouse.click(bounds.x + bounds.width * .7, bounds.y + bounds.height * .38);
   await expect(host.locator("[data-selected-point]")).toBeVisible();
-  await expect(host.locator("[data-readout='r1']")).not.toHaveText("—");
+  await expect(host.locator("[data-measure-sr]")).toContainText("r₁ =");
   const markerBefore = await host.locator("[data-selected-point]").getAttribute("cx");
   await page.mouse.move(bounds.x + bounds.width * .7, bounds.y + bounds.height * .38);
   await page.mouse.down();

@@ -8,6 +8,13 @@ import { checkLineCountAnswer, centralConditionKind, constructiveOrderShape } fr
 import { snapToCondition } from "../../models/interference-snap.ts";
 
 export interface InterferenceController { dispose(): void }
+/** Parameter/point-driven numbers for the typeset formulas. Never contains per-frame values (ψ stays a plain readout). */
+export interface InterferenceReadout {
+  ratio: string; antinodes: string; nodes: string; constructiveCount: string; destructiveCount: string;
+  textbook: boolean; masked: boolean; kin: { v: string; f: string; lambda: string; T: string };
+  point: null | { r1: string; r2: string; path: string; pathRatio: string };
+}
+export const READOUT_EVENT = "interference-readout";
 export interface InterferenceRuntime {
   requestAnimationFrame(callback: FrameRequestCallback): number;
   cancelAnimationFrame(id: number): void;
@@ -57,6 +64,16 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
   let dialogOpener: HTMLElement | null = null;
   const activityState: { measureConstructive: boolean; measureDestructive: boolean; measureDone: boolean; measureStep: string; measureValues: { constructive: string; destructive: string }; countStep: string; countAttempts: number; countPrediction: { antinodes: string; nodes: string }; antiphaseDone: boolean; timeStep: string; timePrediction: string } = { measureConstructive: false, measureDestructive: false, measureDone: false, measureStep: "place", measureValues: { constructive: "", destructive: "" }, countStep: "predict", countAttempts: 0, countPrediction: { antinodes: "", nodes: "" }, antiphaseDone: false, timeStep: "predict", timePrediction: "" };
   const cleanups: Array<() => void> = [];
+  const readout: InterferenceReadout = { ratio: "2.00", antinodes: "5", nodes: "4", constructiveCount: "5", destructiveCount: "4", textbook: true, masked: false, kin: { v: "1.00", f: "1.00", lambda: "1.00", T: "1.00" }, point: null };
+  let readoutKey = "";
+  /** Emits only when a formula number actually changed, so animation frames never retypeset. */
+  const emitReadout = (patch: Partial<InterferenceReadout>) => {
+    Object.assign(readout, patch);
+    const key = JSON.stringify(readout);
+    if (key === readoutKey) return;
+    readoutKey = key;
+    container.dispatchEvent(new CustomEvent<InterferenceReadout>(READOUT_EVENT, { detail: structuredClone(readout) }));
+  };
   const listen = (target: EventTarget, type: string, handler: EventListener) => {
     target.addEventListener(type, handler);
     cleanups.push(() => target.removeEventListener(type, handler));
@@ -110,7 +127,6 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     }
     renderPoint();
   };
-  const slot = (name: string, value: string) => { for (const node of container.querySelectorAll<HTMLElement>(`[data-slot="${name}"]`)) if (node.textContent !== value) node.textContent = value; };
   const formatSigned = (v: number) => format(v).replace("-", "−");
   const isTextbook = () => params.phase1 === params.phase2 && params.amplitude1 === params.amplitude2 && !params.attenuation;
   const terms = () => isTextbook() ? { constructive: "波腹線", destructive: "波節線" } : { constructive: "相長條件線", destructive: "相消條件線" };
@@ -134,13 +150,10 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     const counts = textbookLineCounts(params.separation, params.wavelength);
     const constructiveCount = phaseConditionLevels(params, "constructive").length, destructiveCount = phaseConditionLevels(params, "destructive").length;
     const hide = (n: number) => masked ? "?" : String(n);
-    for (const name of ["ratio", "ratioA", "ratioB"]) slot(name, format(ratio));
-    slot("antinodes", hide(counts.antinodes)); slot("nodes", hide(counts.nodes));
-    text('[data-readout="constructive-count"]', hide(constructiveCount)); text('[data-readout="destructive-count"]', hide(destructiveCount));
+    emitReadout({ ratio: format(ratio), antinodes: hide(counts.antinodes), nodes: hide(counts.nodes), constructiveCount: hide(constructiveCount), destructiveCount: hide(destructiveCount), textbook, masked,
+      kin: { v: format(waveSpeed), f: format(frequency), lambda: format(params.wavelength), T: format(1 / frequency) } });
     const show = (selector: string, visible: boolean) => { const node = query<HTMLElement>(selector); if (node && node.hidden === visible) node.hidden = !visible; };
-    show("[data-counts-textbook]", textbook); show("[data-counts-advanced]", !textbook); show("[data-counts-masked]", masked);
     const t = terms();
-    text("[data-geometry-sr]", masked ? `d/λ = ${format(ratio)}，線數暫時遮住。` : `d/λ = ${format(ratio)}，${t.constructive} ${textbook ? counts.antinodes : constructiveCount} 條，${t.destructive} ${textbook ? counts.nodes : destructiveCount} 條。`);
     text('[data-term="constructive"]', t.constructive); text('[data-term="destructive"]', t.destructive);
     show("[data-advanced-warning]", !textbook);
     const mode = query<HTMLElement>("[data-mode-status]");
@@ -149,8 +162,6 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     if (keyBar && keyBar.dataset.mode !== view) { keyBar.dataset.mode = view; keyBar.style.background = key.gradient; }
     text("[data-view-key-low]", key.low); text("[data-view-key-high]", key.high);
     show("[data-time-static-hint]", view !== "displacement"); show("[data-phase-note]", view === "phase");
-    slot("kinV", format(waveSpeed)); slot("kinF", format(frequency)); slot("kinLambda", format(params.wavelength)); slot("kinT", format(1 / frequency));
-    text("[data-kinematics-sr]", `v = ${format(waveSpeed)}，f = ${format(frequency)}，λ = ${format(params.wavelength)}，T = ${format(1 / frequency)} s。`);
   };
   const classificationFor = (sample: ReturnType<typeof sampleSelectedPoint>, snapped: PhaseConditionLevel | undefined, textbook: boolean) => {
     const ratio = format(Math.abs(sample.pathDifferenceRatio));
@@ -167,7 +178,7 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     const empty = query<HTMLElement>("[data-point-empty]");
     const clear = query<HTMLButtonElement>('[data-action="clear-point"]');
     const status = query<HTMLElement>("[data-line-readout]");
-    if (!selectedPoint) { const hadPoint = query<HTMLElement>("[data-point-position]")?.textContent?.startsWith("P ("); if (values) values.hidden = true; if (empty) empty.hidden = false; if (clear) clear.hidden = true; if (status) status.hidden = true; text("[data-point-position]", "尚未放置 P"); if (hadPoint) text("[data-point-announcement]", "觀測點 P 已清除。"); return; }
+    if (!selectedPoint) { const hadPoint = query<HTMLElement>("[data-point-position]")?.textContent?.startsWith("P ("); if (values) values.hidden = true; if (empty) empty.hidden = false; if (clear) clear.hidden = true; if (status) status.hidden = true; emitReadout({ point: null }); text("[data-point-position]", "尚未放置 P"); if (hadPoint) text("[data-point-announcement]", "觀測點 P 已清除。"); return; }
     if (values) values.hidden = false; if (empty) empty.hidden = true; if (clear) clear.hidden = false;
     const p = project(selectedPoint);
     const { source1, source2 } = sourcePositions(params.separation);
@@ -201,8 +212,7 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
       text('[data-observed="destructive"]', activityState.measureValues.destructive || "未觀察");
       for (const kind of ["constructive", "destructive"] as const) query<HTMLElement>(`[data-check="${kind}"]`)?.classList.toggle("is-done", kind === "constructive" ? activityState.measureConstructive : activityState.measureDestructive);
     }
-    slot("r1", format(sample.r1)); slot("r2", format(sample.r2)); slot("path", formatSigned(sample.pathDifference)); slot("pathRatio", format(sample.absolutePathDifference / params.wavelength));
-    text("[data-measure-sr]", `r₁ = ${format(sample.r1)}，r₂ = ${format(sample.r2)}，Δr = ${formatSigned(sample.pathDifference)}，|Δr|/λ = ${format(Math.abs(sample.pathDifferenceRatio))}。`);
+    emitReadout({ point: { r1: format(sample.r1), r2: format(sample.r2), path: formatSigned(sample.pathDifference), pathRatio: format(sample.absolutePathDifference / params.wavelength) } });
     text('[data-readout="phase-difference"]', `${format(((sample.phaseDifference * 180 / Math.PI) % 360 + 360) % 360, 1)}°`);
     text('[data-readout="amplitude"]', format(sample.amplitude));
     text('[data-readout="displacement"]', format(instantaneousDisplacement(sample, timeCycle * Math.PI * 2)));

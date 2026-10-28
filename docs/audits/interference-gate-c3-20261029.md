@@ -152,3 +152,54 @@ C4 請 Owner 實際操作：
 - 投影模式是否保留 rail 與時間列的預設內容。
 
 Gate D 前提：Lab 正式部署與 Front redirect／registry／SEO 切換（本次未動）、Firefox／WebKit 重驗、VoiceOver 與 400% 縮放、`/interference-lifecycle` 以外的 prod 路徑 e2e 覆蓋、C4 驗收通過。
+
+## 14. Math Parity Remediation（C3 後續，2026-10-29）
+
+**起因**：Owner 檢查實際畫面後，不接受 §6 以靜態 JSX＋CSS 分數／文字插槽模擬公式的做法。本節改為使用 Lab 既有共用 MathJax 元件。Front 未動，未新增 KaTeX 或第二套引擎。
+
+### 14.1 恢復項目（皆為 MathJax SVG）
+- **幾何 rail**：`\dfrac{d}{\lambda}=2.00`、`N_腹=2⌊d/λ⌋+1` 及代入式、`N_節=2⌊d/λ+½⌋` 及代入式；進階模式改顯示 `N_相長`、`N_相消` 計數與「課本 ⌊d/λ⌋ 公式不適用」說明。活動 2 作答前，結果顯示為 `?`。
+- **量測 rail**：`r₁=|PS₁|`、`r₂=|PS₂|`、`Δr=r₂−r₁`、`|Δr|/λ` 含即時數值；`Δφ (mod 360°)`、`|C|`、`ψ(P,t)` 的標籤改為 MathJax，值仍為純文字；波形標題的 `ψ(P,t)` 亦同。
+- **進階面板**：`v=fλ: 1.00=1.00×1.00, T=1/f=1.00 s` 改為 MathJax。
+- **活動與 dialog**：活動 1–4 與進階探索的內文行內數學（r₁、Δr、|Δr|/λ、d=3λ、m=0,1,2,…、φ₂=180°、|Δr|=3λ、邊界案例三條件）及四個 dialog 的所有行內符號，改用共用 `Tex`；原有的 `TexBlock` 推導式維持。
+- 圖面 SVG 標籤（S₁、S₂、r₁、r₂、P）仍為 SVG `<text>`，與 Front 相同，不屬公式排版。
+
+### 14.2 使用／修改的共用元件
+- 使用 `components/math/MathJax.tsx` 的 `MathProvider`、`Tex`（含既有 `dynamic` 屬性）、`TexBlock`；**未修改該檔案**。載入失敗時沿用其 `<code>` 純 TeX fallback。
+- 修改 interference 自有檔案：`InterferenceFormulas.tsx`（改為 React＋`Tex dynamic`，移除 CSS 分數／floor）、`InterferenceDialogs.tsx`、`InterferenceSimulation.tsx`、`interferenceStyles.ts`、`mountInterference.ts`。
+
+### 14.3 動態更新與效能設計
+| 類別 | 做法 |
+|---|---|
+| 靜態公式 | `Tex`／`TexBlock`，只在掛載時排版一次 |
+| 隨參數或 P 改變 | `mountInterference` 只在公式數字**實際改變**時發出 `interference-readout` 事件；React 狀態更新後 `Tex dynamic` 重新排版 |
+| 動畫期間每影格變動（ψ(P,t)、t/T） | 不進 MathJax：已排版的 `ψ(P,t)` 標籤＋純文字值 |
+- 公式容器固定 `min-height`，並加 `inert`＋`aria-hidden`：MathJax SVG 容器會帶 `tabindex`，放在 aria-hidden 內會被 axe 判為 `aria-hidden-focus`；`inert` 讓它們退出 tab 順序，語意由 `sr-only` 句（`data-geometry-sr`、`data-measure-sr`、`data-kinematics-sr`）提供。
+- 測試驗證：播放 1.5 秒前後，host 內 SVG 總數不變、量測公式 DOM 逐字相同（無重新排版、無節點累積）；改 d 後 `.rail-ratio` 的 MathJax 內容改變且 sr 文字同步。
+
+### 14.4 驗證
+| 項目 | 結果 |
+|---|---|
+| 實際瀏覽器 MathJax SVG | `.if-rail` 內有 `mjx-container svg`；rail 內無 `.if-frac`／`.if-floor`／`data-slot`；dialog 與活動內亦有 SVG |
+| Unit | 439/439 PASS |
+| Interference e2e（dev，29 項，含 C3 新增 15 項） | 29/29 PASS |
+| Axe 亮／暗 | 無 critical／serious（修正了上述 `aria-hidden-focus`） |
+| 手機 390／320、暗色 | 無橫向溢出；公式顏色跟隨主題 |
+| Lint | 0 error（既有 2 warning） |
+| tsc | 3 個既有 Cloudflare 型別錯誤，interference 0 |
+| Production build | PASS |
+| C3 layout 回歸 | 既有版面測試（1440／1280／768／390／320、投影、dialog）全過 |
+| 科學核心 | 未改 |
+
+### 14.5 截圖（`interference-gate-c3-20261029/math-remediation/`）
+- Before（CSS 版）：`before-1440-point.png`、`before-1440-advanced.png`、`before-mobile-390-guided.png`
+- After：`lab-after-rail.png`、`lab-after-rail-advanced.png`、`lab-after-dialog-hyperbola.png`、`after-1440-point.png`
+- 對照：`front-rail.png`（Front，KaTeX）、`electrostatics-math.png`（Lab Electrostatics notes，同一 MathJax 元件）
+- `lab-after/` 內的 C3 功能狀態截圖已用 MathJax 版重新產生。
+
+### 14.6 尚未完成的差異
+- 分類框內句子（如「|Δr|/λ = 1.00 是整數」）與 P 點讀值文字（如「P 吸附在…：|Δr| = λ」）仍為純文字，因由程式動態組句；若要全數 TeX 化需將句子拆段。
+- 畫面左下 P 吸附說明、圖面標籤為純文字／SVG text。
+- MathJax 載入失敗的 fallback 為共用元件行為（顯示 TeX 原文），未另做 interference 專屬 fallback，且未以注入失敗的測試覆蓋。
+- 公式字距與 Front 的 KaTeX 仍有些微差異（引擎不同）。
+- 螢幕閱讀器（VoiceOver）實測、Firefox／WebKit 仍未驗。
