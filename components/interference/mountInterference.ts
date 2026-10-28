@@ -335,7 +335,7 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     bindRange("separation",v=>{params.separation=v;text('[data-output="separation"]',format(v));renderField();});
     for (const name of ["amplitude1","amplitude2"] as const) bindRange(name,v=>updateParam(name,v));
     for (const name of ["phase1","phase2"] as const) bindRange(name,v=>updateParam(name,v*Math.PI/180));
-    bindRange("waveSpeed",v=>{waveSpeed=v;frequency=v/params.wavelength;text('[data-output="waveSpeed"]',format(v));text('[data-output="frequency"]',format(frequency));const f=query<HTMLInputElement>('[data-control="frequency"]');if(f)f.value=String(frequency);});
+    bindRange("waveSpeed",v=>{waveSpeed=v;frequency=v/params.wavelength;text('[data-output="waveSpeed"]',format(v));text('[data-output="frequency"]',format(frequency));const f=query<HTMLInputElement>('[data-control="frequency"]');if(f)f.value=String(frequency);renderReadouts();});
     bindRange("frequency",v=>{params.wavelength=clamp(waveSpeed/v,.5,1.5);syncFrequency();text('[data-output="wavelength"]',format(params.wavelength));const w=query<HTMLInputElement>('[data-control="wavelength"]');if(w)w.value=String(params.wavelength);renderField();});
     for (const name of ["constructive","destructive","wavefronts"] as const) { const input=query<HTMLInputElement>(`[data-control="${name}"]`);if(input)listen(input,"change",renderSvg as EventListener); }
     const attenuation=query<HTMLInputElement>('[data-control="attenuation"]');if(attenuation)listen(attenuation,"change",()=>updateParam("attenuation",attenuation.checked));

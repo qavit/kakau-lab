@@ -127,8 +127,10 @@ html[data-mode="dark"] .interference-lab{--if-term-c:#f0b84a;--if-term-d:#5fd0e0
 .activity__small{margin:.5rem 0 0;font-size:.78rem;line-height:1.7;color:var(--body)}
 .activity__explain{margin-top:.8rem;padding-top:.7rem;border-top:1px solid var(--line)}
 .step{position:relative;margin:0 0 .9rem}
-.step__title{display:flex;align-items:baseline;gap:.45rem;margin:0 0 .35rem;font-size:.88rem;font-weight:750;line-height:1.5}
-.step__index{display:inline-grid;flex:none;place-items:center;width:1.3rem;height:1.3rem;border-radius:50%;background:var(--primary);font-size:.68rem;color:#fff}
+.step__title{margin:0 0 .35rem;padding-inline-start:1.75rem;text-indent:-1.75rem;font-size:.88rem;font-weight:750;line-height:1.5;overflow-wrap:anywhere}
+.step__title *{text-indent:0}
+.step__title:not(:has(.step__index)){padding-inline-start:0;text-indent:0}
+.step__index{display:inline-grid;vertical-align:baseline;place-items:center;width:1.3rem;height:1.3rem;margin-inline-end:.45rem;border-radius:50%;background:var(--primary);font-size:.68rem;color:#fff}
 .step.is-done .step__index{font-size:0;background:var(--if-good)}.step.is-done .step__index::after{content:"✓";font-size:.7rem}
 .step__body{margin:0 0 .4rem;font-size:.82rem;line-height:1.75;color:var(--body)}
 .checklist{display:grid;gap:.4rem;margin:.45rem 0 0;padding:0;list-style:none}
