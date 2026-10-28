@@ -78,7 +78,7 @@ Owner 尚未實際操作，C4 不得視為關閉。操作清單見 [owner-script
 | 項目 | 結果 |
 |---|---|
 | Unit | 439/439 |
-| C4 新增 E2E | 15（desktop-chromium）全過 |
+| C4 新增 E2E | 13（desktop-chromium）全過 |
 | Firefox + WebKit（C4 子集 20 項，使用 C3 之後的 MathJax 版本） | 20/20 |
 | 全部 interference E2E（desktop + mobile-chromium，dev server） | 42/42 |
 | axe（C3 spec 亮／暗；C2 dialog） | 無 serious／critical |
@@ -98,4 +98,4 @@ Owner 尚未實際操作，C4 不得視為關閉。操作清單見 [owner-script
 - 之後才進 Gate D：Registry、Front redirect、canonical／sitemap、SEO；目前皆未動，Front 未修改。
 
 ## 9. Git 與工時
-Branch 在本機領先 origin 5 個 commit，**尚未 push**；無 PR、merge、deploy。工時未追蹤。
+Branch 在本機領先 origin 6 個 commit（含本報告），**尚未 push**；無 PR、merge、deploy。工時未追蹤。
