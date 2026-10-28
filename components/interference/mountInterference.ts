@@ -4,6 +4,8 @@ import {
 } from "../../lib/science/interference.ts";
 import type { InterferenceParameters, Point } from "../../lib/science/interference.ts";
 import { geometryForCondition, svgPathForPoints } from "../../models/interference-geometry.ts";
+import { checkLineCountAnswer, centralConditionKind, constructiveOrderShape } from "../../models/interference-activities.ts";
+import { snapToCondition } from "../../models/interference-snap.ts";
 
 export interface InterferenceController { dispose(): void }
 export interface InterferenceRuntime {
@@ -51,6 +53,9 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
   let frequency = 1;
   let fieldCacheKey = "";
   let fieldCache = new Float32Array();
+  let activeActivity = "measure";
+  let dialogOpener: HTMLElement | null = null;
+  const activityState: { measureConstructive: boolean; measureDestructive: boolean; measureDone: boolean; measureStep: string; measureValues: { constructive: string; destructive: string }; countStep: string; countAttempts: number; countPrediction: { antinodes: string; nodes: string }; antiphaseDone: boolean; timeStep: string; timePrediction: string } = { measureConstructive: false, measureDestructive: false, measureDone: false, measureStep: "place", measureValues: { constructive: "", destructive: "" }, countStep: "predict", countAttempts: 0, countPrediction: { antinodes: "", nodes: "" }, antiphaseDone: false, timeStep: "predict", timePrediction: "" };
   const cleanups: Array<() => void> = [];
   const listen = (target: EventTarget, type: string, handler: EventListener) => {
     target.addEventListener(type, handler);
@@ -66,6 +71,12 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     return node;
   };
   const format = (v: number, digits = 2) => Number.isFinite(v) ? v.toFixed(digits) : "—";
+  const syncFrequency = () => {
+    frequency = waveSpeed / params.wavelength;
+    text('[data-output="frequency"]', format(frequency));
+    const input = query<HTMLInputElement>('[data-control="frequency"]');
+    if (input) input.value = String(frequency);
+  };
 
   const renderSvg = () => {
     const conditions = layer("conditions"); conditions.replaceChildren();
@@ -108,12 +119,43 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     const s1 = project(source1), s2 = project(source2);
     for (const [source, color] of [[s1, "#b15c25"], [s2, "#376f9d"]] as const) measurement.append(svgNode("line", { x1: String(source.x), y1: String(source.y), x2: String(p.x), y2: String(p.y), stroke: color, "stroke-width": "1.5", "stroke-dasharray": "4 4", opacity: ".75" }));
     measurement.append(svgNode("circle", { cx: String(p.x), cy: String(p.y), r: "8", fill: "#f4c542", stroke: "#29394c", "stroke-width": "2", "data-selected-point": "" }));
-    const sample = sampleSelectedPoint(selectedPoint, params, true);
+    const textbook = params.phase1 === params.phase2 && params.amplitude1 === params.amplitude2 && !params.attenuation;
+    const textbookNotice=query<HTMLElement>("[data-textbook-required]");if(textbookNotice)textbookNotice.hidden=textbook;
+    const sample = sampleSelectedPoint(selectedPoint, params, textbook);
+    const levels = [...phaseConditionLevels(params, "constructive"), ...phaseConditionLevels(params, "destructive")];
+    const snapped = snapToCondition(selectedPoint, params.separation, levels, .12).level;
+    if (activeActivity === "measure" && activityState.measureStep === "place") { activityState.measureStep = "explore"; const place=query<HTMLElement>('[data-activity="measure"] [data-activity-step="place"]');const explore=query<HTMLElement>('[data-activity="measure"] [data-activity-step="explore"]');if(place)place.hidden=true;if(explore)explore.hidden=false; }
+    if (activeActivity === "measure" && textbook && snapped) {
+      if (snapped.kind === "constructive") { activityState.measureConstructive = true; activityState.measureValues.constructive = format(sample.absolutePathDifference / params.wavelength); }
+      if (snapped.kind === "destructive") { activityState.measureDestructive = true; activityState.measureValues.destructive = format(sample.absolutePathDifference / params.wavelength); }
+      if (activityState.measureStep === "explore" && activityState.measureConstructive && activityState.measureDestructive) { activityState.measureStep = "conclude"; query<HTMLElement>('[data-activity="measure"] [data-activity-step="explore"]')!.hidden = true; query<HTMLElement>('[data-activity="measure"] [data-activity-step="conclude"]')!.hidden = false; }
+      text("[data-measure-progress]", `已觀察：波腹 ${activityState.measureConstructive ? 1 : 0}/1，波節 ${activityState.measureDestructive ? 1 : 0}/1`);
+      text('[data-observed="constructive"]', activityState.measureValues.constructive || "未觀察");
+      text('[data-observed="destructive"]', activityState.measureValues.destructive || "未觀察");
+    }
     text('[data-readout="r1"]', format(sample.r1)); text('[data-readout="r2"]', format(sample.r2));
-    text('[data-readout="path"]', format(sample.pathDifference)); text('[data-readout="pathRatio"]', format(sample.pathDifferenceRatio));
+    text('[data-readout="path"]', format(sample.pathDifference)); text('[data-readout="pathRatio"]', format(sample.absolutePathDifference / params.wavelength));
     text('[data-readout="phase-difference"]', `${format(((sample.phaseDifference * 180 / Math.PI) % 360 + 360) % 360, 1)}°`);
     text('[data-readout="amplitude"]', format(sample.amplitude));
     text('[data-readout="displacement"]', format(instantaneousDisplacement(sample, timeCycle * Math.PI * 2)));
+    const classification = !textbook && snapped
+      ? `在${snapped.kind === "constructive" ? "相長" : "相消"}條件線上；幾何條件不代表零振幅（|C|=${format(sample.amplitude)})`
+      : textbook && sample.classification !== "neither"
+        ? sample.classification === "constructive" ? "相長（波腹）" : "相消（波節）"
+        : textbook ? "非波腹／波節條件位置" : "進階模式：依 Δφ 與 |C| 判讀";
+    text('[data-readout="classification"]', classification);
+    const curve = container.querySelector<SVGPathElement>("[data-waveform-curve]");
+    if (curve) {
+      const maxAmplitude = Math.max(params.amplitude1 + params.amplitude2, .01);
+      const points = Array.from({ length: 121 }, (_, i) => {
+        const phase = i / 120 * Math.PI * 2;
+        const psi = instantaneousDisplacement(sample, phase);
+        return `${i ? "L" : "M"}${(i * 2).toFixed(2)},${(45 - psi * 40 / maxAmplitude).toFixed(2)}`;
+      });
+      curve.setAttribute("d", points.join(" "));
+      const marker = container.querySelector<SVGCircleElement>("[data-waveform-marker]");
+      if (marker) { attr(marker, "cx", String(timeCycle * 240)); attr(marker, "cy", String(45 - instantaneousDisplacement(sample, timeCycle * Math.PI * 2) * 40 / maxAmplitude)); }
+    }
     text("[data-point-position]", `P (${format(selectedPoint.x)}, ${format(selectedPoint.y)})`);
   };
 
@@ -181,16 +223,28 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     const px = ((p.x+4)/8)*rect.width, py=((4-p.y)/8)*rect.height;
     const existing = selectedPoint ? { x: ((selectedPoint.x+4)/8)*rect.width, y: ((4-selectedPoint.y)/8)*rect.height } : null;
     if (!existing || Math.hypot(px-existing.x,py-existing.y)>18) selectedPoint=p;
+    if (!selectedPoint) return;
+    const levels = [...phaseConditionLevels(params, "constructive"), ...phaseConditionLevels(params, "destructive")];
+    selectedPoint = snapToCondition(selectedPoint, params.separation, levels, .16).point;
     dragging=true;
+    plot.focus?.({ preventScroll: true });
     try { plot.setPointerCapture(event.pointerId); capturedPointers.add(event.pointerId); } catch { /* pointer may have been cancelled */ }
     renderPoint();
   };
-  const onPointerMove = (event: PointerEvent) => { if (!dragging || disposed) return; selectedPoint=pointFromEvent(event); renderPoint(); };
+  const onPointerMove = (event: PointerEvent) => { if (!dragging || disposed) return; const p=pointFromEvent(event); const levels=[...phaseConditionLevels(params,"constructive"),...phaseConditionLevels(params,"destructive")]; selectedPoint=snapToCondition(p,params.separation,levels,.16).point; renderPoint(); };
   const endDrag = (event: PointerEvent) => { dragging=false; capturedPointers.delete(event.pointerId); try { if (plot.hasPointerCapture(event.pointerId)) plot.releasePointerCapture(event.pointerId); } catch { /* already released */ } };
 
   try {
     listen(plot,"pointerdown",onPointerDown as EventListener); listen(plot,"pointermove",onPointerMove as EventListener);
     listen(plot,"pointerup",endDrag as EventListener); listen(plot,"pointercancel",endDrag as EventListener);
+    listen(plot,"dblclick",()=>{selectedPoint=null;renderPoint();});
+    listen(plot,"keydown",((event:KeyboardEvent)=>{
+      if (!selectedPoint) return;
+      if (event.key === "Escape" || event.key === "Delete" || event.key === "Backspace") { event.preventDefault(); selectedPoint=null; renderPoint(); return; }
+      const step=event.shiftKey ? .25 : .05; const p={...selectedPoint};
+      if(event.key==="ArrowLeft")p.x-=step;else if(event.key==="ArrowRight")p.x+=step;else if(event.key==="ArrowUp")p.y+=step;else if(event.key==="ArrowDown")p.y-=step;else return;
+      event.preventDefault();selectedPoint={x:clamp(p.x,-4,4),y:clamp(p.y,-4,4)};renderPoint();
+    }) as EventListener);
     const resizeObserver=runtime.createResizeObserver(()=>{ if (!disposed) renderField(); }); resizeObserver.observe(plot); cleanups.push(()=>resizeObserver.disconnect());
     const bindRange=(name:string, fn:(value:number)=>void)=>{ const input=query<HTMLInputElement>(`[data-control="${name}"]`); if (!input) return; listen(input,"input",()=>fn(Number(input.value))); };
     const updateParam=(name:keyof InterferenceParameters, value:number|boolean)=>{ (params as unknown as Record<string,number|boolean>)[name]=value; text(`[data-output="${name}"]`,typeof value==="boolean"?"":name.startsWith("phase")?`${format(Number(value)*180/Math.PI,0)}°`:format(Number(value))); renderField(); };
@@ -199,7 +253,7 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
     for (const name of ["amplitude1","amplitude2"] as const) bindRange(name,v=>updateParam(name,v));
     for (const name of ["phase1","phase2"] as const) bindRange(name,v=>updateParam(name,v*Math.PI/180));
     bindRange("waveSpeed",v=>{waveSpeed=v;frequency=v/params.wavelength;text('[data-output="waveSpeed"]',format(v));text('[data-output="frequency"]',format(frequency));const f=query<HTMLInputElement>('[data-control="frequency"]');if(f)f.value=String(frequency);});
-    bindRange("frequency",v=>{frequency=v;params.wavelength=clamp(waveSpeed/v,.5,1.5);text('[data-output="frequency"]',format(v));text('[data-output="wavelength"]',format(params.wavelength));const w=query<HTMLInputElement>('[data-control="wavelength"]');if(w)w.value=String(params.wavelength);renderField();});
+    bindRange("frequency",v=>{params.wavelength=clamp(waveSpeed/v,.5,1.5);syncFrequency();text('[data-output="wavelength"]',format(params.wavelength));const w=query<HTMLInputElement>('[data-control="wavelength"]');if(w)w.value=String(params.wavelength);renderField();});
     for (const name of ["constructive","destructive","wavefronts"] as const) { const input=query<HTMLInputElement>(`[data-control="${name}"]`);if(input)listen(input,"change",renderSvg as EventListener); }
     const attenuation=query<HTMLInputElement>('[data-control="attenuation"]');if(attenuation)listen(attenuation,"change",()=>updateParam("attenuation",attenuation.checked));
     for (const input of container.querySelectorAll<HTMLInputElement>('input[name="interference-view"]')) listen(input,"change",()=>{if(input.checked){view=input.value as View;renderField();}});
@@ -221,6 +275,30 @@ export function mountInterference(container: HTMLElement, runtime: InterferenceR
       const displacement=query<HTMLInputElement>('input[name="interference-view"][value="displacement"]');if(displacement)displacement.checked=true;view="displacement";
       renderField();
     });
+    const activity = (event: Event) => {
+      const target=event.target as HTMLElement; const action=target.closest<HTMLElement>("[data-activity-action]")?.dataset.activityAction;
+      const setStep=(id:string,step:string)=>{const article=query<HTMLElement>(`[data-activity="${id}"]`);article?.querySelectorAll<HTMLElement>("[data-activity-step]").forEach(el=>{el.hidden=el.dataset.activityStep!==step;});};
+      const feedback=(id:string,value:string)=>text(`[data-feedback="${id}"]`,value);
+      if(target.matches("[data-activity-tab]")){const id=(target as HTMLElement).dataset.activityTab!;activeActivity=id;container.querySelectorAll<HTMLElement>("[data-activity]").forEach(el=>{el.hidden=el.dataset.activity!==id;});container.querySelectorAll<HTMLElement>("[data-activity-tab]").forEach(el=>el.setAttribute("aria-current",el.dataset.activityTab===id?"step":"false"));text("[data-activity-progress]",id==="edge"?"進階探索":`${["measure","count","antiphase","time"].indexOf(id)+1} / 4`);query<HTMLElement>(`[data-activity="${id}"] h3`)?.focus();return;}
+      if(target.matches("[data-activity-go]")){const id=(target as HTMLElement).dataset.activityGo!;query<HTMLElement>(`[data-activity-tab="${id}"]`)?.click();return;}
+      if(target.matches("[data-activity-nav]")){const ids=["measure","count","antiphase","time"];const idx=ids.indexOf(activeActivity);const next=ids[(idx+((target as HTMLElement).dataset.activityNav==="next"?1:ids.length-1))%ids.length];query<HTMLElement>(`[data-activity-tab="${next}"]`)?.click();return;}
+      if(target.matches("[data-open-dialog]")){const dialog=query<HTMLDialogElement>(`[data-dialog="${(target as HTMLElement).dataset.openDialog}"]`);if(dialog){dialogOpener=target;dialog.showModal();dialog.querySelector<HTMLElement>("button")?.focus();}return;}
+      if(target.matches("[data-close-dialog]")){(target.closest("dialog") as HTMLDialogElement|null)?.close();dialogOpener?.focus();dialogOpener=null;return;}
+      if(action==="setup-textbook"){params.amplitude1=1;params.amplitude2=1;params.phase1=0;params.phase2=0;params.attenuation=false;for(const [name,value] of Object.entries({amplitude1:1,amplitude2:1,phase1:0,phase2:0})){const input=query<HTMLInputElement>(`[data-control="${name}"]`);if(input)input.value=String(value);}const attenuation=query<HTMLInputElement>('[data-control="attenuation"]');if(attenuation)attenuation.checked=false;text('[data-output="amplitude1"]',"1.00");text('[data-output="amplitude2"]',"1.00");text('[data-output="phase1"]',"0°");text('[data-output="phase2"]',"0°");renderField();return;}
+      if(action==="measure-check"){const a=query<HTMLSelectElement>('[data-answer="measure-constructive"]')?.value;const b=query<HTMLSelectElement>('[data-answer="measure-destructive"]')?.value;const correct=a==="integer"&&b==="half"&&activityState.measureConstructive&&activityState.measureDestructive;feedback("measure",correct?"正確：波腹對應整數倍波長，波節對應半整數倍。":"先在圖上分別觀察波腹與波節條件線，再選擇路徑差規律。");if(correct){activityState.measureDone=true;setStep("measure","done");}return;}
+      if(action==="count-lock"){const a=query<HTMLInputElement>('[data-answer="count-predict-antinodes"]')?.value;const n=query<HTMLInputElement>('[data-answer="count-predict-nodes"]')?.value;if(!a||!n)return;activityState.countPrediction={antinodes:a,nodes:n};text('[data-prediction="antinodes"]',a);text('[data-prediction="nodes"]',n);const observedA=query<HTMLInputElement>('[data-answer="count-antinodes"]');const observedN=query<HTMLInputElement>('[data-answer="count-nodes"]');if(observedA)observedA.value=a;if(observedN)observedN.value=n;params.wavelength=1;params.separation=3;params.amplitude1=1;params.amplitude2=1;params.phase1=0;params.phase2=0;params.attenuation=false;syncFrequency();for(const name of ["wavelength","separation","amplitude1","amplitude2","phase1","phase2"]){const input=query<HTMLInputElement>(`[data-control="${name}"]`);if(input)input.value=name==="separation"?"3":name.startsWith("phase")?"0":"1";}const attenuation=query<HTMLInputElement>('[data-control="attenuation"]');if(attenuation)attenuation.checked=false;text('[data-output="separation"]',"3.00");text('[data-output="wavelength"]',"1.00");activityState.countStep="observe";setStep("count","observe");renderField();return;}
+      if(action==="count-check"||action==="count-reveal"){const answer={antinodes:Number(query<HTMLInputElement>('[data-answer="count-antinodes"]')?.value),nodes:Number(query<HTMLInputElement>('[data-answer="count-nodes"]')?.value)};activityState.countAttempts++;const result=checkLineCountAnswer(answer,params.separation,params.wavelength,activityState.countAttempts);const reveal=query<HTMLButtonElement>('[data-activity-action="count-reveal"]');if(reveal)reveal.hidden=activityState.countAttempts<1;if(action==="count-reveal"||result.correct||result.hint==="reveal"){text("[data-count-result]",`答案：${result.expected.antinodes} 條波腹線、${result.expected.nodes} 條波節線。${result.correct?"你的觀察正確。":"請留意中央線與邊界退化半直線。"}`);setStep("count","done");}else feedback("count",result.hint==="central"?"提示：波腹線包含中央 Δr=0。":result.hint==="nodes-no-central"?"提示：波節線沒有中央線。": "提示：最外側等號條件仍有兩條退化半直線。");return;}
+      if(action==="count-retry"){activityState.countStep="predict";activityState.countAttempts=0;for(const input of container.querySelectorAll<HTMLInputElement>('[data-answer^="count-"]'))input.value="";const reveal=query<HTMLButtonElement>('[data-activity-action="count-reveal"]');if(reveal)reveal.hidden=true;feedback("count","");setStep("count","predict");return;}
+      if(action==="antiphase-apply"){const choice=query<HTMLInputElement>('input[name="antiphase-choice"]:checked')?.value;if(!choice)return;params.amplitude1=1;params.amplitude2=1;params.phase1=0;params.phase2=Math.PI;params.attenuation=false;for(const name of ["amplitude1","amplitude2","phase1","phase2"]){const input=query<HTMLInputElement>(`[data-control="${name}"]`);if(input)input.value=name==="phase2"?"180":name.startsWith("amplitude")?"1":"0";}const attenuation=query<HTMLInputElement>('[data-control="attenuation"]');if(attenuation)attenuation.checked=false;activityState.antiphaseDone=true;const kind=centralConditionKind(params);const explanation=kind!=="destructive"?"中央線類型沒有改變。":choice==="node"?"猜對了：中央線變成相消條件線。":choice==="antinode"?"中央線其實變成相消條件線。":"觀察結果：中央線變成相消條件線。";text('[data-feedback="antiphase"]',`${explanation} 合成振幅 ${format(fieldAtPoint({x:0,y:0},params).amplitude)}。`);text('[data-output="phase2"]',"180°");renderField();setStep("antiphase","done");return;}
+      if(action==="antiphase-toggle"){params.phase2=params.phase2===0?Math.PI:0;const input=query<HTMLInputElement>('[data-control="phase2"]');if(input)input.value=String(params.phase2*180/Math.PI);text('[data-output="phase2"]',`${params.phase2*180/Math.PI}°`);renderField();return;}
+      if(action==="time-start"){const choice=query<HTMLInputElement>('input[name="time-choice"]:checked')?.value;if(!choice)return;activityState.timePrediction=choice;view="displacement";const radio=query<HTMLInputElement>('input[name="interference-view"][value="displacement"]');if(radio)radio.checked=true;const waves=query<HTMLInputElement>('[data-control="wavefronts"]');if(waves)waves.checked=true;timeCycle=0;lastTime=null;const ti=query<HTMLInputElement>('[data-control="time-cycle"]');if(ti)ti.value="0";text('[data-output="time-cycle"]',"0.00");const button=query<HTMLButtonElement>('[data-action="play-pause"]');if(button&&playing)button.click();if(button&&!playing)button.click();activityState.timeStep="observe";setStep("time","observe");renderField();return;}
+      if(action==="time-check"){const fronts=query<HTMLInputElement>('input[name="time-fronts"]:checked')?.value;const lines=query<HTMLInputElement>('input[name="time-lines"]:checked')?.value;if(!fronts||!lines)return;if(fronts==="moves"&&lines==="static"){feedback("time",activityState.timePrediction==="static"?"你一開始就猜對了：波峰、波谷一直向外跑，條件線固定。":"波峰、波谷向外跑，條件線固定，和常見直覺相反。");setStep("time","done");}else feedback("time",!fronts.includes("moves")?"再看圓圈：波峰與波谷會隨播放移動。":"再比較橘色與藍綠色條件線：播放時它們的位置不變。");return;}
+      if(action==="edge-set"){const ratio=Number((target as HTMLElement).dataset.value);params.wavelength=1;params.separation=ratio;params.amplitude1=1;params.amplitude2=1;params.phase1=0;params.phase2=0;params.attenuation=false;syncFrequency();for(const name of ["wavelength","separation","amplitude1","amplitude2","phase1","phase2"]){const input=query<HTMLInputElement>(`[data-control="${name}"]`);if(input)input.value=name==="separation"?String(ratio):name.startsWith("phase")?"0":"1";}const attenuation=query<HTMLInputElement>('[data-control="attenuation"]');if(attenuation)attenuation.checked=false;text('[data-output="wavelength"]',"1.00");text('[data-output="separation"]',format(ratio));const shape=constructiveOrderShape(params,3);text("[data-edge-shape]",shape==="absent"?"不存在":shape==="degenerate"?"兩條退化半直線":"雙曲線");renderField();return;}
+    };
+    listen(container,"click",activity as EventListener);
+    for(const dialog of container.querySelectorAll<HTMLDialogElement>("dialog[data-dialog]"))listen(dialog,"close",()=>{const opener=dialogOpener;dialogOpener=null;opener?.focus();});
+    listen(container,"input",((event:Event)=>{const target=event.target as HTMLInputElement;const id=target.dataset.answer;if(id?.startsWith("count-predict")){const ready=!!query<HTMLInputElement>('[data-answer="count-predict-antinodes"]')?.value&&!!query<HTMLInputElement>('[data-answer="count-predict-nodes"]')?.value;const button=query<HTMLButtonElement>('[data-activity-action="count-lock"]');if(button)button.disabled=!ready;}if(id==="count-antinodes"||id==="count-nodes"){const ready=!!query<HTMLInputElement>('[data-answer="count-antinodes"]')?.value&&!!query<HTMLInputElement>('[data-answer="count-nodes"]')?.value;const button=query<HTMLButtonElement>('[data-activity-action="count-check"]');if(button)button.disabled=!ready;}}) as EventListener);
+    listen(container,"change",((event:Event)=>{const target=event.target as HTMLInputElement;if(target.name==="antiphase-choice"){const b=query<HTMLButtonElement>('[data-activity-action="antiphase-apply"]');if(b)b.disabled=false;}if(target.name==="time-choice"){const b=query<HTMLButtonElement>('[data-activity-action="time-start"]');if(b)b.disabled=false;}if(target.name==="time-fronts"||target.name==="time-lines"){const b=query<HTMLButtonElement>('[data-activity-action="time-check"]');if(b)b.disabled=!(query<HTMLInputElement>('input[name="time-fronts"]:checked')&&query<HTMLInputElement>('input[name="time-lines"]:checked'));}if(target.dataset.answer?.startsWith("measure-")){if(target.dataset.answer==="measure-constructive")activityState.measureConstructive=target.value==="integer";if(target.dataset.answer==="measure-destructive")activityState.measureDestructive=target.value==="half";}}) as EventListener);
     renderField();
   } catch (error) {
     disposed=true; cleanups.splice(0).forEach(cleanup=>cleanup());runtimeElement.remove();throw error;
