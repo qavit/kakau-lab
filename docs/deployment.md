@@ -28,7 +28,7 @@ npx wrangler deploy --dry-run       # 完整打包但不上傳（不需要 Cloud
 
 **CI**（`.github/workflows/ci.yml`）：每個 PR 與 push 到 `main` 都會跑 `npm ci`、`npm run lint`、`npm test`（`npm test` 已包含 `npm run build`，不另跑）。CI 只驗證程式，**不會部署**。
 
-**CD**（`.github/workflows/deploy.yml`）：只能手動觸發（`workflow_dispatch`），合併或 push 到 `main` 都不會自動部署。流程：確認選的是 `main` → checkout `main` 並記錄 commit SHA → lint 與 test（含 build）→ 確認 `main` 沒有在檢查期間前進（否則失敗，請重跑，避免舊版覆蓋新版）→ `npm run deploy`（保留 MathJax predeploy）→ 對 `https://lab.kakau.tw` 的 `/`、`/projectile`、`/electrostatics` 做 HTTP smoke test → 在 job summary 記錄部署的 SHA。部署用的 concurrency group 不取消進行中的部署。
+**CD**（`.github/workflows/deploy.yml`）：只能手動觸發（`workflow_dispatch`），合併或 push 到 `main` 都不會自動部署。流程：確認選的是 `main` → checkout `main` 並記錄 commit SHA → lint 與 test（含 build）→ 確認 `main` 沒有在檢查期間前進（否則失敗，請重跑，避免舊版覆蓋新版）→ `npm run deploy`（保留 MathJax predeploy）→ 對 `https://lab.kakau.tw` 的 `/`、`/projectile`、`/electrostatics`、`/interference` 做 HTTP smoke test → 在 job summary 記錄部署的 SHA。部署用的 concurrency group 不取消進行中的部署。
 
 **SHA 防護的範圍：** 每次執行都 checkout 當下最新的 `main`，並在部署前再比對一次 `origin/main`；兩者不同就失敗。它防的是「檢查期間 `main` 前進」，不是完整的版本鎖：比對與上傳之間仍有極短的空窗，且不會驗證線上目前是哪一版。
 
