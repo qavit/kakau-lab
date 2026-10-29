@@ -37,8 +37,9 @@ for (const [width, height] of [[1440, 900], [1280, 800]] as const) {
     expect(plot.width).toBeGreaterThanOrEqual(480);
     expect(plot.width * plot.height).toBeGreaterThan(rail.width * rail.height);
     expect(await noHorizontalOverflow(page)).toBe(true);
-    // one scroll region per column at most: the page itself does not scroll
-    expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 40)).toBe(true);
+    // one scroll region per column at most: the simulator fits the first screen. The server-rendered concept
+    // summary sits below it, so the page may scroll to reach that, but the lab itself must not need it.
+    expect(await page.evaluate(() => document.querySelector('[data-testid="interference-host"]')!.getBoundingClientRect().bottom <= window.innerHeight + 40)).toBe(true);
     await shot(page, `desktop-${width}-activities-open`);
 
     await page.locator('[data-action="toggle-activities"]').click();

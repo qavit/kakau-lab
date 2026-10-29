@@ -250,9 +250,10 @@ The registry also distinguishes *which app* implements a lab. `implementation.ap
   because both properties are first-party Kakau products. The catalog code still keeps the
   distinction explicit rather than pretending an external URL is an internal route.
 
-Models 01–07 are all `kakau-lab`. Model 08 (`two-source-interference`, 雙點波源干涉) is
-`kakau-web`, pointing at the already-published `https://kakau.tw/lab/interference` — it is not an
-iframe, a proxy, or a port of that lab's code into this repo.
+Models 01–08 and 09 are all `kakau-lab`. Model 08 (`two-source-interference`, 雙點波源干涉) moved here
+from Kakau Web (Gate D): its canonical URL is `https://lab.kakau.tw/interference`, and
+`kakau.tw/lab/interference` is a server-side permanent redirect to it. No registry entry currently
+uses `kakau-web`; the variant stays in the type for future externally hosted labs.
 
 `LabManifest` reserves an optional `scientificQuality` block (`assumptions`, `approximations`,
 `validity`, `verification`) for a future pedagogical-quality pass. Stage 0 does not backfill it for
@@ -263,8 +264,8 @@ the seven existing models; leaving it empty is intentional, not an oversight.
 Two Kakau properties, deliberately on separate runtimes:
 
 - **Kakau Web** — `https://kakau.tw`. Brand, content, resources, lightweight native labs, and the
-  SEO / acquisition surface. `kakau.tw/lab/interference` stays at that URL; Stage 0 does not move
-  it to `lab.kakau.tw`.
+  SEO / acquisition surface. `kakau.tw/lab/interference` only redirects to
+  `https://lab.kakau.tw/interference`.
 - **Kakau Lab app** (this repo) — target origin `https://lab.kakau.tw`. Heavier interactive science
   models: stateful React applications with Three.js scenes and synchronized multi-view
   visualizations.

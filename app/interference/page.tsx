@@ -1,6 +1,20 @@
+import type { Metadata } from "next";
 import InterferenceSimulation from "@/components/interference/InterferenceSimulation";
+import InterferenceSummary from "@/components/interference/InterferenceSummary";
+import { interferenceLearningResource, interferenceSeo, serializeJsonLd } from "@/lib/labs/interference-seo";
+import { socialMetadata } from "@/lib/site-metadata";
 
-/** Local production smoke target. Catalog and cross-site SEO stay on the Front route until Gate D. */
+export const metadata: Metadata = {
+  title: interferenceSeo.title,
+  description: interferenceSeo.description,
+  ...socialMetadata({ title: interferenceSeo.title, description: interferenceSeo.shareDescription, image: interferenceSeo.image }),
+  alternates: { canonical: interferenceSeo.path },
+};
+
 export default function InterferencePage() {
-  return <main><InterferenceSimulation /></main>;
+  return <main>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(interferenceLearningResource()) }} />
+    <InterferenceSimulation />
+    <InterferenceSummary />
+  </main>;
 }

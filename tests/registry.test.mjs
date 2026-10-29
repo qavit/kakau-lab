@@ -73,12 +73,17 @@ test("models 01-07 are internal kakau-lab routes", () => {
   }
 });
 
-test("model 08 is the external kakau-web interference lab", () => {
+test("model 08 is the local kakau-lab interference route", () => {
   const model08 = labRegistry.find((lab) => lab.number === "08");
   assert.ok(model08);
   assert.equal(model08.id, "two-source-interference");
-  assert.equal(model08.implementation.app, "kakau-web");
-  assert.equal(model08.implementation.url, "https://kakau.tw/lab/interference");
+  assert.equal(model08.number, "08");
+  assert.equal(model08.title, "雙點波源干涉");
+  assert.equal(model08.implementation.app, "kakau-lab");
+  assert.equal(model08.implementation.route, "/interference");
+  assert.equal(model08.maturity, "beta");
+  assert.equal(model08.visibility, "public");
+  assert.equal(catalogLabs().includes(model08), true);
   assert.equal(model08.status, "published");
 });
 

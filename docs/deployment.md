@@ -48,7 +48,7 @@ npx wrangler deploy --dry-run       # 完整打包但不上傳（不需要 Cloud
 
 ## 驗證
 
-部署後 Cloudflare 會回一個 `https://kakau-lab.<subdomain>.workers.dev` 網址。最小驗收：catalog 回 200 且顯示 9 個模型、01–07 各自載入、Model 08 連到 `https://kakau.tw/lab/interference`、Model 09 的 `/electrostatics` 正常載入、Model 07 的 `/projectile/notes` 數學式有算繪。
+部署後 Cloudflare 會回一個 `https://kakau-lab.<subdomain>.workers.dev` 網址。最小驗收：catalog 回 200 且顯示 9 個模型、01–07 各自載入、Model 08 連到本站 `/interference`（頁面 200、canonical 為 `https://lab.kakau.tw/interference`、JSON-LD 可解析）、Model 09 的 `/electrostatics` 正常載入、Model 07 的 `/projectile/notes` 數學式有算繪。
 
 ## Rollback
 

@@ -217,7 +217,7 @@ export const labRegistry: readonly LabManifest[] = [
       "time-evolution",
     ],
     level: ["high-school"],
-    implementation: { app: "kakau-web", url: "https://kakau.tw/lab/interference" },
+    implementation: { app: "kakau-lab", route: "/interference" },
     status: "published",
     maturity: "beta",
     visibility: "public",
