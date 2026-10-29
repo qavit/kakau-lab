@@ -58,12 +58,17 @@ jobs:
 
       # Must be `npm run deploy` (its predeploy hook copies MathJax), never `vinext deploy`.
       - name: Deploy to Cloudflare
+        id: deploy
         run: npm run deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      # Read-only, so it also runs when the deploy step fails after the Worker was already uploaded
+      # (the job stays red because the deploy step failed). It is skipped only if deploy never ran.
       - name: Smoke test
+        id: smoke
+        if: ${{ !cancelled() && steps.deploy.conclusion != 'skipped' }}
         run: |
           for path in / /projectile /electrostatics /interference; do
             curl --fail --silent --show-error --output /dev/null \
@@ -77,6 +82,8 @@ jobs:
         run: |
           {
             echo "### Deploy ${{ job.status }}"
+            echo "- Deploy step: ${{ steps.deploy.outcome }}"
+            echo "- Smoke test: ${{ steps.smoke.outcome }}"
             echo "- Commit: \`$DEPLOY_SHA\`"
             echo "- Site: $SITE_URL"
           } >> "$GITHUB_STEP_SUMMARY"

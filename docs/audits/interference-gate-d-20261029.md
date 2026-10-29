@@ -178,3 +178,42 @@ HTTP 308、query string 保留、非目標路由、sitemap：**NOT VERIFIED**。
 - 仍未驗：Front preview HTTP 層、Cloudflare 實際環境、VoiceOver／400% zoom／真機、Firefox／WebKit 未重跑。
 - 既有風險：200% 字級下模擬器 slider 溢出（上表）、3 個 Cloudflare tsc 錯誤。
 - D2 可以開始（無科學錯誤或部署阻斷發現）；merge／deploy／轉址仍須 Owner 另行 Go。
+
+## 14. Gate D2-A — Lab 正式上線、Smoke 與 Deploy workflow 分析（2026-10-29）
+
+**更正：** 先前曾短暫記為「未部署」，不正確。Lab 已實際上線。
+
+### 部署事實（唯讀核對）
+| 項目 | 值 |
+|---|---|
+| Lab PR #29 merge commit（main HEAD） | `4fd059939b5a2ab5220b2e96a785abcc3dcbb314`（父：`ae9b3a9` 部署前 main、`b3c7a7f` PR 頭） |
+| Deploy run | 40869256243（`workflow_dispatch`，ref main，`DEPLOY_SHA`＝`4fd0599`，建立 11:56:31Z） |
+| Cloudflare 版本 | `67cf2bb1-8717-4482-99b0-4cec5601f575`，version 建立 11:57:44.352Z，deployment 建立 11:57:45.023Z，`wrangler deployments list` 顯示 **100% 流量** |
+| 回滾目標 | `e45151e4-8ee6-4133-a818-cd216760d7c0`（2026-10-03）；Lab main 前一 SHA `ae9b3a9` |
+
+### Production Smoke（`https://lab.kakau.tw`，2026-10-29）
+**已操作（瀏覽器實際互動）**：1440px 點擊放置 P 並拖曳，相位差讀值 180.0°→0.0°；五個活動分頁逐一開啟且面板可見；進階模式展開；390px 觸控模擬點擊放 P，讀值 0.0° 並可見；320／390／1440 皆無整頁溢出、無 console 錯誤。
+**已檢查（存在／內容／HTTP，未互動）**：`/interference` 200；title；canonical `https://lab.kakau.tw/interference`；`og:image` `/og/kakau-interference-lab.png` 200 `image/png`；LearningResource JSON-LD；無 noindex meta、無 `X-Robots-Tag`；`/mathjax/tex-svg.js` 200；摘要 7 個展示公式為 MathJax SVG（共 97 個 SVG）、無 plain fallback；`sitemap.xml` 含 `/interference`（共 10 個 loc）；首頁 Registry 有編號 08「雙點波源干涉」並連到 `/interference`；既有公開模型 `/`、`/projectile`、`/electrostatics`、`/hydrogen`、`/fbd`、`/solar` 皆 200 且 title 正確（公開目錄頁依 registry 測試為 solar、atmosphere-profile、projectile、interference、electrostatics 五項；`/lewis`、`/standard-atmosphere` 回 404 是 unlisted／別名，非 regression，`/atmosphere-profile` 在 sitemap 中）。
+**未測試**：各活動的完整答題流程（僅由 CI 的 dev E2E 覆蓋）；投影模式（只確認收合控制存在，無獨立 toggle 選擇器命中）；Safari／Firefox、真機；VoiceOver、400% zoom、MathJax fallback；Cloudflare 的 headers 細節（cache、HSTS）。
+
+### Deploy workflow 失敗分析（run 40869256243 完整日誌）
+時間線：build（11:57:32–38）→ `wrangler deploy` 開始（11:57:38.96「Deploying to production」）→ Worker version 上傳 11:57:44 → deployment 建立 11:57:45 → **11:57:46 wrangler 回報錯誤，exit 1**。錯誤兩條：`GET /accounts/{id}/workers/subdomain` → `Authentication error [code: 10000]`；`GET /memberships` → `Authentication failed (status: 400) [code: 9106]`。
+判讀：失敗發生在**上傳與流量切換之後**的收尾階段（wrangler 在 deploy 結尾查詢 workers.dev 子網域以輸出／啟用 workers.dev 網址；`/memberships` 是它在帳號查詢失敗後的診斷呼叫）。因此版本已上線，但 `Deploy to Cloudflare` 步驟為紅、`Smoke test` 被跳過（預設 `if: success()`）。`wrangler.jsonc` 沒有 `workers_dev: false`／routes，所以 wrangler 預設會處理 workers.dev。這是 repo secret 的**首次真實部署**（`docs/ci-cd-v1-closeout.md` 原註記「尚未以真實部署驗證」），而 `docs/deployment.md` 指示 token 只給 Workers Scripts:Edit。
+**權限建議（未修改任何 secret）**：最小調整為在現有 token 上加 *Account → Account Settings: Read*（涵蓋 `/memberships`／帳號資訊）；若 `workers/subdomain` 仍 10000，再加 *Account → Workers Scripts: Read* 或改用 Cloudflare「Edit Cloudflare Workers」範本（含上述讀取權限）。這是依錯誤端點的推測，**尚未實測**；確認方式只能是下次真實部署或 Owner 以 `wrangler whoami` 檢查 token 範圍。替代方案：在 `wrangler.jsonc` 明確設定 `workers_dev`／`preview_urls`，讓 wrangler 不查詢子網域——但會改變 workers.dev 的服務狀態，需 Owner 決定，本輪不做。
+**Workflow 小修（PR `ci/deploy-smoke-decouple`，未合併）**：給 deploy step 加 `id: deploy`；Smoke step 加 `if: ${{ !cancelled() && steps.deploy.conclusion != 'skipped' }}`，使 deploy step 失敗時唯讀 smoke 仍會執行；job 仍因 deploy 步驟失敗而為紅，狀態可見；Summary 加入 deploy／smoke 各自 outcome。若 deploy 前置步驟失敗（deploy 被跳過）則 smoke 同樣跳過，避免對舊版本誤報綠燈。YAML 語法已驗證，行為需下次 workflow 實跑確認。
+
+### D2-A 待辦
+1. Owner：調整 `CLOUDFLARE_API_TOKEN` 權限（見上），之後是否重跑 Deploy 由 Owner 決定（目前不授權）。
+2. 審核／合併 workflow 小修 PR。
+3. 已知風險：200% 字級下整頁橫向多約 45px（slider 可操作）；無障礙未驗範圍同 §11；不得宣稱 WCAG 2.2 AA 通過。
+
+## 15. Gate D2-B — 發布前檢查（Front PR #76，本輪未合併、未部署）
+
+- PR #76：Draft、mergeable、Vercel Preview 部署 Ready（`dpl_kzkFHxz6Ggv1FxBeLBy8de5kEtYg`），12 檔：`vercel.json` 兩條 `permanent: true` 規則（有／無尾斜線）→ `https://lab.kakau.tw/interference`；站內連結與 `routes.ts` 改指新址；舊頁 `src/pages/lab/interference.astro` 僅加一行、原實作保留；新增 `tests/interference-redirect.test.mjs`。
+- **HTTP 308／Location／query／非目標路由／sitemap：仍 NOT VERIFIED。** 本輪再試 `vercel curl`（已登入 `qavit`），仍要求 Protection Bypass 密鑰，CLI 回傳「create a Protection Bypass for Automation secret」；`vercel build` 也因 `Project Environment Variable not found` 無法在本機產生 vercel.json 合成後的路由。未再嘗試其他授權操作，未修改 Deployment Protection。
+- 已知但**非驗證**的依據：Vercel 文件規定 `vercel.json` redirects 在檔案系統之前處理，且預設保留 query；Owner 在受保護 Preview 的瀏覽器導向結果與此一致。這些不能替代實測。
+- 可執行替代方案：
+  1. **（建議）兩段式上線**：先把規則改為 `permanent: false`（307）合併，於 `kakau.tw` 正式站實測 status／Location／query／`/lab`／sitemap，確認正確後再以小 PR 改回 `permanent: true`（308）。307 不會被瀏覽器長期快取，避免第一次就鎖定。
+  2. Owner 自行產生 Protection Bypass 密鑰，用 §8 腳本驗證後立即撤銷；密鑰不經過我。
+  3. Owner 在已登入瀏覽器開啟 Preview，以 DevTools Network 保留記錄檢視第一個 `/lab/interference?utm_source=x` 請求的 status 與 Location。
+- Front Cutover：**NO-GO（HOLD）**，Lab 先上線的前提已滿足，缺的是 Front 轉址驗證與 Owner 的獨立 Go。
