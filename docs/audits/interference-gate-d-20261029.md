@@ -1,5 +1,8 @@
 # Interference Gate D（D0–D1）— 發布準備、跨站切換與驗收
 
+> **現況（Gate D3 結案，2026-10-29）：** 本報告 §1–§12 為**當時（D0/D1）的歷史紀錄**，其中「未 merge、未 deploy、未轉址」「Production cutover：HOLD／NO-GO」「C4 Owner 簽核不存在」「Gate D0/D1：PARTIAL」等**已被取代**。現行結論：Lab 已於 2026-10-29 上線（merge `4fd0599`，Cloudflare `67cf2bb1-8717-4482-99b0-4cec5601f575`）、Front 已永久轉址（merge `9ca808a`，`dpl_3yHjB9KZqTYaz1miwEsxHB387wJL`）、C4 Owner 六項 PASS；詳見 §13–§18。以 §18 為準。
+
+
 日期：2026-10-29　範圍：發布前稽核與準備。**未 merge、未 deploy、未轉址。Production cutover：HOLD。**
 **Gate D0/D1 Verdict：PARTIAL**（Lab 準備就緒；Front 轉址的 Vercel preview 實測因 Deployment Protection 為 NOT VERIFIED）。
 
@@ -122,7 +125,7 @@ curl -s $P/sitemap.xml | grep -c lab/interference   # 期望 0
 8. 未驗證：VoiceOver、400% zoom、真機、MathJax fallback、Firefox/WebKit（本輪未重跑，C4 回報 24/24）。
 9. Front 站內連結的 UTM／跨站歸因（`ATTRIBUTION_CROSS_SITE.md`）未檢查是否需要對 `lab.kakau.tw` 傳遞。
 
-## 12. Go / No-Go Recommendation
+## 12. Go / No-Go Recommendation（歷史紀錄，已被 §16–§18 取代）
 
 **D0/D1：PARTIAL。Production cutover：NO-GO（HOLD）。**
 解除條件：(1) Owner C4 簽核與殘餘風險接受；(2) Front preview 轉址實測通過（需 Owner 提供 Vercel 存取）；(3) Owner 對 Lab 先、Front 後的順序給出獨立 Production Go。
@@ -278,3 +281,35 @@ HTTP 308、query string 保留、非目標路由、sitemap：**NOT VERIFIED**。
 - 仍開啟：Lab 側 Deploy workflow token 權限與 PR #30（見 §14）；Search Console／索引觀察交 D3；Owner 實測使用的 Preview 與本次正式環境的 HTTP 證據分別保存。
 - 殘餘風險：VoiceOver、400% zoom、真機、MathJax fallback 未驗；200% 字級 slider 溢出（可操作）；3 個 Cloudflare tsc 錯誤。
 - D3（搜尋引擎收錄觀察、Closeout）可以開始。Search Console 尚未更新屬正常延遲，不視為部署失敗。
+
+## 18. Gate D3 — 正式環境最終核對與結案（2026-10-29）
+
+**D3 Verdict：PASS。跨站遷移完成。**
+
+### 最終 SHA 與部署
+| 項目 | 值 |
+|---|---|
+| Lab merge SHA | `4fd059939b5a2ab5220b2e96a785abcc3dcbb314`（PR #29） |
+| Cloudflare 版本 | `67cf2bb1-8717-4482-99b0-4cec5601f575`（100% 流量，11:57:44Z） |
+| Lab Deploy run | 40869256243（deploy 步驟因 token 權限於上傳後收尾查詢失敗而紅燈；版本已上線；見 §14） |
+| Front merge SHA | `9ca808aeac7d8139cebf0072df2c2f6867d4011c`（PR #76） |
+| Vercel 正式部署 | `dpl_3yHjB9KZqTYaz1miwEsxHB387wJL`（別名 `kakau.tw`、`www.kakau.tw`） |
+| 回滾點（未使用） | Lab：Cloudflare `e45151e4-8ee6-4133-a818-cd216760d7c0`／main `ae9b3a9`；Front：`9f5678b` |
+
+### 唯讀最終核對（D2-B 後再測）
+**已在正式 HTTP／HTML 驗證的事實**：`kakau.tw/lab/interference`、`/`尾斜線、`?utm_source=d3` 皆 308 → `https://lab.kakau.tw/interference`（query 保留）；跟隨轉址 hops=1、最終 200、無循環；`/lab`、`/lab/projectile` 404（改動前即如此）；`/`、`/resources`、`/about`、`/faq`、`/tutoring`、`/apply` 皆 200；Front sitemap 0 筆 `lab/interference`；`/faq`、`/tutoring` 內連結為新址、無舊址連結。Lab：`/interference` 200；title「雙點波源干涉模擬｜Kakau Lab」、description、canonical `https://lab.kakau.tw/interference`、`og:image` `/og/kakau-interference-lab.png`（200）、LearningResource JSON-LD（`@id` `https://lab.kakau.tw/interference#interactive-lab`，provider 引用 `https://kakau.tw/#organization`）皆存在；無 noindex meta、無 `X-Robots-Tag`；Lab sitemap 含 `/interference`；首頁 Registry 有 `/interference` 入口；`robots.txt` 200。未重跑 C4 Owner 驗收。
+
+### Search Console（D3-B）
+本環境沒有 Search Console 存取，**未取得任何 Search Console 實際回報資料**。可驗證的僅有上列 HTTP／HTML 事實。尚未重新抓取屬正常延遲，**不得**據此判定遷移失敗。觀察項目已掛入既有的「SEO｜10/13 索引異常 Monitoring 與 11/06 Review Gate」：舊 URL `kakau.tw/lab/interference` 是否被 Google 判為 Page with redirect、新 URL `lab.kakau.tw/interference` 是否可檢索與已收錄、Lab sitemap 讀取狀態（對照 10/29 基線：Lab 2/13 indexed）、Canonical 是否被採用、有無新增 404／noindex／redirect 錯誤。未建立新的監控流程。
+
+### PR #30 審核
+範圍僅 `deploy.yml` 與本報告；workflow 變更只是 deploy step 加 `id`、Smoke step 加 `if: ${{ !cancelled() && steps.deploy.conclusion != 'skipped' }}`、Summary 多兩行 outcome；Smoke 為唯讀 `curl`，**不新增任何部署副作用**；CI 通過（run 40876091666），MERGEABLE／CLEAN。行為需下次 workflow 實跑確認（目前不授權重新部署）。**建議合併**（Owner 決定）。報告已加上現況橫幅並把 §12 標為歷史紀錄，避免與「未部署／NO-GO」舊結論互相矛盾。
+
+### 未驗證項目（未寫成 PASS）
+VoiceOver／NVDA、真實 400% 縮放、真機、MathJax 載入失敗 fallback、Firefox／WebKit（Lab 正式站）、各活動完整答題流程在正式站的實操、投影模式實操、Search Console 資料。
+
+### 移交（不阻擋結案）
+- Lab 共用發布基礎設施（Cloudflare token 最小權限、Deploy 紅燈處置、Smoke 實跑驗證、workers.dev 保留與否）→ 既有「Kakau Lab｜CI/CD v1 … Closeout」所列之 Follow-up「首次 Production Deployment Acceptance」。
+- 無障礙（VoiceOver／NVDA、400%、真機、MathJax fallback、200% 字級 slider 溢出）→ 既有「Kakau 三站共同無障礙品質基準 v0.1」。
+- 三個 Cloudflare tsc 錯誤 → Lab CI/CD 維護。
+- 收錄觀察 → 「SEO｜10/13 索引異常 Monitoring 與 11/06 Review Gate」。
