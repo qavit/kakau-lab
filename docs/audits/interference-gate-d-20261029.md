@@ -78,6 +78,8 @@ JSON-LD 不含任何 `kakau.tw/lab/` 字樣（有測試）。已知差異：Fron
 | Front Vercel preview 已建置（PR #76 → `kakau-git-feat-interference-lab-redirect-qavits-projects.vercel.app`，Preview 環境，不影響正式網域） | 部署成功 |
 | Front 轉址、尾斜線、query、其他 `/lab/*`、sitemap 的 Vercel 實測 | **NOT VERIFIED**：preview 啟用 Vercel Deployment Protection，所有路徑回 302 到 `vercel.com/sso-api`，需 Owner 登入或提供 bypass。我未嘗試繞過。本機 build 不能代替 Vercel 實測。 |
 
+**2026-10-29 補充（`vercel curl` 嘗試，仍 NOT VERIFIED）：** Vercel CLI 54.14.0 支援 `vercel curl`，已登入為 `qavit`，PR #76 的 Preview 為 `dpl_kzkFHxz6Ggv1FxBeLBy8de5kEtYg`（Ready，target preview，`kakau-ehr9nkei0-qavits-projects.vercel.app`）。worktree 原未連結專案，`vercel curl --yes` 會嘗試新建專案（403，已中止，未建立任何東西），改以本機 `.vercel/project.json`（gitignored，指向既有專案 `kakau`）連結。之後 `vercel curl` 需要自動建立 Protection Bypass 密鑰，失敗（權限不足）。依指示未修改 Deployment Protection，也未嘗試其他繞過。解法：Owner 在專案設定自行產生「Protection Bypass for Automation」密鑰，於自己的終端機以 `VERCEL_AUTOMATION_BYPASS_SECRET` 環境變數執行 `vercel curl <path> --deployment dpl_kzkFHxz6Ggv1FxBeLBy8de5kEtYg -- -s -o /dev/null -D -`（不加 `-L`）並回貼輸出，或授權我使用。
+
 Owner 取得存取後執行（將 `$P` 換成 preview 網域，bypass 以 `x-vercel-protection-bypass` header 提供）：
 ```bash
 P=https://kakau-git-feat-interference-lab-redirect-qavits-projects.vercel.app
