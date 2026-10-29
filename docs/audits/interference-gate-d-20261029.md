@@ -1,5 +1,8 @@
 # Interference Gate D（D0–D1）— 發布準備、跨站切換與驗收
 
+> **現況（Gate D3 結案，2026-10-29）：** 本報告 §1–§12 為**當時（D0/D1）的歷史紀錄**，其中「未 merge、未 deploy、未轉址」「Production cutover：HOLD／NO-GO」「C4 Owner 簽核不存在」「Gate D0/D1：PARTIAL」等**已被取代**。現行結論：Lab 已於 2026-10-29 上線（merge `4fd0599`，Cloudflare `67cf2bb1-8717-4482-99b0-4cec5601f575`）、Front 已永久轉址（merge `9ca808a`，`dpl_3yHjB9KZqTYaz1miwEsxHB387wJL`）、C4 Owner 六項 PASS；詳見 §13–§18。以 §18 為準。
+
+
 日期：2026-10-29　範圍：發布前稽核與準備。**未 merge、未 deploy、未轉址。Production cutover：HOLD。**
 **Gate D0/D1 Verdict：PARTIAL**（Lab 準備就緒；Front 轉址的 Vercel preview 實測因 Deployment Protection 為 NOT VERIFIED）。
 
@@ -122,7 +125,7 @@ curl -s $P/sitemap.xml | grep -c lab/interference   # 期望 0
 8. 未驗證：VoiceOver、400% zoom、真機、MathJax fallback、Firefox/WebKit（本輪未重跑，C4 回報 24/24）。
 9. Front 站內連結的 UTM／跨站歸因（`ATTRIBUTION_CROSS_SITE.md`）未檢查是否需要對 `lab.kakau.tw` 傳遞。
 
-## 12. Go / No-Go Recommendation
+## 12. Go / No-Go Recommendation（歷史紀錄，已被 §16–§18 取代）
 
 **D0/D1：PARTIAL。Production cutover：NO-GO（HOLD）。**
 解除條件：(1) Owner C4 簽核與殘餘風險接受；(2) Front preview 轉址實測通過（需 Owner 提供 Vercel 存取）；(3) Owner 對 Lab 先、Front 後的順序給出獨立 Production Go。
@@ -178,3 +181,135 @@ HTTP 308、query string 保留、非目標路由、sitemap：**NOT VERIFIED**。
 - 仍未驗：Front preview HTTP 層、Cloudflare 實際環境、VoiceOver／400% zoom／真機、Firefox／WebKit 未重跑。
 - 既有風險：200% 字級下模擬器 slider 溢出（上表）、3 個 Cloudflare tsc 錯誤。
 - D2 可以開始（無科學錯誤或部署阻斷發現）；merge／deploy／轉址仍須 Owner 另行 Go。
+
+## 14. Gate D2-A — Lab 正式上線、Smoke 與 Deploy workflow 分析（2026-10-29）
+
+**更正：** 先前曾短暫記為「未部署」，不正確。Lab 已實際上線。
+
+### 部署事實（唯讀核對）
+| 項目 | 值 |
+|---|---|
+| Lab PR #29 merge commit（main HEAD） | `4fd059939b5a2ab5220b2e96a785abcc3dcbb314`（父：`ae9b3a9` 部署前 main、`b3c7a7f` PR 頭） |
+| Deploy run | 40869256243（`workflow_dispatch`，ref main，`DEPLOY_SHA`＝`4fd0599`，建立 11:56:31Z） |
+| Cloudflare 版本 | `67cf2bb1-8717-4482-99b0-4cec5601f575`，version 建立 11:57:44.352Z，deployment 建立 11:57:45.023Z，`wrangler deployments list` 顯示 **100% 流量** |
+| 回滾目標 | `e45151e4-8ee6-4133-a818-cd216760d7c0`（2026-10-03）；Lab main 前一 SHA `ae9b3a9` |
+
+### Production Smoke（`https://lab.kakau.tw`，2026-10-29）
+**已操作（瀏覽器實際互動）**：1440px 點擊放置 P 並拖曳，相位差讀值 180.0°→0.0°；五個活動分頁逐一開啟且面板可見；進階模式展開；390px 觸控模擬點擊放 P，讀值 0.0° 並可見；320／390／1440 皆無整頁溢出、無 console 錯誤。
+**已檢查（存在／內容／HTTP，未互動）**：`/interference` 200；title；canonical `https://lab.kakau.tw/interference`；`og:image` `/og/kakau-interference-lab.png` 200 `image/png`；LearningResource JSON-LD；無 noindex meta、無 `X-Robots-Tag`；`/mathjax/tex-svg.js` 200；摘要 7 個展示公式為 MathJax SVG（共 97 個 SVG）、無 plain fallback；`sitemap.xml` 含 `/interference`（共 10 個 loc）；首頁 Registry 有編號 08「雙點波源干涉」並連到 `/interference`；既有公開模型 `/`、`/projectile`、`/electrostatics`、`/hydrogen`、`/fbd`、`/solar` 皆 200 且 title 正確（公開目錄頁依 registry 測試為 solar、atmosphere-profile、projectile、interference、electrostatics 五項；`/lewis`、`/standard-atmosphere` 回 404 是 unlisted／別名，非 regression，`/atmosphere-profile` 在 sitemap 中）。
+**未測試**：各活動的完整答題流程（僅由 CI 的 dev E2E 覆蓋）；投影模式（只確認收合控制存在，無獨立 toggle 選擇器命中）；Safari／Firefox、真機；VoiceOver、400% zoom、MathJax fallback；Cloudflare 的 headers 細節（cache、HSTS）。
+
+### Deploy workflow 失敗分析（run 40869256243 完整日誌）
+時間線：build（11:57:32–38）→ `wrangler deploy` 開始（11:57:38.96「Deploying to production」）→ Worker version 上傳 11:57:44 → deployment 建立 11:57:45 → **11:57:46 wrangler 回報錯誤，exit 1**。錯誤兩條：`GET /accounts/{id}/workers/subdomain` → `Authentication error [code: 10000]`；`GET /memberships` → `Authentication failed (status: 400) [code: 9106]`。
+判讀：失敗發生在**上傳與流量切換之後**的收尾階段（wrangler 在 deploy 結尾查詢 workers.dev 子網域以輸出／啟用 workers.dev 網址；`/memberships` 是它在帳號查詢失敗後的診斷呼叫）。因此版本已上線，但 `Deploy to Cloudflare` 步驟為紅、`Smoke test` 被跳過（預設 `if: success()`）。`wrangler.jsonc` 沒有 `workers_dev: false`／routes，所以 wrangler 預設會處理 workers.dev。這是 repo secret 的**首次真實部署**（`docs/ci-cd-v1-closeout.md` 原註記「尚未以真實部署驗證」），而 `docs/deployment.md` 指示 token 只給 Workers Scripts:Edit。
+**權限建議（未修改任何 secret）**：最小調整為在現有 token 上加 *Account → Account Settings: Read*（涵蓋 `/memberships`／帳號資訊）；若 `workers/subdomain` 仍 10000，再加 *Account → Workers Scripts: Read* 或改用 Cloudflare「Edit Cloudflare Workers」範本（含上述讀取權限）。這是依錯誤端點的推測，**尚未實測**；確認方式只能是下次真實部署或 Owner 以 `wrangler whoami` 檢查 token 範圍。替代方案：在 `wrangler.jsonc` 明確設定 `workers_dev`／`preview_urls`，讓 wrangler 不查詢子網域——但會改變 workers.dev 的服務狀態，需 Owner 決定，本輪不做。
+**Workflow 小修（PR `ci/deploy-smoke-decouple`，未合併）**：給 deploy step 加 `id: deploy`；Smoke step 加 `if: ${{ !cancelled() && steps.deploy.conclusion != 'skipped' }}`，使 deploy step 失敗時唯讀 smoke 仍會執行；job 仍因 deploy 步驟失敗而為紅，狀態可見；Summary 加入 deploy／smoke 各自 outcome。若 deploy 前置步驟失敗（deploy 被跳過）則 smoke 同樣跳過，避免對舊版本誤報綠燈。YAML 語法已驗證，行為需下次 workflow 實跑確認。
+
+### D2-A 待辦
+1. Owner：調整 `CLOUDFLARE_API_TOKEN` 權限（見上），之後是否重跑 Deploy 由 Owner 決定（目前不授權）。
+2. 審核／合併 workflow 小修 PR。
+3. 已知風險：200% 字級下整頁橫向多約 45px（slider 可操作）；無障礙未驗範圍同 §11；不得宣稱 WCAG 2.2 AA 通過。
+
+## 15. Gate D2-B — 發布前檢查（Front PR #76，本輪未合併、未部署）
+
+- PR #76：Draft、mergeable、Vercel Preview 部署 Ready（`dpl_kzkFHxz6Ggv1FxBeLBy8de5kEtYg`），12 檔：`vercel.json` 兩條 `permanent: true` 規則（有／無尾斜線）→ `https://lab.kakau.tw/interference`；站內連結與 `routes.ts` 改指新址；舊頁 `src/pages/lab/interference.astro` 僅加一行、原實作保留；新增 `tests/interference-redirect.test.mjs`。
+- **（以下為更新前紀錄，見 §16 的 Owner 實測更新）HTTP 308／Location／query／非目標路由／sitemap：當時 NOT VERIFIED。** 本輪再試 `vercel curl`（已登入 `qavit`），仍要求 Protection Bypass 密鑰，CLI 回傳「create a Protection Bypass for Automation secret」；`vercel build` 也因 `Project Environment Variable not found` 無法在本機產生 vercel.json 合成後的路由。未再嘗試其他授權操作，未修改 Deployment Protection。
+- 已知但**非驗證**的依據：Vercel 文件規定 `vercel.json` redirects 在檔案系統之前處理，且預設保留 query；Owner 在受保護 Preview 的瀏覽器導向結果與此一致。這些不能替代實測。
+- 可執行替代方案：
+  1. **（建議）兩段式上線**：先把規則改為 `permanent: false`（307）合併，於 `kakau.tw` 正式站實測 status／Location／query／`/lab`／sitemap，確認正確後再以小 PR 改回 `permanent: true`（308）。307 不會被瀏覽器長期快取，避免第一次就鎖定。
+  2. Owner 自行產生 Protection Bypass 密鑰，用 §8 腳本驗證後立即撤銷；密鑰不經過我。
+  3. Owner 在已登入瀏覽器開啟 Preview，以 DevTools Network 保留記錄檢視第一個 `/lab/interference?utm_source=x` 請求的 status 與 Location。
+- Front Cutover：**NO-GO（HOLD）**，Lab 先上線的前提已滿足，缺的是 Front 轉址驗證與 Owner 的獨立 Go。
+
+## 16. Gate D2-B — Owner 實測更新與 Front Cutover 建議（2026-10-29）
+
+### Owner 實測（Chrome DevTools，Preview `dpl_kzkFHxz6Ggv1FxBeLBy8de5kEtYg`）— VERIFIED／PASS
+`/lab/interference?utm_source=gate-d2` → **308 Permanent Redirect**；`Location: https://lab.kakau.tw/interference?utm_source=gate-d2`（query 完整保留）；目標頁 200；Preview 的 `X-Robots-Tag: noindex` 屬預期。不再要求 Protection Bypass 密鑰，維持 308、不改 307。
+
+### 其餘項目（本輪唯讀核對）
+| 項目 | 狀態 | 證據層級 |
+|---|---|---|
+| 尾斜線 `/lab/interference/` | **設定層 PASS、HTTP 未實測** | `vercel.json` 有精確 source `/lab/interference/`，`permanent: true`，目的地相同；Front 單元測試 4/4 通過；Astro 未設定 `trailingSlash`。沒有該路徑的 HTTP 實測。 |
+| 非目標路由 | **設定層 PASS、HTTP 未對 Preview 實測** | 規則為兩條精確比對、無萬用字元、目的地主機固定為 `lab.kakau.tw`（不可能回圈），`vercel.json` 只有 `redirects`。正式站目前基準：`/lab` 404、`/lab/projectile` 404（改動前即如此，非本 PR 造成）、`/resources` 200。 |
+| Front sitemap | 設定層 PASS | `routes.ts`：`/lab/interference` 改為 `legacy`、`index:false`、`sitemap:false`，單元測試確認不在 sitemap；正式站 sitemap 現含 1 筆 `lab/interference`，合併部署後應為 0。 |
+| 站內連結 | PASS（靜態） | 7 處改指 `https://lab.kakau.tw/interference`，測試掃描 `src/` 無殘留舊連結。 |
+| 舊頁實作 | 保留 | `src/pages/lab/interference.astro` 僅加 noindex，原實作保留供回滾。 |
+| Lab 正式頁 | 仍可用 | `https://lab.kakau.tw/interference` 200（本輪重測）。 |
+
+### 發布前狀態與回滾
+- Front PR #76：Draft，OPEN，MERGEABLE／CLEAN，頭部 `7ec0048`，Vercel Preview check 通過；base `main` = `9f5678b2df0c30b720d7334e9f76dbc71aa32a4d`（**Front 部署前 SHA／回滾 SHA**）。Front 無其他 CI check。
+- Lab PR #30（workflow 小修＋本報告）：CI 綠，MERGEABLE，未合併；與 Front 切換互不依賴。
+- 回滾（Runbook §10 情境 C）：revert Front PR #76 的 merge commit 並部署，還原舊頁索引、sitemap、站內連結並移除 `vercel.json` 規則；優先維持 `lab.kakau.tw/interference` 可用。308 已被瀏覽器快取者無法立即恢復，為已知風險。
+- 合併後必驗（Front 正式站）：`/lab/interference`、`/lab/interference/`、`?utm_source=` 三種的 status＝308 與 Location；`/lab`、`/resources`、`/lab/projectile` 狀態與改動前一致；sitemap 不含 `lab/interference`；新址 200。
+
+### 建議
+**Front Cutover：建議 GO（有條件）。** 條件：① Owner 明確發布授權；② 接受尾斜線與非目標路由僅有設定／測試證據、未對 Preview 做 HTTP 實測（合併後立即於正式站補驗，異常則依上述回滾）；③ 知悉 308 快取風險。Lab 側與 workflow 的待辦（token 權限、PR #30）不阻擋 Front 切換。本輪未合併、未部署 Front。
+
+## 17. Gate D2-B — Front Production Cutover 結果（2026-10-29）
+
+**D2-B Verdict：PASS。** 授權範圍僅 Front PR #76 的正式切換與必要驗收。
+
+### 發布紀錄
+| 項目 | 值 |
+|---|---|
+| 合併前核對 | PR #76 頭部 `7ec0048` 不變、MERGEABLE／CLEAN、Vercel Preview check 通過；Front main 仍為 `9f5678b`；Lab `/interference` 200 |
+| Front merge SHA | `9ca808aeac7d8139cebf0072df2c2f6867d4011c`（merge commit，PR #76 → main） |
+| Vercel 正式部署 | `dpl_3yHjB9KZqTYaz1miwEsxHB387wJL`（`kakau-36f7dkwed-qavits-projects.vercel.app`），target production，Ready，建立於 2026-10-29 20:39:55 +08:00，別名 `kakau.tw`、`www.kakau.tw`；GitHub deployment 7412441440 狀態 success |
+| 回滾 SHA | Front 部署前 main `9f5678b2df0c30b720d7334e9f76dbc71aa32a4d`；前一個正式部署為 `kakau-fyunr74gu-qavits-projects.vercel.app` |
+
+### 部署前基準（改動前）
+`/lab/interference`、`/lab/interference/`、`?utm_source=gate-d2` 皆 200；`/lab` 404、`/lab/projectile` 404、`/resources` 200；sitemap 含 1 筆 `lab/interference`。
+
+### 部署後正式環境驗證（連續 3 輪，間隔約 20 秒，結果一致）
+| 請求 | 結果 |
+|---|---|
+| `/lab/interference` | **308** → `https://lab.kakau.tw/interference` |
+| `/lab/interference/` | **308** → `https://lab.kakau.tw/interference` |
+| `/lab/interference?utm_source=gate-d2` | **308** → `https://lab.kakau.tw/interference?utm_source=gate-d2`（query 保留） |
+| `/lab/interference/?utm_source=gate-d2` | **308** → 同上（query 保留） |
+| `/lab`、`/lab/projectile` | 404、404（與改動前相同） |
+| `/resources`、`/` | 200、200 |
+| Front sitemap | `lab/interference` 出現 **0** 次（改動前 1 次） |
+| 跟隨轉址 | 單次轉址（hops=1）→ 最終 200，`https://lab.kakau.tw/interference?utm_source=gate-d2`，無循環 |
+| Lab 新址 | 200 |
+| 308 回應 `Cache-Control` | `public, max-age=0, must-revalidate`（瀏覽器端不會長期快取，降低回滾壓力；代理與瀏覽器行為仍屬 308 語意） |
+
+先前接受的尾斜線與非目標路由風險，已由上表正式環境實測關閉。**未發現阻斷性錯誤，無回滾。**
+
+### 狀態與待辦
+- 未動其他 Front 開發線、Cloudflare token 或權限。
+- 仍開啟：Lab 側 Deploy workflow token 權限與 PR #30（見 §14）；Search Console／索引觀察交 D3；Owner 實測使用的 Preview 與本次正式環境的 HTTP 證據分別保存。
+- 殘餘風險：VoiceOver、400% zoom、真機、MathJax fallback 未驗；200% 字級 slider 溢出（可操作）；3 個 Cloudflare tsc 錯誤。
+- D3（搜尋引擎收錄觀察、Closeout）可以開始。Search Console 尚未更新屬正常延遲，不視為部署失敗。
+
+## 18. Gate D3 — 正式環境最終核對與結案（2026-10-29）
+
+**D3 Verdict：PASS。跨站遷移完成。**
+
+### 最終 SHA 與部署
+| 項目 | 值 |
+|---|---|
+| Lab merge SHA | `4fd059939b5a2ab5220b2e96a785abcc3dcbb314`（PR #29） |
+| Cloudflare 版本 | `67cf2bb1-8717-4482-99b0-4cec5601f575`（100% 流量，11:57:44Z） |
+| Lab Deploy run | 40869256243（deploy 步驟因 token 權限於上傳後收尾查詢失敗而紅燈；版本已上線；見 §14） |
+| Front merge SHA | `9ca808aeac7d8139cebf0072df2c2f6867d4011c`（PR #76） |
+| Vercel 正式部署 | `dpl_3yHjB9KZqTYaz1miwEsxHB387wJL`（別名 `kakau.tw`、`www.kakau.tw`） |
+| 回滾點（未使用） | Lab：Cloudflare `e45151e4-8ee6-4133-a818-cd216760d7c0`／main `ae9b3a9`；Front：`9f5678b` |
+
+### 唯讀最終核對（D2-B 後再測）
+**已在正式 HTTP／HTML 驗證的事實**：`kakau.tw/lab/interference`、`/`尾斜線、`?utm_source=d3` 皆 308 → `https://lab.kakau.tw/interference`（query 保留）；跟隨轉址 hops=1、最終 200、無循環；`/lab`、`/lab/projectile` 404（改動前即如此）；`/`、`/resources`、`/about`、`/faq`、`/tutoring`、`/apply` 皆 200；Front sitemap 0 筆 `lab/interference`；`/faq`、`/tutoring` 內連結為新址、無舊址連結。Lab：`/interference` 200；title「雙點波源干涉模擬｜Kakau Lab」、description、canonical `https://lab.kakau.tw/interference`、`og:image` `/og/kakau-interference-lab.png`（200）、LearningResource JSON-LD（`@id` `https://lab.kakau.tw/interference#interactive-lab`，provider 引用 `https://kakau.tw/#organization`）皆存在；無 noindex meta、無 `X-Robots-Tag`；Lab sitemap 含 `/interference`；首頁 Registry 有 `/interference` 入口；`robots.txt` 200。未重跑 C4 Owner 驗收。
+
+### Search Console（D3-B）
+本環境沒有 Search Console 存取，**未取得任何 Search Console 實際回報資料**。可驗證的僅有上列 HTTP／HTML 事實。尚未重新抓取屬正常延遲，**不得**據此判定遷移失敗。觀察項目已掛入既有的「SEO｜10/13 索引異常 Monitoring 與 11/06 Review Gate」：舊 URL `kakau.tw/lab/interference` 是否被 Google 判為 Page with redirect、新 URL `lab.kakau.tw/interference` 是否可檢索與已收錄、Lab sitemap 讀取狀態（對照 10/29 基線：Lab 2/13 indexed）、Canonical 是否被採用、有無新增 404／noindex／redirect 錯誤。未建立新的監控流程。
+
+### PR #30 審核
+範圍僅 `deploy.yml` 與本報告；workflow 變更只是 deploy step 加 `id`、Smoke step 加 `if: ${{ !cancelled() && steps.deploy.conclusion != 'skipped' }}`、Summary 多兩行 outcome；Smoke 為唯讀 `curl`，**不新增任何部署副作用**；CI 通過（run 40876091666），MERGEABLE／CLEAN。行為需下次 workflow 實跑確認（目前不授權重新部署）。**建議合併**（Owner 決定）。報告已加上現況橫幅並把 §12 標為歷史紀錄，避免與「未部署／NO-GO」舊結論互相矛盾。
+
+### 未驗證項目（未寫成 PASS）
+VoiceOver／NVDA、真實 400% 縮放、真機、MathJax 載入失敗 fallback、Firefox／WebKit（Lab 正式站）、各活動完整答題流程在正式站的實操、投影模式實操、Search Console 資料。
+
+### 移交（不阻擋結案）
+- Lab 共用發布基礎設施（Cloudflare token 最小權限、Deploy 紅燈處置、Smoke 實跑驗證、workers.dev 保留與否）→ 既有「Kakau Lab｜CI/CD v1 … Closeout」所列之 Follow-up「首次 Production Deployment Acceptance」。
+- 無障礙（VoiceOver／NVDA、400%、真機、MathJax fallback、200% 字級 slider 溢出）→ 既有「Kakau 三站共同無障礙品質基準 v0.1」。
+- 三個 Cloudflare tsc 錯誤 → Lab CI/CD 維護。
+- 收錄觀察 → 「SEO｜10/13 索引異常 Monitoring 與 11/06 Review Gate」。
