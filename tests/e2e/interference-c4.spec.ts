@@ -208,3 +208,42 @@ test("projection round-trip preserves parameters, P and the active activity @c4 
   await expect(page.locator('input[name="time-choice"][value="static"]')).toBeChecked();
   await expect(page.locator("[data-geometry-sr]")).toContainText("d/λ = 3.75");
 });
+
+test("activity 1 keeps steps 1–3 and adds the explanation after a correct check @c4 @cross-browser", async ({ page }) => {
+  await open(page, 1440, 900);
+  const plot = await page.locator("[data-interference-plot]").boundingBox();
+  await page.mouse.click(plot!.x + plot!.width * .62, plot!.y + plot!.height * .3);
+  const fractions: Array<[number, number]> = [[.5, .2], [.55, .3], [.45, .4], [.5, .5], [.6, .45], [.7, .6], [.35, .3], [.3, .7], [.8, .5]];
+  for (const [fx, fy] of fractions) {
+    if (await page.locator('[data-activity-step="conclude"]').isVisible()) break;
+    await page.mouse.move(plot!.x + plot!.width * fx, plot!.y + plot!.height * fy);
+    await page.mouse.down();
+    await page.mouse.move(plot!.x + plot!.width * (fx + .02), plot!.y + plot!.height * (fy + .01), { steps: 3 });
+    await page.mouse.up();
+  }
+  await page.locator('[data-answer="measure-constructive"]').selectOption("integer");
+  await page.locator('[data-answer="measure-destructive"]').selectOption("half");
+  await page.locator('[data-activity-action="measure-check"]').click();
+  const visibleSteps = page.locator('[data-activity="measure"] [data-activity-step]').filter({ visible: true });
+  await expect(visibleSteps).toHaveCount(4);
+  for (const step of ["place", "explore", "conclude"]) await expect(page.locator(`[data-activity-step="${step}"]`)).toHaveClass(/is-done/);
+  await expect(page.locator('[data-activity="measure"] [data-activity-step="done"]')).toBeVisible();
+  expect(await noOverflow(page)).toBe(true);
+  await shot(page, "activity1-final-state", '[data-activity="measure"]');
+});
+
+test("previous/next walks all five activities in order and stops at both ends @c4 @cross-browser", async ({ page }) => {
+  await open(page, 1440, 900);
+  const prev = page.locator('[data-activity-nav="prev"]'), next = page.locator('[data-activity-nav="next"]');
+  const current = () => page.locator("[data-activity-tab][aria-current=step]").getAttribute("data-activity-tab");
+  expect(await current()).toBe("measure");
+  await expect(prev).toBeDisabled();
+  await expect(next).toBeEnabled();
+  for (const id of ["count", "antiphase", "time", "edge"]) { await next.click(); expect(await current()).toBe(id); }
+  await expect(next).toBeDisabled();
+  await expect(prev).toBeEnabled();
+  await prev.click();
+  expect(await current()).toBe("time");
+  for (const id of ["antiphase", "count", "measure"]) { await prev.click(); expect(await current()).toBe(id); }
+  await expect(prev).toBeDisabled();
+});

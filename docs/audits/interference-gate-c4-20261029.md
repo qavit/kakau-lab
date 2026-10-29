@@ -99,3 +99,11 @@ Owner 尚未實際操作，C4 不得視為關閉。操作清單見 [owner-script
 
 ## 9. Git 與工時
 Branch 在本機領先 origin 6 個 commit（含本報告），**尚未 push**；無 PR、merge、deploy。工時未追蹤。
+
+## 10. 獨立審查後的小修（2026-10-29，接於 `6b24317`）
+獨立審查指出兩個 C4 教學互動缺口，皆已確認並修復：
+1. **活動 1 核對成功後前面步驟消失**：`measure-check` 成功時呼叫 `setStep("measure","done")`，會隱藏所有非 `done` 步驟。改為保留步驟 1–3（標 `is-done`）並顯示解說。
+2. **上一個／下一個未涵蓋 ★**：導覽陣列只有四項並用 `% 4` 循環。改為 `measure → count → antiphase → time → edge` 線性順序，首尾停用按鈕（與 Front 一致）；每次 readout／點擊後同步 disabled。
+- 新增 2 項 E2E（活動 1 最終狀態：4 個可見步驟且 1–3 為 done；導覽走完五項並在兩端停用），兩項在舊碼上皆失敗。
+- 重跑：unit 439/439；interference E2E（desktop＋mobile 模擬）44/44；Firefox＋WebKit C4 子集 24/24；lint 0 error；tsc 仍僅 3 個既有 Cloudflare 錯誤；build 完成。
+- 判定：兩項缺口已關閉，Engineering PASS 維持；Owner 驗收仍待進行。
