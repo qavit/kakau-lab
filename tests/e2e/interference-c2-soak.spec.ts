@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
+import { evidencePath } from "./evidence";
 
 test("ten minute interference stability sample @soak", async ({ page }) => {
   test.setTimeout(11 * 60_000);
@@ -24,8 +25,8 @@ test("ten minute interference stability sample @soak", async ({ page }) => {
   await page.waitForTimeout(250);
   const frameAfterPause = Number(await runtime.getAttribute("data-interference-frame"));
   const evidence = { browser: "Playwright Chromium", elapsedSeconds: Math.round((Date.now() - startedAt) / 1000), samples, pausedFrame, frameAfterPause, pageErrors: errors };
-  await mkdir("docs/audits/interference-gate-c2-20261029", { recursive: true });
-  await writeFile("docs/audits/interference-gate-c2-20261029/soak.json", JSON.stringify(evidence, null, 2));
+  await mkdir(evidencePath("interference-gate-c2-20261029"), { recursive: true });
+  await writeFile(evidencePath("interference-gate-c2-20261029", "soak.json"), JSON.stringify(evidence, null, 2));
   expect(errors).toEqual([]);
   expect(samples.every((sample, i) => i === 0 || sample.frame > samples[i - 1].frame)).toBe(true);
   expect(frameAfterPause).toBe(pausedFrame);

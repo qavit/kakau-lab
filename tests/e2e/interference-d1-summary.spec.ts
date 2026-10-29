@@ -1,8 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
+import { evidencePath } from "./evidence";
 
 // Gate D1: the concept summary below the simulator must use real MathJax (not Unicode text) and never overflow.
-const evidenceDir = process.env.D1_EVIDENCE_DIR ?? "docs/audits/interference-gate-d1-20261029";
+// D1_EVIDENCE_DIR (the full directory) stays supported; otherwise follow the shared EVIDENCE_DIR root.
+const evidenceDir = process.env.D1_EVIDENCE_DIR ?? evidencePath("interference-gate-d1-20261029");
 
 for (const width of [320, 390, 1440]) {
   test(`summary formulas are MathJax SVG without overflow at ${width}px`, async ({ page }) => {

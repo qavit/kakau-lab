@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdir } from "node:fs/promises";
-import { resolve } from "node:path";
+import { evidencePath } from "./evidence";
 
 test("guided activities, measurement, keyboard, dialog and advanced edge exploration", async ({ page }) => {
   await page.goto("/interference-lifecycle");
@@ -53,8 +53,8 @@ test("guided activities, measurement, keyboard, dialog and advanced edge explora
   await host.locator('[data-answer="count-nodes"]').fill("6");
   await host.locator('[data-activity-action="count-check"]').click();
   await expect(host.locator('[data-count-result]')).toContainText("7 條波腹線、6 條波節線");
-  await mkdir("docs/audits/interference-gate-b3", { recursive: true });
-  await page.screenshot({ path: resolve("docs/audits/interference-gate-b3/activity-count-desktop.png"), fullPage: true });
+  await mkdir(evidencePath("interference-gate-b3"), { recursive: true });
+  await page.screenshot({ path: evidencePath("interference-gate-b3", "activity-count-desktop.png"), fullPage: true });
   await host.locator('[data-action="reset-parameters"]').click();
   await expect(host.locator('[data-activity="count"] [data-activity-step="done"]')).toBeVisible();
   await host.locator('[data-activity-action="count-retry"]').click();
@@ -77,7 +77,7 @@ test("guided activities, measurement, keyboard, dialog and advanced edge explora
   await host.locator('input[name="time-lines"][value="static"]').check();
   await host.locator('[data-activity-action="time-check"]').click();
   await expect(host.locator('[data-activity="time"] [data-activity-step="done"]')).toBeVisible();
-  await page.screenshot({ path: resolve("docs/audits/interference-gate-b3/activity-time-desktop.png"), fullPage: true });
+  await page.screenshot({ path: evidencePath("interference-gate-b3", "activity-time-desktop.png"), fullPage: true });
   await host.locator('[data-action="play-pause"]').click();
 
   // Advanced edge conditions retain the absent / degenerate / hyperbola boundary.
@@ -112,8 +112,8 @@ test("activity controls fit a narrow touch viewport @mobile", async ({ page }) =
   await host.locator('[data-answer="count-predict-nodes"]').fill("6");
   await host.locator('[data-activity-action="count-lock"]').tap();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await mkdir("docs/audits/interference-gate-b3", { recursive: true });
-  await page.screenshot({ path: resolve("docs/audits/interference-gate-b3/activity-count-mobile.png"), fullPage: true });
+  await mkdir(evidencePath("interference-gate-b3"), { recursive: true });
+  await page.screenshot({ path: evidencePath("interference-gate-b3", "activity-count-mobile.png"), fullPage: true });
 });
 
 test("interference host exposes named controls and has no serious axe violations @a11y", async ({ page }) => {

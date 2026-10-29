@@ -1,10 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdir } from "node:fs/promises";
+import { evidencePath } from "./evidence";
 
 // Gate C3 layout parity. Assertions are geometric (region order, sizes, overflow) so they hold across
 // machines; the screenshots are evidence for the audit report, not pixel baselines.
-const evidenceDir = "docs/audits/interference-gate-c3-20261029/lab-after";
+const evidenceDir = evidencePath("interference-gate-c3-20261029", "lab-after");
 const shot = async (page: Page, name: string, fullPage = false) => { await mkdir(evidenceDir, { recursive: true }); await page.screenshot({ path: `${evidenceDir}/${name}.png`, fullPage }); };
 const rect = async (page: Page, selector: string) => {
   const box = await page.locator(selector).first().boundingBox();

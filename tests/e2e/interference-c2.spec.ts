@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdir, writeFile } from "node:fs/promises";
+import { evidencePath } from "./evidence";
 
-const evidenceDir = "docs/audits/interference-gate-c2-20261029";
+const evidenceDir = evidencePath("interference-gate-c2-20261029");
 
 test("keyboard focus order, hidden sidebar and point readout @c2", async ({ page }) => {
   await page.goto("/interference");

@@ -1,8 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
+import { evidencePath } from "./evidence";
 
 // Gate C4 regressions. Geometry assertions (not pixel baselines) so they hold across machines.
-const evidenceDir = "docs/audits/interference-gate-c4-20261029";
+const evidenceDir = evidencePath("interference-gate-c4-20261029");
 const shot = async (page: Page, name: string, selector?: string) => {
   await mkdir(evidenceDir, { recursive: true });
   const path = `${evidenceDir}/${name}.png`;
