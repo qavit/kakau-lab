@@ -36,7 +36,7 @@
 |---|---|---|
 | 互動模擬器、五項引導活動、P 量測 | 已由 Lab 模擬器涵蓋 | `InterferenceSimulation` |
 | 四個教學 dialog（雙曲線、線數、反相、時間） | 已涵蓋 | `InterferenceDialogs` |
-| 四段「概念摘要」（條件線、線數、同調≠同相、波動圖樣不動） | **保留為可索引文字** | 新 `InterferenceSummary.tsx`（server render，Unicode 公式，不需 MathJax／hydration） |
+| 四段「概念摘要」（條件線、線數、同調≠同相、波動圖樣不動） | **保留為可索引文字** | 新 `InterferenceSummary.tsx`（server render 文字；公式於 D1 改為共用 MathJax，見 §13） |
 | 「上課投影時」使用說明 | 保留 | 同上 |
 | Streamlit 備援入口 | 保留為連結 | 同上（`rel=noreferrer`） |
 | `LearningResource` JSON-LD | 保留並**改寫**：`@id` = `https://lab.kakau.tw/interference#interactive-lab`、`url` 同、`inLanguage zh-Hant`、`educationalLevel 高中`、`provider` = Organization `@id` 引用 | `lib/labs/interference-seo.ts` |
@@ -116,7 +116,7 @@ curl -s $P/sitemap.xml | grep -c lab/interference   # 期望 0
 2. **Front vercel.json 的 Vercel 實測缺失**（preview 受保護）。靜態檔優先權為關鍵未知數。
 3. Lab 沒有預覽環境：Cloudflare 上的實際行為（headers、assets、308）只能在正式部署後驗證；步驟 5 即是閘門。
 4. Lab 這次合併會一次帶入整個 Gate B–C4 移植（20+ commits，153 檔）——PR #29 的 diff 很大，建議審查者以 `16cb61f..HEAD` 看 Gate D 增量。
-5. 內容：公式在摘要中為 Unicode（非 MathJax）；Lab 全站頁無 JSON-LD 先例；`@id` 無結尾斜線與 Front 舊值不同（外部系統若用舊 `@id` 合併實體，需靠 301 與 Search Console 處理）。
+5. 內容：（D1 已解：摘要公式改為 MathJax，見 §13）Lab 全站頁無 JSON-LD 先例；`@id` 無結尾斜線與 Front 舊值不同（外部系統若用舊 `@id` 合併實體，需靠 301 與 Search Console 處理）。
 6. 既存問題（非本次 regression）：全 repo `tsc` 3 個 Cloudflare ambient 型別錯誤；`StandardAtmosphereLab.tsx` 2 個 lint warning；Front 的 attribution 單元測試有 3 項在本 worktree 失敗（`application-handler`／`attribution`，與干涉無關，主 checkout 亦有 1 項失敗，未查根因）；dev server 在 3000 埠被其他程序占用時 Playwright 預設 webServer 會逾時（改用 `BASE_URL`）。
 7. 工作樹污染：Interference E2E 會覆寫已提交的 `docs/audits/**` 截圖與 `tab-sequence.json`（約 40 個檔）。我無權限還原（被擋），保留為未提交修改，**未納入任何 commit**；請 Owner 以 `git checkout -- docs/audits` 還原。
 8. 未驗證：VoiceOver、400% zoom、真機、MathJax fallback、Firefox/WebKit（本輪未重跑，C4 回報 24/24）。
@@ -142,3 +142,39 @@ curl -s $P/sitemap.xml | grep -c lab/interference   # 期望 0
 | Front unit | 新增 4 項通過；全套 149/152，3 項 attribution 失敗為既有／環境相關 |
 | Front Vercel preview 轉址 | **NOT VERIFIED** |
 | Cloudflare 實際環境 | **NOT VERIFIED** |
+
+## 13. Gate D1 — 概念摘要 MathJax 與發布前驗證（2026-10-29）
+
+**D1 Verdict：PARTIAL**（工程與科學項目 PASS；Front preview HTTP 308／query／非目標路由／sitemap 為 NOT VERIFIED，未再投入權限設定）。
+
+### 修改
+- `components/interference/InterferenceSummary.tsx`：四張卡的公式改用共用 `Tex`／`TexBlock`（行內公式融入中文句，展示公式各占一行，兩條式不合併成寬單行）；每組展示公式加 `role="group"` 與中文 `aria-label`（MathJax 本身另提供輔助 MathML）；網格改為 `minmax(min(100%,24rem),1fr)`（桌面 2×2）。未新增 KaTeX／第二套引擎。
+- `app/interference/page.tsx`：以單一 `MathProvider` 包住模擬器與摘要，MathJax 只載入一次；模擬器內既有 `MathProvider` 因巢狀為 no-op。摘要為靜態內容，播放動畫不觸發重排版（E2E 驗證 mjx 節點未被重建）。
+- 測試：新增 `tests/e2e/interference-d1-summary.spec.ts`（320／390／1440：7 個展示公式、6 個行內公式皆為 MathJax SVG、無 `.formula-plain`、散文無 Unicode 數學字元、無整頁／卡片／公式盒溢出、aria-label、不重排版）；`tests/rendered-html.test.mjs` 新增 1 項（SSR 含 TeX 原始碼、無 Unicode 公式、MathJax 腳本只出現一次、d=3λ→7／6 與 d=3.5λ→7／8 邊界）。
+
+### 科學核對
+`N腹 = 2⌊d/λ⌋ + 1`、`N節 = 2⌊d/λ + ½⌋` 與 Front 原版一致。整數邊界：d = 3λ → 7 條波腹、6 條波節（|Δr| = d 的退化半直線計入）；d = 3.5λ → 7、8（|Δr| = 3.5λ 為波節邊界，計入）。`Δφ = (2π/λ)Δr + (φ₂−φ₁)`、`ψ = |C|cos(Φ−ωt)`、`Δθ = kΔr + (φ₂−φ₁)` 語意不變。
+
+### 驗證
+| 項目 | 結果 |
+|---|---|
+| Lab unit | 442/442（含新增 1） |
+| 摘要 MathJax E2E（desktop-chromium） | 4/4 |
+| Interference E2E（desktop+mobile，隔離副本執行） | 47/48；1 項失敗 `interference-c4 › activity 3 title survives 200% text size`：整頁橫向溢出由模擬器 slider（`.if-control--slider`，right≈703 於 390px／200% 字級）造成，**與摘要無關**；在乾淨的 HEAD `2adde73` 匯出副本上同樣失敗 → **既有問題，非本次 regression**，未修（超出 D1 範圍，建議 D2 前由 Owner 決定是否列為已知風險）。 |
+| lint | 0 errors、2 既有 warnings |
+| tsc | 僅既有 3 個 Cloudflare 型別錯誤（`db/index.ts`、`worker/index.ts` ×2），無新增 |
+| `npm run build`／`deploy:dry` | PASS |
+| SEO／Registry | `rendered-html` 與 `registry` 單元測試通過：title、description、canonical、OG 圖、LearningResource JSON-LD、四段摘要文字、Streamlit 備援連結、Model 08 Registry、sitemap 皆在 |
+| 截圖 | `docs/audits/interference-gate-d1-20261029/summary-{320,390,1440}.png` |
+
+### 工作樹證據保護
+E2E 在**隔離副本**（`/tmp` 中 rsync 後的複本，`node_modules` 以 symlink 共用）執行，新截圖輸出到 `D1_EVIDENCE_DIR`／新目錄。主工作樹中先前被覆寫的 `docs/audits/**` 約 40 個已修改檔**原樣保留、未還原、未納入 commit**（仍待 Owner 以 `git checkout -- docs/audits` 決定）。
+
+### D1-D Front Preview
+HTTP 308、query string 保留、非目標路由、sitemap：**NOT VERIFIED**。Owner 以瀏覽器從受保護 preview 開啟 `/lab/interference` 抵達 `https://lab.kakau.tw/interference`，僅證明瀏覽器導向目標正確，**不等於**完整 HTTP redirect PASS。未建立 bypass secret、未另行變更權限。Front PR #76 狀態未動。
+
+### D2 交接
+- 發布候選 SHA：見本節 commit（PR #29 head）。
+- 仍未驗：Front preview HTTP 層、Cloudflare 實際環境、VoiceOver／400% zoom／真機、Firefox／WebKit 未重跑。
+- 既有風險：200% 字級下模擬器 slider 溢出（上表）、3 個 Cloudflare tsc 錯誤。
+- D2 可以開始（無科學錯誤或部署阻斷發現）；merge／deploy／轉址仍須 Owner 另行 Go。

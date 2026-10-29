@@ -596,6 +596,20 @@ test("interference page carries its own metadata, self canonical and a consisten
   assert.equal((html.match(/<h1[ >]/g) ?? []).length, 1, "exactly one h1");
 });
 
+test("interference concept summary formulas are TeX for MathJax, not Unicode text", async () => {
+  const html = await (await render("/interference")).text();
+  const summary = html.slice(html.indexOf('class="if-summary"'));
+  for (const tex of ["N_{\\text{腹}}=2\\left\\lfloor", "\\left\\lfloor \\dfrac{d}{\\lambda}+\\tfrac12\\right\\rfloor", "\\Delta\\phi=\\dfrac{2\\pi}{\\lambda}", "d=3\\lambda"]) {
+    assert.ok(summary.includes(tex), `${tex} is in the summary`);
+  }
+  assert.doesNotMatch(summary, /[⌊⌋₁₂½]/, "no Unicode math glyphs left in the summary");
+  assert.equal((html.match(/mathjax\/tex-svg\.js/g) ?? []).length <= 1, true, "MathJax loaded once");
+  // Boundary check for the count formulas: d = 3λ gives 7 antinodal and 6 nodal lines (|Δr| = d included).
+  const count = (r) => ({ n: 2 * Math.floor(r + 1e-9) + 1, m: 2 * Math.floor(r + 0.5 + 1e-9) });
+  assert.deepEqual(count(3), { n: 7, m: 6 });
+  assert.deepEqual(count(3.5), { n: 7, m: 8 });
+});
+
 test("only the production host is indexable; every other host gets X-Robots-Tag noindex", async () => {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `host-${process.pid}-${Date.now()}`);
