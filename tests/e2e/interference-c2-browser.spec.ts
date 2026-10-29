@@ -1,0 +1,32 @@
+import { expect, test } from "@playwright/test";
+
+test("cross browser simulation and guided controls @cross-browser", async ({ page }) => {
+  await page.goto("/interference-lifecycle");
+  const host = page.getByTestId("interference-host");
+  await expect(host.locator("[data-interference-runtime]")).toHaveCount(1);
+  await expect(host.locator("canvas[data-interference-canvas]")).toBeVisible();
+  await expect(host.locator('[data-layer="conditions"] path')).not.toHaveCount(0);
+  const wavelength = host.locator('[data-control="wavelength"]');
+  await wavelength.fill("1.2");
+  await expect(host.locator('[data-output="wavelength"]')).toHaveText("1.20");
+  const plot = host.locator("[data-interference-plot]");
+  await plot.click({ position: { x: 180, y: 180 } });
+  await expect(host.locator("[data-selected-point]")).toHaveCount(1);
+  await plot.focus();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("Delete");
+  await expect(host.locator("[data-selected-point]")).toHaveCount(0);
+  await host.locator('[data-activity-tab="edge"]').click();
+  await host.locator('[data-activity-action="edge-set"][data-value="3"]').click();
+  await expect(host.locator("[data-edge-shape]")).toHaveText("兩條退化半直線");
+  await host.locator('[data-activity="edge"] [data-open-dialog="hyperbola"]').click();
+  await expect(host.locator('[data-dialog="hyperbola"]')).toBeVisible();
+  await page.keyboard.press("Escape");
+  await host.locator('[data-action="play-pause"]').click();
+  await expect(host.locator('[data-action="play-pause"]')).toHaveAttribute("aria-pressed", "true");
+  await host.locator('[data-action="play-pause"]').click();
+  await page.reload();
+  await expect(host.locator("[data-interference-runtime]")).toHaveCount(1);
+  await page.setViewportSize({ width: 900, height: 800 });
+  await expect(host.locator("canvas[data-interference-canvas]")).toBeVisible();
+});

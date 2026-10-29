@@ -1,0 +1,172 @@
+[
+  {
+    "tag": "button",
+    "name": "重設參數",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "投影模式",
+    "hidden": false
+  },
+  {
+    "tag": "div",
+    "name": "波場與觀測點。按 Enter 或空白鍵在中央建立 P，方向鍵移動，Shift 加大步距，Delete 清除。",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "關閉操作說明",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "▶ 播放",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "重設時間",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "模擬時間 t / T",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "波長 λ",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "波源間距 d",
+    "hidden": false
+  },
+  {
+    "tag": "summary",
+    "name": "波源與介質參數",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "收合活動側欄",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "1｜路徑差",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "2｜線數預測",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "3｜反相波源",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "4｜波在動嗎？",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "★ 進階探索",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "← 上一個",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "下一個 →",
+    "hidden": false
+  },
+  {
+    "tag": "body",
+    "name": ".interference-lab{font:14px/1.45 system-ui,sans-se",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "重設參數",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "投影模式",
+    "hidden": false
+  },
+  {
+    "tag": "div",
+    "name": "波場與觀測點。按 Enter 或空白鍵在中央建立 P，方向鍵移動，Shift 加大步距，Delete 清除。",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "關閉操作說明",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "▶ 播放",
+    "hidden": false
+  },
+  {
+    "tag": "button",
+    "name": "重設時間",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "模擬時間 t / T",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "波長 λ",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "波源間距 d",
+    "hidden": false
+  },
+  {
+    "tag": "summary",
+    "name": "波源與介質參數",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "",
+    "hidden": false
+  },
+  {
+    "tag": "input",
+    "name": "",
+    "hidden": false
+  }
+]

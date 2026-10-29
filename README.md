@@ -13,10 +13,10 @@ Kakau Lab 把較重的互動科學模型（React 狀態應用、Three.js、多�
 
 ### Kakau Lab 與 Kakau Web 的邊界
 
-- **Kakau Web**（<https://kakau.tw>）：品牌、內容、資源與輕量原生 lab（例如雙點波源干涉 <https://kakau.tw/lab/interference>），扮演 SEO／導客的角色。
+- **Kakau Web**（<https://kakau.tw>）：品牌、內容、資源與輕量原生 lab，扮演 SEO／導客的角色。
 - **Kakau Lab**（本 repo，<https://lab.kakau.tw>）：較重的互動科學模型。
 
-兩者是刻意分開的 runtime：「整合產品」不代表「整合 framework」，不合併 runtime、不搬移模型，`kakau.tw/lab/interference` 的網址維持不變。詳見 [`docs/architecture.md`](docs/architecture.md)。
+兩者是刻意分開的 runtime：「整合產品」不代表「整合 framework」，不合併 runtime、不搬移模型。詳見 [`docs/architecture.md`](docs/architecture.md)。
 
 ## 模型概覽
 
@@ -31,7 +31,7 @@ Kakau Lab 把較重的互動科學模型（React 狀態應用、Three.js、多�
 | 05 | 大氣垂直結構 | `/atmosphere-profile` | beta | public |
 | 06 | 科氏力效應 | `/coriolis` | prototype | unlisted |
 | 07 | 拋體運動 | `/projectile` | stable | public |
-| 08 | 雙點波源干涉 | <https://kakau.tw/lab/interference>（Kakau Web） | beta | public |
+| 08 | 雙點波源干涉 | <https://lab.kakau.tw/interference>（Kakau Lab；`kakau.tw/lab/interference` 永久轉址至此） | beta | public |
 | 09 | 靜電學 | `/electrostatics` | stable | public |
 | — | 自由體圖（FBD） | `/fbd` | prototype（paused） | unlisted |
 

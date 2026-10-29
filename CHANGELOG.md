@@ -8,6 +8,13 @@ History is intentionally not backfilled beyond the recent milestones below.
 
 ## Unreleased
 
+- Hydrogen Atom Lab prototype (`/hydrogen`, model 10, unlisted): Bohr orbit diagram, energy-level diagram and
+  line spectrum driven by one transition state. Emission and absorption modes, Lyman/Balmer/Paschen series. Viewing a transition no longer moves the electron; a transition fires only from
+  its starting level. The spectrum axis auto-fits ultraviolet and infrared series.
+- Hydrogen Lab v0.2: first visit offers guided or free exploration (switching resets both). The guided
+  activity "where does the ~486 nm line come from?" runs observe → predict → compare with the model →
+  evidence. The answer stays unrendered until the student asks for evidence; learning state is separate from
+  the physical state. The spectrum strip now draws in real pixels, so it stays legible on phones.
 - Light, dark and follow-system appearance across the catalog and every Lab, with a three-way switch in each
   header. The choice is stored in `localStorage` (`mode`) and applied via `<html data-mode>` before first paint,
   matching Kakau Notes. Dark mode swaps in an ivory Kakau Lab wordmark.

@@ -1,0 +1,36 @@
+
+Running 8 tests using 5 workers
+
+(node:61602) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:61601) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:61603) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:61605) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:61604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/8] [desktop-chromium] › tests/e2e/interference-gate-c.spec.ts:3:1 › Gate C dialog content and stored preferences survive reload
+[2/8] [desktop-chromium] › tests/e2e/interference-renderer.spec.ts:5:1 › renderer shows the field and keeps controls, measurement and lifecycle in sync
+[3/8] [desktop-chromium] › tests/e2e/interference-lifecycle.spec.ts:3:1 › development harness survives StrictMode replay, unmount, and remount
+[4/8] [mobile-chromium] › tests/e2e/interference-b3.spec.ts:104:1 › activity controls fit a narrow touch viewport @mobile
+[5/8] [desktop-chromium] › tests/e2e/interference-b3.spec.ts:6:1 › guided activities, measurement, keyboard, dialog and advanced edge exploration
+[6/8] [mobile-chromium] › tests/e2e/interference-gate-c.spec.ts:29:1 › Gate C mobile sidebar defaults closed and can be reopened @mobile
+(node:61641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[7/8] [mobile-chromium] › tests/e2e/interference-renderer.spec.ts:78:1 › renderer fits a touch viewport and can place a measurement point @mobile
+[8/8] [desktop-chromium] › tests/e2e/interference-b3.spec.ts:119:1 › interference host exposes named controls and has no serious axe violations @a11y
+  8 passed (4.5s)

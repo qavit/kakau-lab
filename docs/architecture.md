@@ -115,6 +115,48 @@ account of the one curve that is not a closed form: why quadratic drag has none,
 scheme and step size are, and how the integrator is calibrated against the exact solution it
 generalizes. It follows the `/about` page's pattern, which until now the solar model alone used.
 
+## The hydrogen-atom model
+
+`/hydrogen` (catalogue number 10, `prototype` and `unlisted`) is a Bohr-model lab: one selected
+transition drives a true-to-scale orbit diagram, an energy-level diagram and a line spectrum.
+`lib/science/hydrogen.ts` is closed-form and imports nothing: level energies, orbit radii, speeds,
+transition photons, series lines and limits, and an independent Rydberg-formula wavelength that a
+test checks against the energy route for every level pair.
+
+The nucleus is treated as infinitely heavy (R∞, a₀), so Hα comes out at 656.11 nm rather than the
+656.47 nm vacuum value; the roughly 0.05 % reduced-mass correction is left out on purpose and said
+so on the page and in the tests' tolerance.
+
+`models/hydrogen.ts` owns the state machine. Looking at a transition and making it happen are separate: `selectTransition` never moves the electron, and `fireTransition` refuses (`fireBlock` says why) unless the electron already sits on the starting level — emission from the upper level, absorption from the lower. Choosing a preset above the shown range widens the diagrams instead of substituting a different transition, and the shown level count cannot drop below what the selection and electron occupy. A jump is discontinuous, so it is never interpolated:
+an emitting electron drops at once and the photon leaves, while an absorbing electron stays put until
+the photon arrives and is then lifted. Orbit angle advances at ω ∝ 1/n³ for display only. The
+orbit view is drawn at true n² scale (the largest shown orbit fills the frame) rather than
+compressed, and the energy diagram spreads crowded labels near the ionisation limit with leader
+lines instead of letting them overlap. The spectrum axis fits the selected series (Lyman in the ultraviolet, Paschen in the infrared) with the visible band marked, or can be pinned to 380–750 nm; the orbit view can switch to a schematic rₙ ∝ n scale, labelled as such. Absorption mode renders the spectrum as dark lines on a
+continuum, emission as bright lines on a dark ground. The Bohr picture's limits (no orbitals, no
+l or m, no fine structure) are stated in the lab's footnote; quantum orbitals are a possible later
+model, not part of this one.
+
+### Hydrogen entry and the guided spectral activity
+
+The first visit to `/hydrogen` shows a two-way choice (guided or free) instead of the lab. Every
+switch between modes starts the destination from its own initial state — the free atom
+(`initialHydrogenState`) or the guided atom (`guidedPhysicsState`) plus a fresh learning state — so a
+guess or the electron's level never carries across. Nothing is stored and there is no URL schema.
+
+The single guided activity, "where does the ~486 nm line come from?", keeps learning state in
+`models/hydrogen-learning.ts`, separate from `HydrogenState`: its functions neither receive nor return
+the physical state, so choosing or comparing a guess can never move the electron or fire a transition.
+Comparing a guess only calls `transition(upper, 2)` from the science layer. The evidence policy
+(`evidencePolicy`) is visibility only: before the student asks for evidence the orbit view, energy
+diagram, transition readout and level names are not rendered at all (not hidden by CSS), so they cannot
+leak through the accessibility tree, a tooltip or keyboard focus. The guided spectrum is built from the
+Balmer series itself, not from the selected transition, and its lines are unselectable until the
+evidence phase. In the evidence phase the atom can emit the photon, through the same `fireBlock` rule as
+free exploration. Line brightness is schematic: no populations, selection rules or transition
+probabilities are modelled. The spectrum strip measures its width and draws in real pixels, so labels
+stay readable on phones.
+
 ## The electrostatics model
 
 `/electrostatics` (catalogue number 09, still `experimental` in the registry) is the
@@ -208,9 +250,10 @@ The registry also distinguishes *which app* implements a lab. `implementation.ap
   because both properties are first-party Kakau products. The catalog code still keeps the
   distinction explicit rather than pretending an external URL is an internal route.
 
-Models 01–07 are all `kakau-lab`. Model 08 (`two-source-interference`, 雙點波源干涉) is
-`kakau-web`, pointing at the already-published `https://kakau.tw/lab/interference` — it is not an
-iframe, a proxy, or a port of that lab's code into this repo.
+Models 01–08 and 09 are all `kakau-lab`. Model 08 (`two-source-interference`, 雙點波源干涉) moved here
+from Kakau Web (Gate D): its canonical URL is `https://lab.kakau.tw/interference`, and
+`kakau.tw/lab/interference` is a server-side permanent redirect to it. No registry entry currently
+uses `kakau-web`; the variant stays in the type for future externally hosted labs.
 
 `LabManifest` reserves an optional `scientificQuality` block (`assumptions`, `approximations`,
 `validity`, `verification`) for a future pedagogical-quality pass. Stage 0 does not backfill it for
@@ -221,8 +264,8 @@ the seven existing models; leaving it empty is intentional, not an oversight.
 Two Kakau properties, deliberately on separate runtimes:
 
 - **Kakau Web** — `https://kakau.tw`. Brand, content, resources, lightweight native labs, and the
-  SEO / acquisition surface. `kakau.tw/lab/interference` stays at that URL; Stage 0 does not move
-  it to `lab.kakau.tw`.
+  SEO / acquisition surface. `kakau.tw/lab/interference` only redirects to
+  `https://lab.kakau.tw/interference`.
 - **Kakau Lab app** (this repo) — target origin `https://lab.kakau.tw`. Heavier interactive science
   models: stateful React applications with Three.js scenes and synchronized multi-view
   visualizations.

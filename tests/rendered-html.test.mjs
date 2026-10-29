@@ -60,16 +60,17 @@ test("server-renders the Kakau Lab model catalog", async () => {
   assert.match(html, /太陽、天球與竿影/);
   assert.match(html, /大氣垂直結構/);
   assert.match(html, /拋體運動/);
-  for (const hidden of ["全球行星風系", "岩層位態", "多導線磁場疊加", "科氏力效應", "自由體圖", "風場粒子"]) {
+  for (const hidden of ["全球行星風系", "岩層位態", "多導線磁場疊加", "科氏力效應", "氫原子能階與光譜", "自由體圖", "風場粒子"]) {
     assert.doesNotMatch(html, new RegExp(hidden), `${hidden} must not be in the production catalog`);
   }
-  for (const href of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/fbd"]) {
+  for (const href of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/hydrogen", "/fbd"]) {
     assert.doesNotMatch(html, new RegExp(`href="${href}"`));
   }
   assert.match(html, /雙點波源干涉/);
   assert.match(html, /靜電學/);
   assert.match(html, /05 interactive models/);
-  assert.match(html, /href="https:\/\/kakau\.tw\/lab\/interference"/);
+  assert.match(html, /href="\/interference"/);
+  assert.doesNotMatch(html, /kakau\.tw\/lab\/interference/);
   assert.doesNotMatch(html, /data-testid="experimental-catalog"/);
   assert.doesNotMatch(html, /同步控制台/);
 });
@@ -95,17 +96,17 @@ test("sitemap lists only catalog-eligible local labs and supporting pages", asyn
   assert.equal(response.status, 200);
   const xml = await response.text();
   const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
-  for (const path of ["/solar", "/atmosphere-profile", "/projectile", "/electrostatics"]) {
+  for (const path of ["/solar", "/atmosphere-profile", "/projectile", "/interference", "/electrostatics"]) {
     assert.ok(paths.includes(path), `${path} should be in the sitemap`);
   }
-  for (const path of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/fbd", "/lab/interference"]) {
+  for (const path of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/hydrogen", "/fbd", "/lab/interference"]) {
     assert.ok(!paths.includes(path), `${path} must not be in the sitemap`);
   }
   assert.doesNotMatch(xml, /kakau\.tw\/lab\/interference/);
 });
 
 test("unlisted lab routes stay reachable but are noindex", async () => {
-  for (const path of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/fbd"]) {
+  for (const path of ["/magnetism", "/atmosphere", "/geology", "/coriolis", "/hydrogen", "/fbd"]) {
     const response = await render(path);
     assert.equal(response.status, 200, path);
     const html = await response.text();
@@ -134,8 +135,10 @@ test("resolves Open Graph and Twitter image URLs against the production origin",
 test("every page with its own openGraph still carries a share image", async () => {
   const expected = {
     "/coriolis": SITE_OG,
+    "/hydrogen": SITE_OG,
     "/electrostatics": SITE_OG,
     "/projectile": SITE_OG,
+    "/interference": "https://lab.kakau.tw/og/kakau-interference-lab.png",
     "/atmosphere-profile": SITE_OG,
     "/en/atmosphere-profile": SITE_OG,
     "/geology": "https://lab.kakau.tw/geology-preview.png",
@@ -416,6 +419,22 @@ test("keeps valley-rule science independent of its synchronized views", async ()
   assert.match(view, /from "@\/lib\/render\/viewport"/);
 });
 
+test("server-renders the hydrogen-atom model page", async () => {
+  const response = await render("/hydrogen");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /<title>氫原子能階與光譜｜Kakau Lab<\/title>/);
+  assert.match(html, /模型目錄/);
+  // First visit: the student chooses how to explore before any diagram, so neither mode's answer-bearing content is rendered.
+  assert.match(html, /data-testid="intent-choice"/);
+  assert.match(html, /帶著問題探索/);
+  assert.match(html, /自由探索/);
+  assert.match(html, /data-testid="choose-guided"/);
+  assert.match(html, /data-testid="choose-free"/);
+  assert.match(html, /data-mode="intent"/);
+  assert.doesNotMatch(html, /玻耳軌道|巴耳末系（Balmer）|Hβ|data-testid="guided-card"/);
+});
+
 test("server-renders the Coriolis-force model page", async () => {
   const response = await render("/coriolis");
   assert.equal(response.status, 200);
@@ -549,5 +568,59 @@ test("every published route declares a self canonical and a page-specific og:tit
     const ogTitle = html.match(/<meta property="og:title" content="([^"]*)"/)?.[1];
     assert.ok(ogTitle, `${path} has og:title`);
     if (path !== "/") assert.notEqual(ogTitle, siteTitle, `${path} must not fall back to the site-level og:title`);
+  }
+});
+
+test("interference page carries its own metadata, self canonical and a consistent LearningResource", async () => {
+  const response = await render("/interference");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /<title>雙點波源干涉模擬｜Kakau Lab<\/title>/);
+  assert.match(html, /<meta name="description" content="在原生互動波場中/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/lab\.kakau\.tw\/interference"/);
+  assert.doesNotMatch(html, /<meta name="robots" content="noindex/);
+  assert.equal(meta(html, "twitter:card"), "summary_large_image");
+  const raw = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(raw, "JSON-LD script present");
+  const data = JSON.parse(raw);
+  assert.equal(data["@type"], "LearningResource");
+  assert.equal(data.url, "https://lab.kakau.tw/interference");
+  assert.equal(data["@id"], "https://lab.kakau.tw/interference#interactive-lab");
+  assert.equal(data.inLanguage, "zh-Hant");
+  assert.equal(data.educationalLevel, "高中");
+  assert.deepEqual(data.provider, { "@id": "https://kakau.tw/#organization" });
+  assert.doesNotMatch(raw, /kakau\.tw\/lab\//);
+  for (const text of ["概念摘要", "條件線是固定路徑差的雙曲線", "線數只由 d/λ 決定", "同調不等於同相", "波在動，圖樣不動", "https://interference.streamlit.app/"]) {
+    assert.ok(html.includes(text), `${text} is server-rendered`);
+  }
+  assert.equal((html.match(/<h1[ >]/g) ?? []).length, 1, "exactly one h1");
+});
+
+test("interference concept summary formulas are TeX for MathJax, not Unicode text", async () => {
+  const html = await (await render("/interference")).text();
+  const summary = html.slice(html.indexOf('class="if-summary"'));
+  for (const tex of ["N_{\\text{腹}}=2\\left\\lfloor", "\\left\\lfloor \\dfrac{d}{\\lambda}+\\tfrac12\\right\\rfloor", "\\Delta\\phi=\\dfrac{2\\pi}{\\lambda}", "d=3\\lambda"]) {
+    assert.ok(summary.includes(tex), `${tex} is in the summary`);
+  }
+  assert.doesNotMatch(summary, /[⌊⌋₁₂½]/, "no Unicode math glyphs left in the summary");
+  assert.equal((html.match(/mathjax\/tex-svg\.js/g) ?? []).length <= 1, true, "MathJax loaded once");
+  // Boundary check for the count formulas: d = 3λ gives 7 antinodal and 6 nodal lines (|Δr| = d included).
+  const count = (r) => ({ n: 2 * Math.floor(r + 1e-9) + 1, m: 2 * Math.floor(r + 0.5 + 1e-9) });
+  assert.deepEqual(count(3), { n: 7, m: 6 });
+  assert.deepEqual(count(3.5), { n: 7, m: 8 });
+});
+
+test("only the production host is indexable; every other host gets X-Robots-Tag noindex", async () => {
+  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
+  workerUrl.searchParams.set("test", `host-${process.pid}-${Date.now()}`);
+  const { default: worker } = await import(workerUrl.href);
+  const fetchAt = (url) => worker.fetch(
+    new Request(url, { headers: { accept: "text/html" } }),
+    { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
+    { waitUntil() {}, passThroughOnException() {} },
+  );
+  assert.equal((await fetchAt("https://lab.kakau.tw/interference")).headers.get("x-robots-tag"), null);
+  for (const url of ["https://kakau-lab.example.workers.dev/interference", "http://localhost/interference"]) {
+    assert.equal((await fetchAt(url)).headers.get("x-robots-tag"), "noindex, nofollow", url);
   }
 });
