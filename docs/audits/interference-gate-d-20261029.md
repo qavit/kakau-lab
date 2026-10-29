@@ -210,10 +210,34 @@ HTTP 308、query string 保留、非目標路由、sitemap：**NOT VERIFIED**。
 ## 15. Gate D2-B — 發布前檢查（Front PR #76，本輪未合併、未部署）
 
 - PR #76：Draft、mergeable、Vercel Preview 部署 Ready（`dpl_kzkFHxz6Ggv1FxBeLBy8de5kEtYg`），12 檔：`vercel.json` 兩條 `permanent: true` 規則（有／無尾斜線）→ `https://lab.kakau.tw/interference`；站內連結與 `routes.ts` 改指新址；舊頁 `src/pages/lab/interference.astro` 僅加一行、原實作保留；新增 `tests/interference-redirect.test.mjs`。
-- **HTTP 308／Location／query／非目標路由／sitemap：仍 NOT VERIFIED。** 本輪再試 `vercel curl`（已登入 `qavit`），仍要求 Protection Bypass 密鑰，CLI 回傳「create a Protection Bypass for Automation secret」；`vercel build` 也因 `Project Environment Variable not found` 無法在本機產生 vercel.json 合成後的路由。未再嘗試其他授權操作，未修改 Deployment Protection。
+- **（以下為更新前紀錄，見 §16 的 Owner 實測更新）HTTP 308／Location／query／非目標路由／sitemap：當時 NOT VERIFIED。** 本輪再試 `vercel curl`（已登入 `qavit`），仍要求 Protection Bypass 密鑰，CLI 回傳「create a Protection Bypass for Automation secret」；`vercel build` 也因 `Project Environment Variable not found` 無法在本機產生 vercel.json 合成後的路由。未再嘗試其他授權操作，未修改 Deployment Protection。
 - 已知但**非驗證**的依據：Vercel 文件規定 `vercel.json` redirects 在檔案系統之前處理，且預設保留 query；Owner 在受保護 Preview 的瀏覽器導向結果與此一致。這些不能替代實測。
 - 可執行替代方案：
   1. **（建議）兩段式上線**：先把規則改為 `permanent: false`（307）合併，於 `kakau.tw` 正式站實測 status／Location／query／`/lab`／sitemap，確認正確後再以小 PR 改回 `permanent: true`（308）。307 不會被瀏覽器長期快取，避免第一次就鎖定。
   2. Owner 自行產生 Protection Bypass 密鑰，用 §8 腳本驗證後立即撤銷；密鑰不經過我。
   3. Owner 在已登入瀏覽器開啟 Preview，以 DevTools Network 保留記錄檢視第一個 `/lab/interference?utm_source=x` 請求的 status 與 Location。
 - Front Cutover：**NO-GO（HOLD）**，Lab 先上線的前提已滿足，缺的是 Front 轉址驗證與 Owner 的獨立 Go。
+
+## 16. Gate D2-B — Owner 實測更新與 Front Cutover 建議（2026-10-29）
+
+### Owner 實測（Chrome DevTools，Preview `dpl_kzkFHxz6Ggv1FxBeLBy8de5kEtYg`）— VERIFIED／PASS
+`/lab/interference?utm_source=gate-d2` → **308 Permanent Redirect**；`Location: https://lab.kakau.tw/interference?utm_source=gate-d2`（query 完整保留）；目標頁 200；Preview 的 `X-Robots-Tag: noindex` 屬預期。不再要求 Protection Bypass 密鑰，維持 308、不改 307。
+
+### 其餘項目（本輪唯讀核對）
+| 項目 | 狀態 | 證據層級 |
+|---|---|---|
+| 尾斜線 `/lab/interference/` | **設定層 PASS、HTTP 未實測** | `vercel.json` 有精確 source `/lab/interference/`，`permanent: true`，目的地相同；Front 單元測試 4/4 通過；Astro 未設定 `trailingSlash`。沒有該路徑的 HTTP 實測。 |
+| 非目標路由 | **設定層 PASS、HTTP 未對 Preview 實測** | 規則為兩條精確比對、無萬用字元、目的地主機固定為 `lab.kakau.tw`（不可能回圈），`vercel.json` 只有 `redirects`。正式站目前基準：`/lab` 404、`/lab/projectile` 404（改動前即如此，非本 PR 造成）、`/resources` 200。 |
+| Front sitemap | 設定層 PASS | `routes.ts`：`/lab/interference` 改為 `legacy`、`index:false`、`sitemap:false`，單元測試確認不在 sitemap；正式站 sitemap 現含 1 筆 `lab/interference`，合併部署後應為 0。 |
+| 站內連結 | PASS（靜態） | 7 處改指 `https://lab.kakau.tw/interference`，測試掃描 `src/` 無殘留舊連結。 |
+| 舊頁實作 | 保留 | `src/pages/lab/interference.astro` 僅加 noindex，原實作保留供回滾。 |
+| Lab 正式頁 | 仍可用 | `https://lab.kakau.tw/interference` 200（本輪重測）。 |
+
+### 發布前狀態與回滾
+- Front PR #76：Draft，OPEN，MERGEABLE／CLEAN，頭部 `7ec0048`，Vercel Preview check 通過；base `main` = `9f5678b2df0c30b720d7334e9f76dbc71aa32a4d`（**Front 部署前 SHA／回滾 SHA**）。Front 無其他 CI check。
+- Lab PR #30（workflow 小修＋本報告）：CI 綠，MERGEABLE，未合併；與 Front 切換互不依賴。
+- 回滾（Runbook §10 情境 C）：revert Front PR #76 的 merge commit 並部署，還原舊頁索引、sitemap、站內連結並移除 `vercel.json` 規則；優先維持 `lab.kakau.tw/interference` 可用。308 已被瀏覽器快取者無法立即恢復，為已知風險。
+- 合併後必驗（Front 正式站）：`/lab/interference`、`/lab/interference/`、`?utm_source=` 三種的 status＝308 與 Location；`/lab`、`/resources`、`/lab/projectile` 狀態與改動前一致；sitemap 不含 `lab/interference`；新址 200。
+
+### 建議
+**Front Cutover：建議 GO（有條件）。** 條件：① Owner 明確發布授權；② 接受尾斜線與非目標路由僅有設定／測試證據、未對 Preview 做 HTTP 實測（合併後立即於正式站補驗，異常則依上述回滾）；③ 知悉 308 快取風險。Lab 側與 workflow 的待辦（token 權限、PR #30）不阻擋 Front 切換。本輪未合併、未部署 Front。
