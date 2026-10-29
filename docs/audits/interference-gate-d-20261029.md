@@ -241,3 +241,40 @@ HTTP 308、query string 保留、非目標路由、sitemap：**NOT VERIFIED**。
 
 ### 建議
 **Front Cutover：建議 GO（有條件）。** 條件：① Owner 明確發布授權；② 接受尾斜線與非目標路由僅有設定／測試證據、未對 Preview 做 HTTP 實測（合併後立即於正式站補驗，異常則依上述回滾）；③ 知悉 308 快取風險。Lab 側與 workflow 的待辦（token 權限、PR #30）不阻擋 Front 切換。本輪未合併、未部署 Front。
+
+## 17. Gate D2-B — Front Production Cutover 結果（2026-10-29）
+
+**D2-B Verdict：PASS。** 授權範圍僅 Front PR #76 的正式切換與必要驗收。
+
+### 發布紀錄
+| 項目 | 值 |
+|---|---|
+| 合併前核對 | PR #76 頭部 `7ec0048` 不變、MERGEABLE／CLEAN、Vercel Preview check 通過；Front main 仍為 `9f5678b`；Lab `/interference` 200 |
+| Front merge SHA | `9ca808aeac7d8139cebf0072df2c2f6867d4011c`（merge commit，PR #76 → main） |
+| Vercel 正式部署 | `dpl_3yHjB9KZqTYaz1miwEsxHB387wJL`（`kakau-36f7dkwed-qavits-projects.vercel.app`），target production，Ready，建立於 2026-10-29 20:39:55 +08:00，別名 `kakau.tw`、`www.kakau.tw`；GitHub deployment 7412441440 狀態 success |
+| 回滾 SHA | Front 部署前 main `9f5678b2df0c30b720d7334e9f76dbc71aa32a4d`；前一個正式部署為 `kakau-fyunr74gu-qavits-projects.vercel.app` |
+
+### 部署前基準（改動前）
+`/lab/interference`、`/lab/interference/`、`?utm_source=gate-d2` 皆 200；`/lab` 404、`/lab/projectile` 404、`/resources` 200；sitemap 含 1 筆 `lab/interference`。
+
+### 部署後正式環境驗證（連續 3 輪，間隔約 20 秒，結果一致）
+| 請求 | 結果 |
+|---|---|
+| `/lab/interference` | **308** → `https://lab.kakau.tw/interference` |
+| `/lab/interference/` | **308** → `https://lab.kakau.tw/interference` |
+| `/lab/interference?utm_source=gate-d2` | **308** → `https://lab.kakau.tw/interference?utm_source=gate-d2`（query 保留） |
+| `/lab/interference/?utm_source=gate-d2` | **308** → 同上（query 保留） |
+| `/lab`、`/lab/projectile` | 404、404（與改動前相同） |
+| `/resources`、`/` | 200、200 |
+| Front sitemap | `lab/interference` 出現 **0** 次（改動前 1 次） |
+| 跟隨轉址 | 單次轉址（hops=1）→ 最終 200，`https://lab.kakau.tw/interference?utm_source=gate-d2`，無循環 |
+| Lab 新址 | 200 |
+| 308 回應 `Cache-Control` | `public, max-age=0, must-revalidate`（瀏覽器端不會長期快取，降低回滾壓力；代理與瀏覽器行為仍屬 308 語意） |
+
+先前接受的尾斜線與非目標路由風險，已由上表正式環境實測關閉。**未發現阻斷性錯誤，無回滾。**
+
+### 狀態與待辦
+- 未動其他 Front 開發線、Cloudflare token 或權限。
+- 仍開啟：Lab 側 Deploy workflow token 權限與 PR #30（見 §14）；Search Console／索引觀察交 D3；Owner 實測使用的 Preview 與本次正式環境的 HTTP 證據分別保存。
+- 殘餘風險：VoiceOver、400% zoom、真機、MathJax fallback 未驗；200% 字級 slider 溢出（可操作）；3 個 Cloudflare tsc 錯誤。
+- D3（搜尋引擎收錄觀察、Closeout）可以開始。Search Console 尚未更新屬正常延遲，不視為部署失敗。
