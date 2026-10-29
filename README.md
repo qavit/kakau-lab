@@ -55,6 +55,8 @@ npm test         # 包含 build 與單元測試
 npm run test:e2e # Playwright
 ```
 
+E2E 產生的截圖與 JSON 證據預設寫到被 git 忽略的 `test-results/evidence/`（Playwright 每次執行開頭會清空 `test-results/`），不會覆寫 `docs/audits/` 內已提交的稽核證據。要刻意更新或指定位置時設定 `EVIDENCE_DIR`（相對於 repo 根目錄或絕對路徑），例如 `EVIDENCE_DIR=docs/audits npm run test:e2e`；Gate D1 摘要 spec 另相容舊變數 `D1_EVIDENCE_DIR`（指向完整目錄）。
+
 CI 會在每個 PR 與 push 到 `main` 時執行 lint 與 `npm test`。部署只能手動觸發，見 [`docs/deployment.md`](docs/deployment.md)。
 
 ## 專案結構

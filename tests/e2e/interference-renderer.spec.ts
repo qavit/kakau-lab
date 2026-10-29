@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
+import { evidencePath } from "./evidence";
 
 test("renderer shows the field and keeps controls, measurement and lifecycle in sync", async ({ page }) => {
   await page.goto("/interference-lifecycle");
@@ -15,7 +16,7 @@ test("renderer shows the field and keeps controls, measurement and lifecycle in 
     return [...data];
   });
   expect(fieldPixel[3]).toBe(255);
-  const artifacts = resolve("docs/audits/interference-gate-b2-20261028");
+  const artifacts = evidencePath("interference-gate-b2-20261028");
   await mkdir(artifacts, { recursive: true });
   await page.screenshot({ path: resolve(artifacts, "desktop-default.png"), fullPage: true });
 
@@ -93,6 +94,6 @@ test("renderer fits a touch viewport and can place a measurement point @mobile",
   await page.touchscreen.tap(bounds.x + bounds.width * .35, bounds.y + bounds.height * .4);
   await expect(host.locator("[data-selected-point]")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await mkdir(resolve("docs/audits/interference-gate-b2-20261028"), { recursive: true });
-  await page.screenshot({ path: resolve("docs/audits/interference-gate-b2-20261028/mobile.png"), fullPage: true });
+  await mkdir(evidencePath("interference-gate-b2-20261028"), { recursive: true });
+  await page.screenshot({ path: evidencePath("interference-gate-b2-20261028", "mobile.png"), fullPage: true });
 });
