@@ -140,7 +140,7 @@ export default function ModelCatalog({ showExperimental = process.env.KAKAU_EXPE
   const previews = showExperimental ? experimentalLabs() : [];
 
   return (
-    <main className="catalog-shell">
+    <main className="catalog-shell catalog-c2">
       <header className="catalog-header">
         <Link href="/" className="catalog-brand" aria-label="Kakau Lab 模型目錄">
           <KakauLabMark />

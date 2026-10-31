@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ModelCatalog from "@/components/ModelCatalog";
+import "./catalog-c2.css";
 
 export const metadata: Metadata = {
   title: "Kakau Lab｜互動式科學模型",

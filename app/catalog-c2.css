@@ -1,0 +1,266 @@
+/* Lab A1 — C2 Neutral Scientific Workbench, catalog-only.
+ * The page imports this stylesheet; every interior rule is scoped to .catalog-c2.
+ * Do not update shared Lab science tokens or the canvas/model workspaces here.
+ * Gold is a decorative brand point only; the artwork keeps its scientific colors.
+ */
+body:has(.catalog-c2) {
+  background: #f5f5f6;
+  background-image: none;
+}
+.catalog-c2 {
+  --lc-page: #f5f5f6;
+  --lc-raised: #fff;
+  --lc-sunken: #ebebed;
+  --lc-text: #16181d;
+  --lc-muted: #555b66;
+  --lc-border: #16181d1f;
+  --lc-border-control: #6b7280;
+  --lc-accent: #0b6b66;
+  --lc-focus: #0b6b66;
+  --lc-card-shadow: 0 0 0 1px #16181d0f, 0 1px 3px #16181d0f, 0 8px 24px #16181d0a;
+  color: var(--lc-text);
+  width: min(1440px, 100%);
+  padding: 1.75rem clamp(1rem, 4.5vw, 4.5rem) 2.75rem;
+  font-family: "Avenir Next", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-mode]) body:has(.catalog-c2) { background: #101114; }
+  html:not([data-mode]) .catalog-c2 {
+    --lc-page: #101114;
+    --lc-raised: #1a1c21;
+    --lc-sunken: #0b0c0e;
+    --lc-text: #edeef0;
+    --lc-muted: #a5aab4;
+    --lc-border: #ffffff1f;
+    --lc-border-control: #8a909c;
+    --lc-accent: #5fd3cb;
+    --lc-focus: #5fd3cb;
+    --lc-card-shadow: 0 0 0 1px #ffffff14, 0 8px 24px #00000066;
+  }
+}
+html[data-mode="dark"] body:has(.catalog-c2) { background: #101114; }
+html[data-mode="dark"] .catalog-c2 {
+  --lc-page: #101114;
+  --lc-raised: #1a1c21;
+  --lc-sunken: #0b0c0e;
+  --lc-text: #edeef0;
+  --lc-muted: #a5aab4;
+  --lc-border: #ffffff1f;
+  --lc-border-control: #8a909c;
+  --lc-accent: #5fd3cb;
+  --lc-focus: #5fd3cb;
+  --lc-card-shadow: 0 0 0 1px #ffffff14, 0 8px 24px #00000066;
+}
+
+/* Brand shell — not a generic navigation rewrite for the model routes. */
+.catalog-c2 .catalog-header {
+  gap: 1.5rem;
+  min-height: 4.25rem;
+  padding: 0 0 1rem;
+  border-bottom: 1px solid var(--lc-border);
+}
+.catalog-c2 .catalog-brand { flex: 0 1 auto; min-width: 0; }
+.catalog-c2 .catalog-brand .kakau-lab-mark__wordmark { height: 43px; }
+.catalog-c2 .catalog-header-end { gap: 1.25rem; }
+.catalog-c2 .catalog-count {
+  color: var(--lc-muted);
+  font: 500 12px/1.6 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .08em;
+}
+.catalog-c2 .theme-switcher {
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--lc-border-control);
+  border-radius: 10px;
+  background: var(--lc-raised);
+}
+.catalog-c2 .theme-switcher button {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--lc-text);
+}
+.catalog-c2 .theme-switcher button[aria-pressed="true"] {
+  background: var(--lc-sunken);
+  color: var(--lc-text);
+}
+.catalog-c2 .theme-switcher button:hover { background: var(--lc-sunken); }
+.catalog-c2 :is(a, button):focus-visible {
+  outline: 2px solid var(--lc-focus);
+  outline-offset: 3px;
+}
+.catalog-c2 .catalog-brand:focus-visible { border-radius: 6px; }
+
+/* Hero — editorial language on the left, quiet scientific-workbench motif on the right. */
+.catalog-c2 .catalog-hero {
+  grid-template-columns: minmax(0, 1.45fr) minmax(16rem, .65fr);
+  align-items: stretch;
+  gap: clamp(1.5rem, 4vw, 4.5rem);
+  padding: clamp(3.5rem, 7vw, 6rem) 0 clamp(3.5rem, 5vw, 5rem);
+}
+.catalog-c2 .catalog-eyebrow {
+  margin-bottom: 1.25rem;
+  color: var(--lc-muted);
+  font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .08em;
+}
+.catalog-c2 .catalog-hero h1 {
+  max-width: 48rem;
+  margin: 0;
+  color: var(--lc-text);
+  font-family: inherit;
+  font-size: clamp(2.125rem, 1.4rem + 3vw, 3.5rem);
+  font-weight: 650;
+  line-height: 1.28;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+.catalog-c2 .catalog-hero > div > p:last-child {
+  max-width: 39rem;
+  margin-top: 1.5rem;
+  color: var(--lc-muted);
+  font-size: 1.0625rem;
+  line-height: 2;
+}
+.catalog-c2 .catalog-principle {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  align-self: stretch;
+  min-height: 17rem;
+  overflow: hidden;
+  padding: clamp(1.5rem, 2.8vw, 2.5rem);
+  border: 1px solid #0b17301f;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 83% 24%, transparent 0 2.25rem, #ffffff24 2.29rem 2.32rem, transparent 2.36rem 4.3rem, #ffffff18 4.34rem 4.37rem, transparent 4.41rem),
+    linear-gradient(150deg, #162b48 0%, #0b1730 70%);
+}
+.catalog-c2 .catalog-principle::before {
+  content: "";
+  position: absolute;
+  top: 16%;
+  right: 18%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d8951d;
+}
+.catalog-c2 .catalog-principle span {
+  position: relative;
+  color: #b8c7dc;
+  font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .08em;
+}
+.catalog-c2 .catalog-principle strong {
+  position: relative;
+  color: #f3efe4;
+  font-family: inherit;
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.625rem);
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+/* Registry-driven catalog. Keep original art and scientific color encodings unchanged. */
+.catalog-c2 .catalog-section {
+  padding-top: 2rem;
+  border-top: 1px solid var(--lc-border);
+}
+.catalog-c2 .catalog-section-heading { align-items: end; margin-bottom: 1.75rem; }
+.catalog-c2 .catalog-section-heading p {
+  color: var(--lc-muted);
+  font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .08em;
+}
+.catalog-c2 .catalog-section-heading h2 {
+  color: var(--lc-text);
+  font-family: inherit;
+  font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
+  font-weight: 650;
+  line-height: 1.5;
+}
+.catalog-c2 .model-card-grid { gap: 1.25rem; }
+.catalog-c2 .model-card {
+  grid-template-columns: minmax(0, 38%) minmax(0, 1fr);
+  min-height: 236px;
+  overflow: hidden;
+  border: 1px solid var(--lc-border);
+  border-radius: 14px;
+  background: var(--lc-raised);
+  color: var(--lc-text);
+  box-shadow: var(--lc-card-shadow);
+  transition: box-shadow 140ms ease, border-color 140ms ease;
+}
+.catalog-c2 .model-card:is(:hover, :focus-visible) {
+  transform: none;
+  border-color: var(--lc-accent);
+  box-shadow: 0 0 0 1px var(--lc-accent), var(--lc-card-shadow);
+}
+.catalog-c2 .model-card:focus-visible { outline-offset: 3px; }
+.catalog-c2 .model-card:hover .model-card-preview { transform: none; }
+.catalog-c2 .model-card-body { padding: 1.5rem; }
+.catalog-c2 .model-card-meta { color: var(--lc-muted); font-size: .8125rem; }
+.catalog-c2 .model-card-meta > svg { color: var(--lc-muted); }
+.catalog-c2 .model-card h3 {
+  margin: 1.25rem 0 .625rem;
+  color: var(--lc-text);
+  font-family: inherit;
+  font-size: 1.25rem;
+  font-weight: 650;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+.catalog-c2 .model-card p { color: var(--lc-muted); font-size: .9375rem; line-height: 1.8; }
+.catalog-c2 .model-card-tags { gap: .375rem; padding-top: 1.25rem; }
+.catalog-c2 .model-card-tags span {
+  padding: .25rem .5rem;
+  border: 1px solid var(--lc-border);
+  border-radius: 6px;
+  color: var(--lc-muted);
+  font-size: .75rem;
+}
+.catalog-c2 .experimental-section { border-top-color: var(--lc-border-control); }
+.catalog-c2 .experimental-section .model-card { border-color: var(--lc-border-control); }
+.catalog-c2 .catalog-footer {
+  gap: 1.5rem;
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--lc-border);
+  color: var(--lc-muted);
+  font: 500 12px/1.8 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .04em;
+}
+
+@media (max-width: 1100px) {
+  .catalog-c2 .catalog-hero { grid-template-columns: minmax(0, 1.25fr) minmax(15rem, .75fr); }
+  .catalog-c2 .model-card-grid { grid-template-columns: minmax(0, 1fr); }
+  .catalog-c2 .model-card { grid-template-columns: minmax(12rem, 34%) minmax(0, 1fr); }
+}
+@media (max-width: 660px) {
+  .catalog-c2 { padding: 1rem 1rem 2rem; }
+  .catalog-c2 .catalog-header { flex-direction: column; align-items: stretch; gap: .75rem; }
+  .catalog-c2 .catalog-brand .kakau-lab-mark__wordmark { height: 35px; }
+  .catalog-c2 .catalog-header-end { width: 100%; justify-content: space-between; gap: .75rem; }
+  .catalog-c2 .catalog-count { display: block; }
+  .catalog-c2 .catalog-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 3rem 0;
+  }
+  .catalog-c2 .catalog-hero h1 { font-size: clamp(1.875rem, 1.45rem + 2vw, 2.5rem); }
+  .catalog-c2 .catalog-principle { min-height: 10.5rem; padding: 1.5rem; }
+  .catalog-c2 .catalog-section-heading { display: block; }
+  .catalog-c2 .catalog-section-heading h2 { margin-top: .5rem; }
+  .catalog-c2 .model-card { grid-template-columns: minmax(0, 1fr); }
+  .catalog-c2 .model-card-art { min-height: 10rem; }
+  .catalog-c2 .model-card-body { padding: 1.25rem; }
+  .catalog-c2 .model-card h3 { margin-top: .75rem; }
+  .catalog-c2 .catalog-footer { flex-direction: column; gap: .5rem; margin-top: 2.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .catalog-c2 .model-card { transition: none; }
+  .catalog-c2 .model-card-preview { transition: none; }
+}
