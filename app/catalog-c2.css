@@ -75,8 +75,8 @@ html[data-mode="dark"] .catalog-c2 {
   background: var(--lc-raised);
 }
 .catalog-c2 .theme-switcher button {
-  min-width: 40px;
-  min-height: 40px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 7px;
   background: transparent;
   color: var(--lc-text);
