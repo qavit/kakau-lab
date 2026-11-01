@@ -59,7 +59,7 @@ html[data-mode="dark"] .catalog-c2 {
   padding: 0 0 1rem;
   border-bottom: 1px solid var(--lc-border);
 }
-.catalog-c2 .catalog-brand { flex: 0 1 auto; min-width: 0; }
+.catalog-c2 .catalog-brand { flex: 0 1 auto; min-width: 0; min-height: 44px; align-items: center; }
 .catalog-c2 .catalog-brand .kakau-lab-mark__wordmark { height: 43px; }
 .catalog-c2 .catalog-header-end { gap: 1.25rem; }
 .catalog-c2 .catalog-count {
