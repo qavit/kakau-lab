@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Monitor, Moon, Sun } from "lucide-react";
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type FocusEvent, type KeyboardEvent } from "react";
 import type { Locale } from "@/lib/i18n";
 import { applyTheme, readStoredTheme, subscribeTheme } from "@/lib/theme";
 
@@ -63,6 +63,8 @@ function ThemeMenu({ mode, text }: { mode: (typeof targets)[number]; text: (type
   const options = () => Array.from(root.current?.querySelectorAll<HTMLButtonElement>(".theme-menu__option") ?? []);
   const close = () => { setOpen(false); trigger.current?.focus(); };
 
+  // A disclosure holding a group of toggle buttons, not an ARIA menu: Tab still walks the options,
+  // arrow keys are a convenience, and leaving the widget (Tab away or a click elsewhere) closes it.
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Escape" && open) { event.stopPropagation(); close(); return; }
     if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
@@ -70,20 +72,25 @@ function ThemeMenu({ mode, text }: { mode: (typeof targets)[number]; text: (type
     if (!open) { setOpen(true); requestAnimationFrame(() => options()[Math.max(0, targets.indexOf(mode))]?.focus()); return; }
     const list = options();
     const at = list.indexOf(document.activeElement as HTMLButtonElement);
-    const step = event.key === "ArrowDown" ? 1 : -1;
-    list[(at + step + list.length) % list.length]?.focus();
+    const next = at < 0 ? (event.key === "ArrowDown" ? 0 : list.length - 1) : (at + (event.key === "ArrowDown" ? 1 : -1) + list.length) % list.length;
+    list[next]?.focus();
+  };
+  const onBlur = (event: FocusEvent<HTMLDivElement>) => {
+    // relatedTarget is null for clicks in browsers that do not focus buttons (Safari); the pointerdown
+    // handler covers those, so only a real move of focus elsewhere closes here.
+    const next = event.relatedTarget as Node | null;
+    if (open && next && !root.current?.contains(next)) setOpen(false);
   };
 
   return (
-    <div className="theme-menu" ref={root} onKeyDown={onKeyDown}>
+    <div className="theme-menu" ref={root} onKeyDown={onKeyDown} onBlur={onBlur}>
       <button
         ref={trigger}
         type="button"
         className="theme-menu__trigger"
         aria-label={`${text.label}：${text[mode]}`}
-        aria-haspopup="true"
         aria-expanded={open}
-        aria-controls={listId}
+        aria-controls={open ? listId : undefined}
         onClick={() => setOpen((value) => !value)}
       >
         <Current size={18} aria-hidden="true" />

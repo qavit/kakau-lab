@@ -64,3 +64,14 @@ test("A1 keeps gold decorative and scientific artwork untouched", () => {
   assert.doesNotMatch(css, /\.catalog-c2 \.projectile-card-path/);
   assert.doesNotMatch(css, /\.catalog-c2 \.coriolis-card-path/);
 });
+
+test("A1 appearance menu is a disclosure with a button group, not an ARIA menu", async () => {
+  const toggle = await read("../components/ThemeToggle.tsx");
+  assert.doesNotMatch(toggle, /aria-haspopup/);
+  assert.doesNotMatch(toggle, /role="(menu|menuitem|menuitemradio)"/);
+  assert.match(toggle, /role="group"/);
+  assert.match(toggle, /aria-expanded=\{open\}/);
+  assert.match(toggle, /aria-controls=\{open \? listId : undefined\}/);
+  assert.match(toggle, /aria-pressed=\{mode === target\}/);
+  assert.match(toggle, /className="theme-switcher" role="group"/);
+});
