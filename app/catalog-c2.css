@@ -84,14 +84,14 @@ html[data-mode="dark"] .catalog-c2 {
   background: transparent;
   color: var(--lc-text);
 }
-/* Hover = accent outline; selected = tinted surface + accent bar, so the two stay distinct without relying on hue alone. */
+/* Hover = accent outline; selected = tinted surface + thicker accent ring, so the two stay distinct without relying on hue alone. Flat, no 3D edge. */
 .catalog-c2 .theme-switcher button:hover { background: var(--lc-sunken); box-shadow: inset 0 0 0 1px var(--lc-accent); }
 .catalog-c2 .theme-switcher button[aria-pressed="true"] {
   background: var(--lc-accent-subtle);
   color: var(--lc-text);
-  box-shadow: inset 0 -3px 0 var(--lc-accent);
+  box-shadow: inset 0 0 0 2px var(--lc-accent);
 }
-.catalog-c2 .theme-switcher button[aria-pressed="true"]:hover { box-shadow: inset 0 -3px 0 var(--lc-accent), inset 0 0 0 1px var(--lc-accent); }
+.catalog-c2 .theme-switcher button[aria-pressed="true"]:hover { box-shadow: inset 0 0 0 2px var(--lc-accent); }
 .catalog-c2 :is(a, button):focus-visible {
   outline: 2px solid var(--lc-focus);
   outline-offset: 3px;
