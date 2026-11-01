@@ -31,7 +31,7 @@ test("A1 retains existing previews, semantics, navigation and appearance toggle"
   for (const marker of ["model-card-preview", "layers-card-art", "projectile-card-art", "model-card-tags", "catalog-title", "catalog-principle"]) {
     assert.ok(catalog.includes(marker), "missing catalog marker: " + marker);
   }
-  assert.match(catalog, /<ThemeToggle \/>/);
+  assert.match(catalog, /<ThemeToggle variant="menu" \/>/);
   assert.match(catalog, /<KakauLabMark \/>/);
   assert.match(catalog, /<h1>把看不見的規律/);
   assert.match(catalog, /<Link href=\{href\} className=\{className\}>/);
@@ -44,8 +44,8 @@ test("A1 has explicit light/dark and system-dark tokens without changing other r
   assert.match(css, /html\[data-mode="dark"\] \.catalog-c2/);
   assert.match(css, /--lc-text: #16181d/);
   assert.match(css, /--lc-text: #edeef0/);
-  assert.match(css, /--lc-focus: #0b6b66/);
-  assert.match(css, /--lc-focus: #5fd3cb/);
+  assert.match(css, /--lc-focus: #216e84/);
+  assert.match(css, /--lc-focus: #9bd7dd/);
 });
 
 test("A1 includes keyboard focus, 44px controls, mobile cards and reduced-motion", () => {
@@ -63,4 +63,15 @@ test("A1 keeps gold decorative and scientific artwork untouched", () => {
   assert.doesNotMatch(css, /\.catalog-c2 \.model-card-art\s*\{[^}]*background:/);
   assert.doesNotMatch(css, /\.catalog-c2 \.projectile-card-path/);
   assert.doesNotMatch(css, /\.catalog-c2 \.coriolis-card-path/);
+});
+
+test("A1 appearance menu is a disclosure with a button group, not an ARIA menu", async () => {
+  const toggle = await read("../components/ThemeToggle.tsx");
+  assert.doesNotMatch(toggle, /aria-haspopup/);
+  assert.doesNotMatch(toggle, /role="(menu|menuitem|menuitemradio)"/);
+  assert.match(toggle, /role="group"/);
+  assert.match(toggle, /aria-expanded=\{open\}/);
+  assert.match(toggle, /aria-controls=\{open \? listId : undefined\}/);
+  assert.match(toggle, /aria-pressed=\{mode === target\}/);
+  assert.match(toggle, /className="theme-switcher" role="group"/);
 });
