@@ -44,8 +44,8 @@ test("A1 has explicit light/dark and system-dark tokens without changing other r
   assert.match(css, /html\[data-mode="dark"\] \.catalog-c2/);
   assert.match(css, /--lc-text: #16181d/);
   assert.match(css, /--lc-text: #edeef0/);
-  assert.match(css, /--lc-focus: #0b6b66/);
-  assert.match(css, /--lc-focus: #5fd3cb/);
+  assert.match(css, /--lc-focus: #216e84/);
+  assert.match(css, /--lc-focus: #9bd7dd/);
 });
 
 test("A1 includes keyboard focus, 44px controls, mobile cards and reduced-motion", () => {

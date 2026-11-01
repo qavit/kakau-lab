@@ -15,8 +15,9 @@ body:has(.catalog-c2) {
   --lc-muted: #555b66;
   --lc-border: #16181d1f;
   --lc-border-control: #6b7280;
-  --lc-accent: #0b6b66;
-  --lc-focus: #0b6b66;
+  --lc-accent: #216e84;
+  --lc-accent-subtle: #e4f1f3;
+  --lc-focus: #216e84;
   --lc-card-shadow: 0 0 0 1px #16181d0f, 0 1px 3px #16181d0f, 0 8px 24px #16181d0a;
   color: var(--lc-text);
   width: min(1440px, 100%);
@@ -33,8 +34,9 @@ body:has(.catalog-c2) {
     --lc-muted: #a5aab4;
     --lc-border: #ffffff1f;
     --lc-border-control: #8a909c;
-    --lc-accent: #5fd3cb;
-    --lc-focus: #5fd3cb;
+    --lc-accent: #9bd7dd;
+    --lc-accent-subtle: #173139;
+    --lc-focus: #9bd7dd;
     --lc-card-shadow: 0 0 0 1px #ffffff14, 0 8px 24px #00000066;
   }
 }
@@ -47,8 +49,9 @@ html[data-mode="dark"] .catalog-c2 {
   --lc-muted: #a5aab4;
   --lc-border: #ffffff1f;
   --lc-border-control: #8a909c;
-  --lc-accent: #5fd3cb;
-  --lc-focus: #5fd3cb;
+  --lc-accent: #9bd7dd;
+  --lc-accent-subtle: #173139;
+  --lc-focus: #9bd7dd;
   --lc-card-shadow: 0 0 0 1px #ffffff14, 0 8px 24px #00000066;
 }
 
@@ -81,11 +84,14 @@ html[data-mode="dark"] .catalog-c2 {
   background: transparent;
   color: var(--lc-text);
 }
+/* Hover = accent outline; selected = tinted surface + accent bar, so the two stay distinct without relying on hue alone. */
+.catalog-c2 .theme-switcher button:hover { background: var(--lc-sunken); box-shadow: inset 0 0 0 1px var(--lc-accent); }
 .catalog-c2 .theme-switcher button[aria-pressed="true"] {
-  background: var(--lc-sunken);
+  background: var(--lc-accent-subtle);
   color: var(--lc-text);
+  box-shadow: inset 0 -3px 0 var(--lc-accent);
 }
-.catalog-c2 .theme-switcher button:hover { background: var(--lc-sunken); }
+.catalog-c2 .theme-switcher button[aria-pressed="true"]:hover { box-shadow: inset 0 -3px 0 var(--lc-accent), inset 0 0 0 1px var(--lc-accent); }
 .catalog-c2 :is(a, button):focus-visible {
   outline: 2px solid var(--lc-focus);
   outline-offset: 3px;
