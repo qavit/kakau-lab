@@ -31,7 +31,7 @@ test("A1 retains existing previews, semantics, navigation and appearance toggle"
   for (const marker of ["model-card-preview", "layers-card-art", "projectile-card-art", "model-card-tags", "catalog-title", "catalog-principle"]) {
     assert.ok(catalog.includes(marker), "missing catalog marker: " + marker);
   }
-  assert.match(catalog, /<ThemeToggle \/>/);
+  assert.match(catalog, /<ThemeToggle variant="menu" \/>/);
   assert.match(catalog, /<KakauLabMark \/>/);
   assert.match(catalog, /<h1>把看不見的規律/);
   assert.match(catalog, /<Link href=\{href\} className=\{className\}>/);

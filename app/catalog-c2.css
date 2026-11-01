@@ -70,28 +70,60 @@ html[data-mode="dark"] .catalog-c2 {
   font: 500 12px/1.6 ui-monospace, SFMono-Regular, monospace;
   letter-spacing: .08em;
 }
-.catalog-c2 .theme-switcher {
-  gap: 3px;
-  padding: 3px;
+/* Appearance menu: one icon button opening a labelled list. Flat surfaces; selected row = tint + accent ring + check. */
+.catalog-c2 .theme-menu { position: relative; }
+.catalog-c2 .theme-menu__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
   border: 1px solid var(--lc-border-control);
   border-radius: 10px;
   background: var(--lc-raised);
+  color: var(--lc-text);
 }
-.catalog-c2 .theme-switcher button {
-  min-width: 44px;
+.catalog-c2 .theme-menu__trigger:hover,
+.catalog-c2 .theme-menu__trigger[aria-expanded="true"] { background: var(--lc-sunken); box-shadow: inset 0 0 0 1px var(--lc-accent); transform: none; border-color: var(--lc-accent); }
+.catalog-c2 .theme-menu__list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  right: 0;
+  display: grid;
+  gap: 4px;
+  min-width: min(14rem, calc(100vw - 2rem));
+  padding: 8px;
+  border: 1px solid var(--lc-border);
+  border-radius: 14px;
+  background: var(--lc-raised);
+  box-shadow: var(--lc-card-shadow);
+}
+.catalog-c2 .theme-menu__title {
+  padding: 4px 10px 6px;
+  color: var(--lc-muted);
+  font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .08em;
+}
+.catalog-c2 .theme-menu__option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
   min-height: 44px;
-  border-radius: 7px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
   background: transparent;
   color: var(--lc-text);
+  font-size: 1rem;
+  text-align: left;
+  transform: none;
 }
-/* Hover = accent outline; selected = tinted surface + thicker accent ring, so the two stay distinct without relying on hue alone. Flat, no 3D edge. */
-.catalog-c2 .theme-switcher button:hover { background: var(--lc-sunken); box-shadow: inset 0 0 0 1px var(--lc-accent); }
-.catalog-c2 .theme-switcher button[aria-pressed="true"] {
-  background: var(--lc-accent-subtle);
-  color: var(--lc-text);
-  box-shadow: inset 0 0 0 2px var(--lc-accent);
-}
-.catalog-c2 .theme-switcher button[aria-pressed="true"]:hover { box-shadow: inset 0 0 0 2px var(--lc-accent); }
+.catalog-c2 .theme-menu__option:hover { background: var(--lc-sunken); border-color: var(--lc-border-control); transform: none; }
+.catalog-c2 .theme-menu__option[aria-pressed="true"] { background: var(--lc-accent-subtle); border-color: var(--lc-accent); box-shadow: inset 0 0 0 1px var(--lc-accent); }
+.catalog-c2 .theme-menu__check { margin-left: auto; color: var(--lc-accent); }
 .catalog-c2 :is(a, button):focus-visible {
   outline: 2px solid var(--lc-focus);
   outline-offset: 3px;

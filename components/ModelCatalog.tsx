@@ -147,7 +147,7 @@ export default function ModelCatalog({ showExperimental = process.env.KAKAU_EXPE
         </Link>
         <div className="catalog-header-end">
           <span className="catalog-count">{`${labs.length.toString().padStart(2, "0")} interactive models`}</span>
-          <ThemeToggle />
+          <ThemeToggle variant="menu" />
         </div>
       </header>
 
