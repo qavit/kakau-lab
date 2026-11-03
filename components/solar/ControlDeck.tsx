@@ -48,7 +48,7 @@ export default function ControlDeck({
             <input type="range" min="-90" max="90" step="0.5" value={state.latitude} onChange={(event) => onStateChange({ latitude: Number(event.target.value) })} />
             <div className="preset-row latitude-presets">
               {latitudePresets.map(([label, latitude]) => (
-                <button type="button" key={label} className={state.latitude === latitude ? "selected" : ""} onClick={() => onSeek({ latitude })}>{label}</button>
+                <button type="button" key={label} className={state.latitude === latitude ? "selected" : ""} aria-pressed={state.latitude === latitude} onClick={() => onSeek({ latitude })}>{label}</button>
               ))}
             </div>
           </label>
@@ -58,11 +58,12 @@ export default function ControlDeck({
             <input type="range" min="1" max="365" step="0.1" value={state.day} onChange={(event) => onStateChange({ day: Number(event.target.value) })} />
             <div className="preset-row">
               {datePresets.map(([label, day]) => (
-                <button type="button" key={label} className={Math.round(state.day) === day ? "selected" : ""} onClick={() => onSeek({ day })}>{label}</button>
+                <button type="button" key={label} className={Math.round(state.day) === day ? "selected" : ""} aria-pressed={Math.round(state.day) === day} onClick={() => onSeek({ day })}>{label}</button>
               ))}
             </div>
             <select
               className="term-select"
+              aria-label="24 節氣"
               value=""
               onChange={(event) => {
                 const index = Number(event.target.value);
@@ -83,7 +84,7 @@ export default function ControlDeck({
                 <input type="checkbox" checked={shadowTraceEnabled} onChange={(event) => onShadowTraceEnabledChange(event.target.checked)} />
                 描繪竿影
               </label>
-              <select disabled={!shadowTraceEnabled} value={shadowTraceInterval} onChange={(event) => onShadowTraceIntervalChange(Number(event.target.value))}>
+              <select aria-label="竿影描繪間隔" disabled={!shadowTraceEnabled} value={shadowTraceInterval} onChange={(event) => onShadowTraceIntervalChange(Number(event.target.value))}>
                 <option value="15">每 15 分</option>
                 <option value="30">每 30 分</option>
                 <option value="60">每 1 小時</option>
@@ -94,10 +95,10 @@ export default function ControlDeck({
           </label>
 
           <div className="play-actions">
-            <button className={playing === "day" ? "active" : ""} onClick={() => onPlayingChange(playing === "day" ? null : "day")}>
+            <button className={playing === "day" ? "active" : ""} aria-pressed={playing === "day"} onClick={() => onPlayingChange(playing === "day" ? null : "day")}>
               {playing === "day" ? <Pause size={14} /> : <Play size={14} />}一天
             </button>
-            <button className={playing === "year" ? "active year-play" : "year-play"} onClick={() => onPlayingChange(playing === "year" ? null : "year")}>
+            <button className={playing === "year" ? "active year-play" : "year-play"} aria-pressed={playing === "year"} onClick={() => onPlayingChange(playing === "year" ? null : "year")}>
               {playing === "year" ? <Pause size={14} /> : <Play size={14} />}一年
             </button>
             <button onClick={() => onSeek({ time: 12 })}>正午</button>
