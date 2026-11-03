@@ -56,9 +56,14 @@ Measured before → after (main vs worktree, same machine):
 | Focus ring contrast, light / dark | 1.85–2.02 / 7.1–8.6 | 5.31 / 11.83 |
 | Selected state | colour class only, no ARIA | tint + ring + weight, `aria-pressed` |
 | Overflow X (1440/390/360, all states) | none | none |
-| Chart height with panel open (1440×900) | 352 px | 547 px (taller panel stretches the row) |
+| Chart height with panel open (1440×900) | 352 px | 483 px (closed state is 539 px on both; see §3a) |
 
 The 11–12 remaining items are 18 px checkboxes inside 44 px labels (the label is the target) and the desktop-only resize grip.
+
+### 3a. Panel-open follow-up (visual acceptance)
+
+The chart is stretched to the side panel's height by design (`globals.css` `.projectile-stage[data-panel="true"]`), so the chart height is the panel height. In the first push the panel was 549 px because `.projectile-c2 .projectile-group` padding also hit `.projectile-group-flush` (the two disclosure rows, 80 px instead of 47 px). That was an unintended specificity side effect and is fixed with one scoped rule. Result at 1440×900: panel and chart 485 / 483 px (main collapsed the chart from 539 to 352 on opening; now 539 to 483), no page scroll, nothing covered.
+On ≤660 px the 44 px controls had made the transport wrap onto four rows (dock 271 → 461 px at 390). The six transport buttons now share one grid row (dock 383 px at 390, 411 px at 360); chart height stays 240 px. All 11 remaining sub-44 controls are 16–18 px checkboxes inside 153–163 × 44–56 px labels; a click on each label's corner toggles it (11/11 at 1440 and 390). The desktop-only resize grip stays a known exception.
 
 ## 4. Second consumer (read-only)
 

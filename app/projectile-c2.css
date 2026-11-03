@@ -167,6 +167,8 @@ html[data-mode="dark"] .projectile-c2 {
 .projectile-c2 .projectile-dock { margin-top: 1rem; }
 .projectile-c2 .projectile-side-grip::after { transition: none; background: var(--lc-border-control); }
 .projectile-c2 .projectile-group { padding: 1rem 1.125rem; }
+/* Flush groups hold the disclosure rows, which carry their own padding; the rule above would otherwise double it. */
+.projectile-c2 .projectile-group.projectile-group-flush { padding: 0; }
 .projectile-c2 .projectile-group-label {
   margin-bottom: 12px;
   color: var(--lc-muted);
@@ -246,8 +248,16 @@ html[data-mode="dark"] .projectile-c2 {
   .projectile-c2 .projectile-topbar .header-actions { justify-content: flex-start; }
   .projectile-c2 .projectile-topbar .header-actions button { min-height: 44px; font-size: 14px; padding: 8px 12px; }
   .projectile-c2 .projectile-topbar .header-actions button svg { width: 16px; height: 16px; }
-  .projectile-c2 .projectile-transport button { padding: 8px 10px; }
+  .projectile-c2 .projectile-transport { padding: 12px 10px; }
+  .projectile-c2 .projectile-transport-buttons,
+  .projectile-c2 .projectile-transport-speeds { gap: 4px; }
+  /* Six controls fit one row: three icon buttons stay 44px, the three labelled ones share the rest. */
+  .projectile-c2 .projectile-transport-buttons { display: grid; grid-template-columns: 44px repeat(3, minmax(0, 1fr)) 44px 44px; width: 100%; }
+  .projectile-c2 .projectile-transport button { padding: 8px 4px; font-size: 13px; white-space: nowrap; }
+  .projectile-c2 .projectile-transport-speeds button { min-width: 48px; }
+  .projectile-c2 .projectile-transport button svg { flex: none; }
   .projectile-c2 .projectile-group { padding: 1rem; }
+  .projectile-c2 .projectile-group.projectile-group-flush { padding: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .projectile-c2 button { transition: none; }
