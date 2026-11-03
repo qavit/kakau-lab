@@ -1,0 +1,77 @@
+/* Lab W45 — C2 Neutral Scientific Workbench, Atmosphere profile workspace only (third consumer).
+ * Every rule is scoped to .atmosphere-c2 (the <main> of /atmosphere-profile and /en/atmosphere-profile).
+ * Shared tokens and rules live in lab-c2.css (import that first); this sheet keeps what only this page needs.
+ * The 2D profile chart, its dark card, every axis/tick/legend/curve colour and the quantity colours in the
+ * layer drawer are left untouched; this sheet only restyles the interface around them.
+ * Gold stays decorative (live dot); it is never a state or focus colour.
+ * Selectors that must out-rank an existing .atmosphere-profile-lab rule in globals.css carry both classes.
+ */
+/* ---- Header: flat workbench bar with a ruled base, one 44px control height ---- */
+.atmosphere-c2 .topbar { align-items: flex-end; gap: 1rem 1.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--lc-border); }
+.atmosphere-c2 :is(.header-actions, .control-panel, .layer-drawer > header) button {
+  min-height: 44px;
+  border-color: var(--lc-border-control);
+  border-radius: 10px;
+  background: var(--lc-raised);
+  color: var(--lc-text);
+  font-size: 14px;
+  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+.atmosphere-c2 :is(.header-actions, .control-panel) button:hover:not(:disabled) { transform: none; border-color: var(--lc-accent); background: var(--lc-sunken); }
+/* Selected/open: tint + ring + heavier weight, so the state is not carried by colour alone. */
+.atmosphere-c2 :is(.header-actions, .control-panel) button:is(.active, .selected, [aria-pressed="true"], [aria-expanded="true"]) {
+  border-color: var(--lc-accent);
+  background: var(--lc-accent-subtle);
+  box-shadow: inset 0 0 0 1px var(--lc-accent);
+  color: var(--lc-text);
+  font-weight: 650;
+}
+/* Language links: the same 44px segmented frame as the appearance control. */
+.atmosphere-c2 .language-switcher { gap: 0; padding: 0; overflow: hidden; border: 0; border-radius: 10px; background: var(--lc-raised); box-shadow: inset 0 0 0 1px var(--lc-border-control); }
+.atmosphere-c2 .language-switcher a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 14px; border-radius: 0; color: var(--lc-text); font-size: 14px; }
+.atmosphere-c2 .language-switcher a:hover { background: var(--lc-sunken); }
+.atmosphere-c2 .language-switcher a[aria-current="page"] { background: var(--lc-accent-subtle); color: var(--lc-accent); font-weight: 650; box-shadow: inset 0 0 0 2px var(--lc-accent); }
+/* Appearance buttons: raised to 44px. One class deeper than the generic header button rule above so they win. */
+.atmosphere-c2 .header-actions .theme-switcher button { min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--lc-text); }
+.atmosphere-c2 .header-actions .theme-switcher button:hover:not(:disabled) { background: var(--lc-sunken); transform: none; }
+.atmosphere-c2 .header-actions .theme-switcher button[aria-pressed="true"] { background: var(--lc-accent-subtle); color: var(--lc-accent); box-shadow: inset 0 0 0 2px var(--lc-accent); }
+/* ---- Focus: 2px in the interface colour; the dark chart card gets the light variant ---- */
+.atmosphere-profile-lab.atmosphere-c2 :is(button, a, input, select, summary):focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
+.atmosphere-profile-lab.atmosphere-c2 .theme-switcher button:focus-visible,
+.atmosphere-profile-lab.atmosphere-c2 .language-switcher a:focus-visible { outline-offset: -4px; }
+.atmosphere-profile-lab.atmosphere-c2 .atmos-chart-card :is(button, a):focus-visible { outline-color: var(--lc-focus-on-dark); outline-offset: -4px; }
+.atmosphere-c2 button:disabled, .atmosphere-c2 select:disabled { cursor: not-allowed; opacity: .5; }
+/* Full-screen toggle sits on the dark chart card: 44px target, dark glass kept. */
+.atmosphere-c2 .atmos-fullscreen-btn { display: grid; place-items: center; width: 44px; height: 44px; min-width: 44px; padding: 0; border-radius: 10px; }
+/* ---- Control panel ---- */
+.atmosphere-c2 .control-panel { border-color: var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+.atmosphere-c2 .control-panel-heading { min-height: 52px; padding: 4px 16px; border-bottom-color: var(--lc-border); }
+.atmosphere-profile-lab.atmosphere-c2 .control-panel-heading > div { font-weight: 650; }
+.atmosphere-c2 .profile-control-grid { gap: 16px 24px; padding: 14px 16px 16px; }
+.atmosphere-profile-lab.atmosphere-c2 .wind-control-block label > span { margin-bottom: 2px; color: var(--lc-body); }
+.atmosphere-profile-lab.atmosphere-c2 .wind-control-block label b { color: var(--lc-text); font-variant-numeric: tabular-nums; }
+.atmosphere-c2 .preset-row { gap: 6px; margin-top: 2px; }
+.atmosphere-profile-lab.atmosphere-c2 .preset-row button { min-width: 44px; padding: 8px 12px; font-size: 14px; }
+.atmosphere-c2 .unit-toggle { flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; }
+.atmosphere-c2 .unit-toggle > span { color: var(--lc-body); }
+.atmosphere-c2 select { min-height: 44px; border-color: var(--lc-border-control); border-radius: 10px; background: var(--lc-raised); color: var(--lc-text); padding: 8px 10px; font-size: 14px; }
+/* ---- Layer drawer: shared rows in lab-c2.css; the axis-scale rows are Atmosphere-only ---- */
+/* The closed drawer is parked off-canvas but its shadow reached back onto the page's right edge. */
+.atmosphere-c2 .layer-drawer:not(.open) { box-shadow: none; }
+.atmosphere-c2 .drawer-scroll details { border-bottom-color: var(--lc-border); }
+.atmosphere-c2 .layer-drawer>header button { border-color: var(--lc-border-control); }
+.atmosphere-profile-lab.atmosphere-c2 .layer-drawer .coordinate-row strong { color: var(--lc-text); }
+.atmosphere-c2 .quantity-scale-list label.selected-inline { border-color: var(--lc-accent); background: var(--lc-accent-subtle); color: var(--lc-text); font-weight: 650; }
+/* ---- Source note ---- */
+.atmosphere-c2 .profile-source { color: var(--lc-muted); font-size: 13px; }
+.atmosphere-c2 .profile-source a { color: var(--lc-accent); border-bottom-color: currentColor; }
+/* ---- Narrow screens: labelled 44px header, no horizontal scroll ---- */
+@media (max-width: 660px) {
+  .atmosphere-c2 .topbar { align-items: stretch; gap: .75rem; }
+  .atmosphere-c2 .header-actions { justify-content: flex-start; }
+  /* The global narrow rule hides every header label (font-size:0); labels stay visible so each control keeps a readable name. */
+  .atmosphere-c2 .header-actions button { font-size: 14px; padding: 8px 12px; }
+  .atmosphere-c2 .header-actions .theme-switcher button { padding: 0; }
+  .atmosphere-c2 .header-actions button svg { width: 16px; height: 16px; }
+  .atmosphere-c2 .profile-control-grid { padding: 12px; }
+}

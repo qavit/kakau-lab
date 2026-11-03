@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, type RefObject } from "react";
 import { Layers3, X } from "lucide-react";
 import { QUANTITY_META, type AxisScale, type StandardAtmosphereState } from "@/models/standardAtmosphere";
 import type { PhysicalQuantity } from "@/lib/science/standardAtmosphere";
@@ -11,11 +12,40 @@ type Props = {
   onClose: () => void;
   onPatch: (patch: Partial<StandardAtmosphereState>) => void;
   copy: AtmosphereProfileCopy;
+  /** The header trigger; focus returns here when the drawer closes. */
+  returnFocusRef?: RefObject<HTMLElement | null>;
 };
 
 const QUANTITIES: PhysicalQuantity[] = ["temperature", "pressure", "density"];
 
-export default function AtmosphereLayerDrawer({ open, state, onClose, onPatch, copy }: Props) {
+export default function AtmosphereLayerDrawer({ open, state, onClose, onPatch, copy, returnFocusRef }: Props) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const wasOpenRef = useRef(false);
+  // Same contract as the shared LabLayerDrawer: focus moves in on open and back to the trigger on close.
+  useEffect(() => {
+    if (open) {
+      wasOpenRef.current = true;
+      closeRef.current?.focus();
+      return;
+    }
+    if (wasOpenRef.current) {
+      wasOpenRef.current = false;
+      returnFocusRef?.current?.focus();
+    }
+  }, [open, returnFocusRef]);
+
+  useEffect(() => {
+    if (!open) return;
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", escape);
+    return () => window.removeEventListener("keydown", escape);
+  }, [open, onClose]);
+
   const check = (key: "showLayerLabels" | "showBoundaries" | "showOzoneLayer" | "showTooltip", label: string) => (
     <label><input type="checkbox" checked={state[key]} onChange={() => onPatch({ [key]: !state[key] })} />{label}</label>
   );
@@ -24,10 +54,10 @@ export default function AtmosphereLayerDrawer({ open, state, onClose, onPatch, c
   };
 
   return (
-    <aside className={`layer-drawer ${open ? "open" : ""}`} aria-hidden={!open}>
+    <aside id="atmosphere-layer-drawer" className={`layer-drawer ${open ? "open" : ""}`} aria-hidden={!open} aria-label={copy.drawer.title} role="dialog" inert={!open}>
       <header>
         <div><Layers3 size={18} /><strong>{copy.drawer.title}</strong></div>
-        <button onClick={onClose} aria-label={copy.drawer.close}><X size={17} /></button>
+        <button ref={closeRef} type="button" onClick={onClose} aria-label={copy.drawer.close}><X size={17} /></button>
       </header>
       <div className="drawer-scroll">
         <details open><summary>{copy.drawer.layers}</summary><div className="layer-list">

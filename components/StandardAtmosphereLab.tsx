@@ -476,6 +476,7 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
   const readout = useMemo(() => deriveStandardAtmosphereModel(state), [state]);
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   const chartCardRef = useRef<HTMLElement | null>(null);
+  const layersTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const usesTemperature = state.quantityA === "temperature" || state.quantityB === "temperature";
   const usesPressure = state.quantityA === "pressure" || state.quantityB === "pressure";
@@ -513,7 +514,7 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
   };
 
   return (
-    <main className="lab-shell atmosphere-profile-lab">
+    <main className="lab-shell atmosphere-profile-lab atmosphere-c2 lab-c2">
       <div className="topbar">
         <div>
           {locale === "en" ? (
@@ -529,8 +530,8 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
             {(["zh-TW", "en"] as const).map((target) => <Link key={target} href={localizedPath(target, "/atmosphere-profile")} lang={target} aria-current={target === locale ? "page" : undefined}>{copy.language[target]}</Link>)}
           </nav>
           <ThemeToggle locale={locale} />
-          <button className={state.swapAxes ? "active" : ""} onClick={() => patchState({ swapAxes: !state.swapAxes })}><ArrowLeftRight size={14} /> {copy.actions.swapAxes}</button>
-          <button className={showLayers ? "active" : ""} onClick={() => setShowLayers((v) => !v)}><Layers3 size={14} /> {copy.actions.layers}</button>
+          <button className={state.swapAxes ? "active" : ""} aria-pressed={state.swapAxes} onClick={() => patchState({ swapAxes: !state.swapAxes })}><ArrowLeftRight size={14} /> {copy.actions.swapAxes}</button>
+          <button ref={layersTriggerRef} className={showLayers ? "active" : ""} aria-expanded={showLayers} aria-controls="atmosphere-layer-drawer" onClick={() => setShowLayers((v) => !v)}><Layers3 size={14} /> {copy.actions.layers}</button>
           <button onClick={handleExport}><Download size={14} /> {copy.actions.export}</button>
           <button onClick={() => setState(initialStandardAtmosphereState())}><RotateCcw size={14} /> {copy.actions.reset}</button>
         </div>
@@ -561,7 +562,7 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
             </label>
             <div className="preset-row">
               {Object.entries(ALTITUDE_PRESETS).map(([key, preset]) => (
-                <button key={key} className={state.maxAltitudeKm === preset.maxAltitudeKm ? "selected" : ""} onClick={() => patchState({ maxAltitudeKm: preset.maxAltitudeKm })}>{copy.presets[key as keyof typeof copy.presets]}</button>
+                <button key={key} className={state.maxAltitudeKm === preset.maxAltitudeKm ? "selected" : ""} aria-pressed={state.maxAltitudeKm === preset.maxAltitudeKm} onClick={() => patchState({ maxAltitudeKm: preset.maxAltitudeKm })}>{copy.presets[key as keyof typeof copy.presets]}</button>
               ))}
             </div>
           </div>
@@ -583,7 +584,7 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
                 <span>{copy.controls.temperatureUnit}</span>
                 <div className="preset-row">
                   {(["K", "C", "F"] as const).map((unit) => (
-                    <button key={unit} className={state.temperatureUnit === unit ? "selected" : ""} onClick={() => patchState({ temperatureUnit: unit })}>{TEMPERATURE_UNIT_LABEL[unit]}</button>
+                    <button key={unit} className={state.temperatureUnit === unit ? "selected" : ""} aria-pressed={state.temperatureUnit === unit} onClick={() => patchState({ temperatureUnit: unit })}>{TEMPERATURE_UNIT_LABEL[unit]}</button>
                   ))}
                 </div>
               </div>
@@ -593,7 +594,7 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
                 <span>{copy.controls.pressureUnit}</span>
                 <div className="preset-row">
                   {(["Pa", "hPa", "bar", "atm", "cmHg", "mmHg", "Torr"] as const).map((unit) => (
-                    <button key={unit} className={state.pressureUnit === unit ? "selected" : ""} onClick={() => patchState({ pressureUnit: unit })}>{PRESSURE_UNIT_LABEL[unit]}</button>
+                    <button key={unit} className={state.pressureUnit === unit ? "selected" : ""} aria-pressed={state.pressureUnit === unit} onClick={() => patchState({ pressureUnit: unit })}>{PRESSURE_UNIT_LABEL[unit]}</button>
                   ))}
                 </div>
               </div>
@@ -603,7 +604,7 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
                 <span>{copy.controls.densityUnit}</span>
                 <div className="preset-row">
                   {(["kg/m3", "g/cm3"] as const).map((unit) => (
-                    <button key={unit} className={state.densityUnit === unit ? "selected" : ""} onClick={() => patchState({ densityUnit: unit })}>{DENSITY_UNIT_LABEL[unit]}</button>
+                    <button key={unit} className={state.densityUnit === unit ? "selected" : ""} aria-pressed={state.densityUnit === unit} onClick={() => patchState({ densityUnit: unit })}>{DENSITY_UNIT_LABEL[unit]}</button>
                   ))}
                 </div>
               </div>
@@ -634,7 +635,7 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
         {copy.sourceNote}
       </p>
 
-      <AtmosphereLayerDrawer open={showLayers} state={state} onClose={() => setShowLayers(false)} onPatch={patchState} copy={copy} />
+      <AtmosphereLayerDrawer open={showLayers} state={state} onClose={() => setShowLayers(false)} onPatch={patchState} copy={copy} returnFocusRef={layersTriggerRef} />
     </main>
   );
 }
