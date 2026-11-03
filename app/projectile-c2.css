@@ -38,10 +38,11 @@
 }
 .projectile-c2 button:disabled { cursor: not-allowed; opacity: .5; }
 /* Appearance: the same three-button segmented group (Light / Dark / System), raised to 44px targets.
- * The frame is an inset shadow rather than a border so the group is exactly as tall as its neighbours. */
-.projectile-c2 .theme-switcher button { min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--lc-text); }
-.projectile-c2 .theme-switcher button:hover { background: var(--lc-sunken); transform: none; }
-.projectile-c2 .theme-switcher button[aria-pressed="true"] { background: var(--lc-accent-subtle); color: var(--lc-accent); box-shadow: inset 0 0 0 2px var(--lc-accent); }
+ * The frame is an inset shadow rather than a border so the group is exactly as tall as its neighbours.
+ * The selectors carry .header-actions (as Solar's do) so they out-rank the generic header button recipe above. */
+.projectile-c2 .header-actions .theme-switcher button { min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--lc-text); }
+.projectile-c2 .header-actions .theme-switcher button:hover:not(:disabled) { background: var(--lc-sunken); transform: none; }
+.projectile-c2 .header-actions .theme-switcher button[aria-pressed="true"] { background: var(--lc-accent-subtle); color: var(--lc-accent); box-shadow: inset 0 0 0 2px var(--lc-accent); }
 .projectile-lab.projectile-c2 .theme-switcher button:focus-visible { outline-offset: -4px; }
 /* Scenario / preset dropdowns */
 .projectile-c2 .projectile-menu-list { padding: 8px; border-radius: 14px; border-color: var(--lc-border); background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
@@ -138,6 +139,8 @@
   .projectile-c2 .projectile-topbar .header-actions { justify-content: flex-start; }
   .projectile-c2 .projectile-topbar .header-actions button { min-height: 44px; font-size: 14px; padding: 8px 12px; }
   .projectile-c2 .projectile-topbar .header-actions button svg { width: 16px; height: 16px; }
+  .projectile-c2 .projectile-topbar .header-actions .theme-switcher button { padding: 0; }
+  .projectile-c2 .projectile-topbar .header-actions .theme-switcher button svg { width: 18px; height: 18px; }
   .projectile-c2 .projectile-transport { padding: 12px 10px; }
   .projectile-c2 .projectile-transport-buttons,
   .projectile-c2 .projectile-transport-speeds { gap: 4px; }
