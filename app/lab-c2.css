@@ -138,7 +138,9 @@ html[data-mode="dark"] .lab-c2 {
 
 .lab-c2 .layer-list input { width: 18px; height: 18px; accent-color: var(--lc-accent); }
 
-/* ---- Reduced motion ---- */
+/* ---- Reduced motion ----
+ * !important because the module sheets set the 140ms button transition on selectors that out-rank any
+ * plain .lab-c2 rule (their :is() lists count as a class). Transitions only: no animation or JS motion. */
 @media (prefers-reduced-motion: reduce) {
-  .lab-c2 button { transition: none; }
+  .lab-c2 :is(button, a, summary) { transition: none !important; }
 }
