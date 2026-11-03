@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { socialMetadata } from "@/lib/site-metadata";
 import ProjectileLab from "@/components/ProjectileLab";
+import "../lab-c2.css";
 import "../projectile-c2.css";
 
 export const metadata: Metadata = {

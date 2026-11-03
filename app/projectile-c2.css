@@ -1,86 +1,10 @@
 /* Lab W45 — C2 Neutral Scientific Workbench, Projectile workspace only.
- * Every rule is scoped to .projectile-c2 (the <main> of /projectile). Nothing here changes the
+ * Every rule is scoped to .projectile-c2 (the <main> of /projectile). Shared tokens and rules live in
+ * lab-c2.css (import that first); this sheet keeps what only Projectile needs. Nothing here changes the
  * physics, the trajectory/chart SVG, the guided activities or the playback logic; the dark chart
  * surfaces and their scientific data colours are deliberately left as they are in both themes.
- * Token names mirror catalog-c2.css so a second consumer can lift them without renaming.
  * Gold stays a decorative brand point only (live dot, readout bullets); it is never a state or focus colour.
  */
-body:has(.projectile-c2) {
-  background: #f5f5f6;
-  background-image: none;
-}
-.projectile-c2 {
-  --lc-page: #f5f5f6;
-  --lc-raised: #fff;
-  --lc-sunken: #ebebed;
-  --lc-text: #16181d;
-  --lc-body: #3d434d;
-  --lc-muted: #555b66;
-  --lc-border: #16181d1f;
-  --lc-border-control: #6b7280;
-  --lc-accent: #216e84;
-  --lc-accent-subtle: #e4f1f3;
-  --lc-on-accent: #fff;
-  --lc-focus: #216e84;
-  --lc-focus-on-dark: #9bd7dd;
-  --lc-card-shadow: 0 0 0 1px #16181d0f, 0 1px 3px #16181d0f, 0 8px 24px #16181d0a;
-  /* Re-point the legacy Lab tokens so the existing projectile rules pick up the C2 surfaces. */
-  --ink: var(--lc-text);
-  --strong: var(--lc-text);
-  --body: var(--lc-body);
-  --muted: var(--lc-muted);
-  --line: var(--lc-border);
-  --line-strong: var(--lc-border-control);
-  --line-hover: var(--lc-accent);
-  --link: var(--lc-accent);
-  --surface: var(--lc-raised);
-  --surface-solid: var(--lc-raised);
-  --cream: var(--lc-raised);
-  --btn-bg: var(--lc-raised);
-  --field-bg: var(--lc-raised);
-  --tint: var(--lc-accent-subtle);
-  --tint-soft: var(--lc-page);
-  --tint-alpha: #216e8414;
-  --formula-bg: var(--lc-page);
-  color: var(--lc-text);
-}
-@media (prefers-color-scheme: dark) {
-  html:not([data-mode]) body:has(.projectile-c2) { background: #101114; }
-  html:not([data-mode]) .projectile-c2 {
-    --lc-page: #101114;
-    --lc-raised: #1a1c21;
-    --lc-sunken: #0b0c0e;
-    --lc-text: #edeef0;
-    --lc-body: #c3c7ce;
-    --lc-muted: #a5aab4;
-    --lc-border: #ffffff1f;
-    --lc-border-control: #8a909c;
-    --lc-accent: #9bd7dd;
-    --lc-accent-subtle: #173139;
-    --lc-on-accent: #0b1a1d;
-    --lc-focus: #9bd7dd;
-    --lc-card-shadow: 0 0 0 1px #ffffff14, 0 8px 24px #00000066;
-    --tint-alpha: #9bd7dd1a;
-  }
-}
-html[data-mode="dark"] body:has(.projectile-c2) { background: #101114; }
-html[data-mode="dark"] .projectile-c2 {
-  --lc-page: #101114;
-  --lc-raised: #1a1c21;
-  --lc-sunken: #0b0c0e;
-  --lc-text: #edeef0;
-  --lc-body: #c3c7ce;
-  --lc-muted: #a5aab4;
-  --lc-border: #ffffff1f;
-  --lc-border-control: #8a909c;
-  --lc-accent: #9bd7dd;
-  --lc-accent-subtle: #173139;
-  --lc-on-accent: #0b1a1d;
-  --lc-focus: #9bd7dd;
-  --lc-card-shadow: 0 0 0 1px #ffffff14, 0 8px 24px #00000066;
-  --tint-alpha: #9bd7dd1a;
-}
-
 /* ---- Header: flat workbench bar with a ruled base, one 44px control height ---- */
 .projectile-c2 .projectile-topbar {
   align-items: flex-end;
@@ -89,21 +13,7 @@ html[data-mode="dark"] .projectile-c2 {
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--lc-border);
 }
-.projectile-c2 .lab-brand { min-width: 44px; min-height: 44px; margin-bottom: 0; }
-.projectile-c2 .eyebrow {
-  margin-bottom: 2px;
-  color: var(--lc-muted);
-  font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace;
-  letter-spacing: .08em;
-}
-.projectile-c2 h1 {
-  font-family: inherit;
-  font-size: clamp(1.5rem, 1.15rem + 1.2vw, 2rem);
-  font-weight: 650;
-  letter-spacing: 0;
-  line-height: 1.3;
-}
-.projectile-c2 .header-actions { gap: 8px; }
+.projectile-c2 .lab-brand { margin-bottom: 0; }
 .projectile-c2 :is(.header-actions, .projectile-menu-list, .projectile-transport, .projectile-side-inner, .guided-inner, .layer-drawer > header, .projectile-share-notice) button {
   min-height: 44px;
   border-color: var(--lc-border-control);
@@ -127,20 +37,15 @@ html[data-mode="dark"] .projectile-c2 {
   font-weight: 650;
 }
 .projectile-c2 button:disabled { cursor: not-allowed; opacity: .5; }
-
 /* Appearance: the same three-button segmented group (Light / Dark / System), raised to 44px targets.
  * The frame is an inset shadow rather than a border so the group is exactly as tall as its neighbours. */
-.projectile-c2 .theme-switcher { gap: 0; padding: 0; overflow: hidden; border: 0; border-radius: 10px; background: var(--lc-raised); box-shadow: inset 0 0 0 1px var(--lc-border-control); }
 .projectile-c2 .theme-switcher button { min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--lc-text); }
 .projectile-c2 .theme-switcher button:hover { background: var(--lc-sunken); transform: none; }
 .projectile-c2 .theme-switcher button[aria-pressed="true"] { background: var(--lc-accent-subtle); color: var(--lc-accent); box-shadow: inset 0 0 0 2px var(--lc-accent); }
-.projectile-c2 .theme-switcher svg { width: 18px; height: 18px; }
 .projectile-lab.projectile-c2 .theme-switcher button:focus-visible { outline-offset: -4px; }
-
 /* Scenario / preset dropdowns */
 .projectile-c2 .projectile-menu-list { padding: 8px; border-radius: 14px; border-color: var(--lc-border); background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
 .projectile-c2 .projectile-menu-list button { border-color: transparent; background: transparent; font-size: 14px; }
-
 /* ---- Focus: 2px in the interface colour, chosen for the surface it sits on ---- */
 .projectile-lab.projectile-c2 :is(button, a, input, select, summary, [role="separator"]):focus-visible {
   outline: 2px solid var(--lc-focus);
@@ -151,16 +56,13 @@ html[data-mode="dark"] .projectile-c2 {
   outline-color: var(--lc-focus-on-dark);
   outline-offset: -2px;
 }
-
 /* ---- Chart card: the dark data surface stays; only its frame follows C2 ---- */
-.projectile-c2 .viewport-card { border-color: var(--lc-border); border-radius: 14px; box-shadow: var(--lc-card-shadow); }
 .projectile-c2 .projectile-zoom-group button,
 .projectile-c2 .projectile-map-reset { width: 44px; height: 44px; min-height: 44px; }
 .projectile-c2 .projectile-zoom-group,
 .projectile-c2 .projectile-map-reset { border-radius: 10px; }
 .projectile-c2 .projectile-path-card .projectile-map-controls svg { width: 18px; height: 18px; }
 .projectile-c2 .projectile-map-reset.active { border-color: #9bd7dd66; color: #9bd7dd; }
-
 /* ---- Side panel and dock surfaces ---- */
 .projectile-c2 .projectile-side-inner,
 .projectile-c2 .projectile-dock { border-color: var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
@@ -180,7 +82,6 @@ html[data-mode="dark"] .projectile-c2 {
 .projectile-c2 .projectile-inline-slider b { font-size: 14px; }
 .projectile-c2 .projectile-slider-stack label b { font-size: 14px; font-weight: 650; }
 /* Native range: a 44px hit band around the unchanged thin track. */
-.projectile-c2 input[type="range"] { height: 44px; margin: 0; background: transparent; accent-color: var(--lc-accent); cursor: pointer; }
 .projectile-c2 input[type="range"]:disabled { cursor: not-allowed; }
 .projectile-c2 .projectile-hint,
 .projectile-c2 .projectile-note { color: var(--lc-muted); font-size: 12px; line-height: 1.65; }
@@ -201,7 +102,6 @@ html[data-mode="dark"] .projectile-c2 {
 .projectile-c2 .projectile-disclosure[aria-expanded="true"] { background: transparent; box-shadow: none; }
 .projectile-c2 .projectile-disclosure small { color: var(--lc-muted); font-size: 12px; }
 .projectile-c2 .projectile-inline-slider { gap: 8px; }
-
 /* ---- Transport and readout ---- */
 .projectile-c2 .projectile-transport { gap: 8px 12px; padding: 12px 14px; }
 .projectile-c2 .projectile-transport-buttons,
@@ -212,16 +112,7 @@ html[data-mode="dark"] .projectile-c2 {
 .projectile-c2 .projectile-readout { gap: 8px 24px; padding: 12px 14px; border-top-color: var(--lc-border); }
 .projectile-c2 .projectile-readout span { font-family: inherit; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .projectile-c2 .projectile-readout i { color: var(--lc-muted); font-size: 12px; font-weight: 400; }
-
 /* ---- Layer drawer ---- */
-.projectile-c2 .layer-drawer { background: var(--lc-raised); border-left-color: var(--lc-border); }
-.projectile-c2 .layer-drawer>header { border-bottom-color: var(--lc-border); }
-.projectile-c2 .drawer-scroll summary { min-height: 44px; display: flex; align-items: center; color: var(--lc-text); }
-.projectile-c2 .layer-list label { min-height: 44px; border-color: var(--lc-border-control); border-radius: 10px; background: var(--lc-raised); color: var(--lc-text); font-size: 14px; }
-.projectile-c2 .layer-list label:hover { background: var(--lc-sunken); }
-.projectile-c2 .layer-list label:has(input:checked) { border-color: var(--lc-accent); background: var(--lc-accent-subtle); }
-.projectile-c2 .layer-list input { width: 18px; height: 18px; accent-color: var(--lc-accent); }
-
 /* ---- Guided rail ---- */
 .projectile-c2 .guided-head { padding: 1rem 1.125rem .75rem; }
 .projectile-c2 .guided-head>div>span { color: var(--lc-muted); font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace; letter-spacing: .08em; }
@@ -241,7 +132,6 @@ html[data-mode="dark"] .projectile-c2 {
 .projectile-c2 .guided-block p { color: var(--lc-body); }
 .projectile-c2 .projectile-share-notice { border-radius: 10px; }
 .projectile-c2 .projectile-share-notice input { min-height: 44px; border-color: var(--lc-border-control); border-radius: 10px; }
-
 /* ---- Narrow screens: ruled header, wrapped 44px controls, no horizontal scroll ---- */
 @media (max-width: 660px) {
   .projectile-c2 .projectile-topbar { align-items: stretch; gap: .75rem; }
@@ -258,7 +148,4 @@ html[data-mode="dark"] .projectile-c2 {
   .projectile-c2 .projectile-transport button svg { flex: none; }
   .projectile-c2 .projectile-group { padding: 1rem; }
   .projectile-c2 .projectile-group.projectile-group-flush { padding: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .projectile-c2 button { transition: none; }
 }

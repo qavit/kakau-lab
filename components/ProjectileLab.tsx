@@ -1500,7 +1500,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
 
   return (
     <MathProvider>
-    <main ref={shellRef} className="lab-shell projectile-lab projectile-c2" style={{ "--projectile-appbar-bottom": `${appBarBottom}px` } as React.CSSProperties}>
+    <main ref={shellRef} className="lab-shell projectile-lab projectile-c2 lab-c2" style={{ "--projectile-appbar-bottom": `${appBarBottom}px` } as React.CSSProperties}>
       <div ref={appBarRef} className="topbar projectile-topbar">
         <div>
           <Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link>

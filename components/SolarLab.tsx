@@ -151,7 +151,7 @@ export default function SolarLab() {
   }, [exportTarget, exportMode, lineWidth, exportShadowTimes, state.latitude, state.day]);
 
   return (
-    <main className="lab-shell solar-c2">
+    <main className="lab-shell solar-c2 lab-c2">
       <header className="topbar">
         <div>
           <Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link>

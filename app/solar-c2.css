@@ -1,92 +1,12 @@
 /* Lab W45 — C2 Neutral Scientific Workbench, Solar workspace only (second consumer after Projectile).
- * Every rule is scoped to .solar-c2 (the <main> of /solar). The geocentric and observer 3D scenes, their
+ * Every rule is scoped to .solar-c2 (the <main> of /solar). Shared tokens and rules live in lab-c2.css
+ * (import that first); this sheet keeps what only Solar needs. The geocentric and observer 3D scenes, their
  * dark canvas surfaces, the legends drawn over them and every scientific colour are left untouched; this
- * sheet only restyles the interface around them. Token block is the Projectile one, renamed.
+ * sheet only restyles the interface around them.
  * Gold stays decorative (live dot); it is never a state or focus colour, so the year-play accent is neutralised.
  */
-body:has(.solar-c2) {
-  background: #f5f5f6;
-  background-image: none;
-}
-.solar-c2 {
-  --lc-page: #f5f5f6;
-  --lc-raised: #fff;
-  --lc-sunken: #ebebed;
-  --lc-text: #16181d;
-  --lc-body: #3d434d;
-  --lc-muted: #555b66;
-  --lc-border: #16181d1f;
-  --lc-border-control: #6b7280;
-  --lc-accent: #216e84;
-  --lc-accent-subtle: #e4f1f3;
-  --lc-on-accent: #fff;
-  --lc-focus: #216e84;
-  --lc-focus-on-dark: #9bd7dd;
-  --lc-card-shadow: 0 0 0 1px #16181d0f, 0 1px 3px #16181d0f, 0 8px 24px #16181d0a;
-  /* Re-point the legacy Lab tokens so the existing projectile rules pick up the C2 surfaces. */
-  --ink: var(--lc-text);
-  --strong: var(--lc-text);
-  --body: var(--lc-body);
-  --muted: var(--lc-muted);
-  --line: var(--lc-border);
-  --line-strong: var(--lc-border-control);
-  --line-hover: var(--lc-accent);
-  --link: var(--lc-accent);
-  --surface: var(--lc-raised);
-  --surface-solid: var(--lc-raised);
-  --cream: var(--lc-raised);
-  --btn-bg: var(--lc-raised);
-  --field-bg: var(--lc-raised);
-  --tint: var(--lc-accent-subtle);
-  --tint-soft: var(--lc-page);
-  --tint-alpha: #216e8414;
-  --formula-bg: var(--lc-page);
-  color: var(--lc-text);
-}
-@media (prefers-color-scheme: dark) {
-  html:not([data-mode]) body:has(.solar-c2) { background: #101114; }
-  html:not([data-mode]) .solar-c2 {
-    --lc-page: #101114;
-    --lc-raised: #1a1c21;
-    --lc-sunken: #0b0c0e;
-    --lc-text: #edeef0;
-    --lc-body: #c3c7ce;
-    --lc-muted: #a5aab4;
-    --lc-border: #ffffff1f;
-    --lc-border-control: #8a909c;
-    --lc-accent: #9bd7dd;
-    --lc-accent-subtle: #173139;
-    --lc-on-accent: #0b1a1d;
-    --lc-focus: #9bd7dd;
-    --lc-card-shadow: 0 0 0 1px #ffffff14, 0 8px 24px #00000066;
-    --tint-alpha: #9bd7dd1a;
-  }
-}
-html[data-mode="dark"] body:has(.solar-c2) { background: #101114; }
-html[data-mode="dark"] .solar-c2 {
-  --lc-page: #101114;
-  --lc-raised: #1a1c21;
-  --lc-sunken: #0b0c0e;
-  --lc-text: #edeef0;
-  --lc-body: #c3c7ce;
-  --lc-muted: #a5aab4;
-  --lc-border: #ffffff1f;
-  --lc-border-control: #8a909c;
-  --lc-accent: #9bd7dd;
-  --lc-accent-subtle: #173139;
-  --lc-on-accent: #0b1a1d;
-  --lc-focus: #9bd7dd;
-  --lc-card-shadow: 0 0 0 1px #ffffff14, 0 8px 24px #00000066;
-  --tint-alpha: #9bd7dd1a;
-}
-
-
 /* ---- Header: flat workbench bar with a ruled base, one 44px control height ---- */
 .solar-c2 .topbar { align-items: flex-end; gap: 1rem 1.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--lc-border); }
-.solar-c2 .lab-brand { min-width: 44px; min-height: 44px; }
-.solar-c2 .eyebrow { margin-bottom: 2px; color: var(--lc-muted); font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace; letter-spacing: .08em; }
-.solar-c2 h1 { font-family: inherit; font-size: clamp(1.5rem, 1.15rem + 1.2vw, 2rem); font-weight: 650; letter-spacing: 0; line-height: 1.3; }
-.solar-c2 .header-actions { gap: 8px; }
 .solar-c2 :is(.header-actions, .control-panel, .export-modal, .layer-drawer > header) :is(button, .model-index-link) {
   min-height: 44px;
   border-color: var(--lc-border-control);
@@ -111,27 +31,18 @@ html[data-mode="dark"] .solar-c2 {
 .solar-c2 .header-actions button.primary-action:hover:not(:disabled),
 .solar-c2 .export-modal button.primary-action:hover:not(:disabled) { background: var(--lc-accent); filter: brightness(.92); }
 .solar-c2 button:disabled, .solar-c2 select:disabled { cursor: not-allowed; opacity: .5; }
-
-/* Appearance: three-button segmented group raised to 44px targets (same as Projectile). */
-.solar-c2 .theme-switcher { gap: 0; padding: 0; overflow: hidden; border: 0; border-radius: 10px; background: var(--lc-raised); box-shadow: inset 0 0 0 1px var(--lc-border-control); }
+/* Appearance buttons: raised to 44px. The selector is one class deeper than Projectile's because Solar's generic button rule above would otherwise out-rank it. */
 .solar-c2 .header-actions .theme-switcher button { min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--lc-text); }
 .solar-c2 .header-actions .theme-switcher button:hover:not(:disabled) { background: var(--lc-sunken); transform: none; }
 .solar-c2 .header-actions .theme-switcher button[aria-pressed="true"] { background: var(--lc-accent-subtle); color: var(--lc-accent); box-shadow: inset 0 0 0 2px var(--lc-accent); }
-.solar-c2 .theme-switcher svg { width: 18px; height: 18px; }
 .solar-c2 .header-actions .theme-switcher button:focus-visible { outline-offset: -4px; }
-
 /* ---- Focus: 2px in the interface colour. No focusable control sits on the dark canvases. ---- */
 .solar-c2 :is(button, a, input, select, summary):focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
-
-/* ---- Scene cards: the dark canvas surface stays; only its frame follows C2 ---- */
-.solar-c2 .viewport-card { border-color: var(--lc-border); border-radius: 14px; box-shadow: var(--lc-card-shadow); }
-
 /* ---- Computed results ---- */
 .solar-c2 .metrics { border-color: var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
 .solar-c2 .metrics div { border-right-color: var(--lc-border); }
 .solar-c2 .metrics span { font-size: 12px; }
 .solar-c2 .metrics strong { margin-top: 4px; font-family: inherit; font-weight: 600; font-variant-numeric: tabular-nums; }
-
 /* ---- Control deck ---- */
 .solar-c2 .control-panel { border-color: var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
 .solar-c2 .control-panel-heading { min-height: 52px; padding: 4px 8px 4px 16px; border-bottom-color: var(--lc-border); }
@@ -140,8 +51,6 @@ html[data-mode="dark"] .solar-c2 {
 .solar-c2 .control-deck { gap: 16px; padding: 14px 16px 16px; }
 .solar-c2 .control-deck label>span { margin-bottom: 2px; font-size: 13px; }
 .solar-c2 .control-deck label b { font-size: 14px; font-weight: 650; font-variant-numeric: tabular-nums; }
-/* Native range: a 44px hit band around the unchanged thin track. */
-.solar-c2 input[type="range"] { height: 44px; margin: 0; background: transparent; accent-color: var(--lc-accent); cursor: pointer; }
 .solar-c2 .preset-row { gap: 6px; margin-top: 2px; }
 .solar-c2 .preset-row button { min-width: 44px; padding: 8px 10px; border-radius: 10px; background: var(--lc-raised); color: var(--lc-text); font-size: 13px; }
 .solar-c2 .preset-row button.selected { background: var(--lc-accent-subtle); border-color: var(--lc-accent); color: var(--lc-text); }
@@ -156,19 +65,10 @@ html[data-mode="dark"] .solar-c2 {
 .solar-c2 .play-actions button { min-width: 44px; padding: 8px 14px; }
 .solar-c2 .year-play { border-color: var(--lc-border-control); color: var(--lc-text); }
 .solar-c2 .year-play.active { background: var(--lc-accent-subtle); border-color: var(--lc-accent); }
-
-/* ---- Layer drawer (shared LabLayerDrawer markup, same rules as Projectile) ---- */
-.solar-c2 .layer-drawer { background: var(--lc-raised); border-left-color: var(--lc-border); }
-.solar-c2 .layer-drawer>header { border-bottom-color: var(--lc-border); }
+/* ---- Layer drawer: Solar-only rows (the shared rows are in lab-c2.css) ---- */
 .solar-c2 .drawer-scroll details { border-bottom-color: var(--lc-border); }
-.solar-c2 .drawer-scroll summary { min-height: 44px; display: flex; align-items: center; color: var(--lc-text); }
-.solar-c2 .layer-list label { min-height: 44px; border-color: var(--lc-border-control); border-radius: 10px; background: var(--lc-raised); color: var(--lc-text); font-size: 14px; }
-.solar-c2 .layer-list label:hover { background: var(--lc-sunken); }
-.solar-c2 .layer-list label:has(input:checked) { border-color: var(--lc-accent); background: var(--lc-accent-subtle); }
-.solar-c2 .layer-list input { width: 18px; height: 18px; accent-color: var(--lc-accent); }
 .solar-c2 .coordinate-row strong { border-left-color: var(--lc-accent); color: var(--lc-text); font-size: 13px; }
 .solar-c2 .field-label { color: var(--lc-muted); font-size: 12px; }
-
 /* ---- Export dialog ---- */
 .solar-c2 .export-modal { border-color: var(--lc-border); border-radius: 14px; background: var(--lc-raised); }
 .solar-c2 .export-modal>header, .solar-c2 .export-modal>footer { border-color: var(--lc-border); }
@@ -176,9 +76,7 @@ html[data-mode="dark"] .solar-c2 {
 .solar-c2 .export-options label>span, .solar-c2 .directory-choice>span, .solar-c2 .export-preview>div:first-child { color: var(--lc-body); font-size: 13px; }
 .solar-c2 .export-options p { color: var(--lc-muted); font-size: 13px; }
 .solar-c2 .export-check { min-height: 44px; color: var(--lc-text); font-size: 14px; }
-
 .solar-c2 .lab-footer { color: var(--lc-muted); }
-
 /* ---- Narrow screens: labelled 44px header, wrapped controls, no horizontal scroll ---- */
 @media (max-width: 660px) {
   .solar-c2 .topbar { align-items: stretch; gap: .75rem; }
@@ -189,7 +87,4 @@ html[data-mode="dark"] .solar-c2 {
   .solar-c2 .header-actions svg { width: 16px; height: 16px; }
   .solar-c2 .control-deck { padding: 12px; }
   .solar-c2 .play-actions button { flex: 1 1 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .solar-c2 button { transition: none; }
 }
