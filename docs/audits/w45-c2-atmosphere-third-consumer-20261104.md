@@ -56,5 +56,21 @@ Duplicated from `solar-c2.css` nearly verbatim (about 20 lines: header-button re
 ## 5. Known issues left (not caused by this slice)
 
 * At 390 / 360 px the SVG scales with the card width, so tick and axis labels render at about 6–7 px. Fixing it means changing label sizes or layout inside the chart; deferred.
-* Potential, not measured: the closed layer drawer is `aria-hidden` and only moved off-canvas, so its controls may stay tabbable (same markup pattern as Projectile and Solar). Deferred to a shared fix.
 * The two `react-hooks/exhaustive-deps` warnings on `plot` pre-exist.
+
+## 6. Final accessibility gate — layer drawer keyboard behaviour
+
+Measured on production builds with a real keyboard (Tab / Shift+Tab / Enter / Space / Escape), 1440 px.
+
+| Check | Atmosphere at `b5a9713` | Atmosphere after fix | Solar (main) | Projectile (main) |
+| --- | --- | --- | --- | --- |
+| Drawer closed: `inert` / `role` | no / none | `inert` / `dialog` | `inert` / `dialog` | `inert` / `dialog` |
+| Drawer closed: Tab and Shift+Tab stops inside the drawer | **11 / 11** (hidden, off-canvas) | 0 / 0 | 0 / 0 | 0 / 0 |
+| Open: focus after Enter on 圖層 | stays on the trigger | moves to the close button | close button | close button |
+| Open: Space toggles a checkbox | yes | yes | yes | yes |
+| Escape | does nothing | closes | closes | closes |
+| Focus after Escape / close button | stays in the (now hidden) drawer | back on 圖層 / Layers | 圖層 | 圖層 |
+
+Root cause: Atmosphere renders its own `AtmosphereLayerDrawer` (it needs the per-quantity scale rows), which had only `aria-hidden`; the shared `LabLayerDrawer` used by Solar and Projectile already has `inert`, `role="dialog"`, focus-in, Escape and focus return. So the defect was **Atmosphere-specific and not shared**. Fix, inside this PR: the same contract added locally to `AtmosphereLayerDrawer` (`inert`, `role="dialog"`, `aria-label`, close-button focus on open, Escape, `returnFocusRef` to the 圖層 button, `aria-controls` on the trigger). The shared drawer was not used because its close label is hard-coded Chinese and the English page needs `copy.drawer.close`. Verified on `/atmosphere-profile` and `/en/atmosphere-profile`.
+
+Same as the shared drawer, the open drawer is non-modal: Tab leaves it for the page after the last control (no focus trap).

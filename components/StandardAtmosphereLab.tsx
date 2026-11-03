@@ -476,6 +476,7 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
   const readout = useMemo(() => deriveStandardAtmosphereModel(state), [state]);
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   const chartCardRef = useRef<HTMLElement | null>(null);
+  const layersTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const usesTemperature = state.quantityA === "temperature" || state.quantityB === "temperature";
   const usesPressure = state.quantityA === "pressure" || state.quantityB === "pressure";
@@ -530,7 +531,7 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
           </nav>
           <ThemeToggle locale={locale} />
           <button className={state.swapAxes ? "active" : ""} aria-pressed={state.swapAxes} onClick={() => patchState({ swapAxes: !state.swapAxes })}><ArrowLeftRight size={14} /> {copy.actions.swapAxes}</button>
-          <button className={showLayers ? "active" : ""} aria-expanded={showLayers} onClick={() => setShowLayers((v) => !v)}><Layers3 size={14} /> {copy.actions.layers}</button>
+          <button ref={layersTriggerRef} className={showLayers ? "active" : ""} aria-expanded={showLayers} aria-controls="atmosphere-layer-drawer" onClick={() => setShowLayers((v) => !v)}><Layers3 size={14} /> {copy.actions.layers}</button>
           <button onClick={handleExport}><Download size={14} /> {copy.actions.export}</button>
           <button onClick={() => setState(initialStandardAtmosphereState())}><RotateCcw size={14} /> {copy.actions.reset}</button>
         </div>
@@ -634,7 +635,7 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
         {copy.sourceNote}
       </p>
 
-      <AtmosphereLayerDrawer open={showLayers} state={state} onClose={() => setShowLayers(false)} onPatch={patchState} copy={copy} />
+      <AtmosphereLayerDrawer open={showLayers} state={state} onClose={() => setShowLayers(false)} onPatch={patchState} copy={copy} returnFocusRef={layersTriggerRef} />
     </main>
   );
 }
