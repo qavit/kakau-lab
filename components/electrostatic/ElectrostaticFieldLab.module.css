@@ -25,9 +25,9 @@
 .appBarLeft { display: flex; align-items: center; gap: 9px; min-width: 0; }
 /* .catalog-brand is the repo's global wordmark (app/globals.css) — reused verbatim here so the
    brand reads identically to the homepage; only wrapped, never restyled. */
-.appBarLeft :global(.catalog-brand):focus-visible { outline: 2px solid var(--strong); outline-offset: 4px; }
-.appBarDivider { color: var(--line); font-size: 14px; }
-.appBarTitle { margin: 0; color: var(--strong); font: 500 21px/1.2 Georgia, "Noto Serif TC", serif; white-space: nowrap; }
+.appBarLeft :global(.catalog-brand):focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 4px; }
+.appBarDivider { color: var(--lc-muted); font-size: 14px; }
+.labShell .appBarTitle { margin: 0; color: var(--lc-text); font-family: inherit; font-size: 20px; font-weight: 650; line-height: 1.2; letter-spacing: 0; white-space: nowrap; }
 .statusChip {
   display: inline-flex;
   align-items: center;
@@ -45,17 +45,17 @@
 .eyebrow,
 .sectionHeading p {
   margin: 0 0 4px;
-  color: #3e7189;
-  font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
-  letter-spacing: .14em;
+  color: var(--lc-muted);
+  font: 500 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .08em;
 }
 
-.catalogLink { min-height: 40px; display: inline-flex; align-items: center; gap: 6px; padding: 0 13px; border: 1px solid var(--line); border-radius: 7px; color: var(--strong); text-decoration: none; background: var(--btn-bg); font-size: 13px; }
-.catalogLink:focus-visible { outline: 3px solid #e3ad36; outline-offset: 3px; }
+.catalogLink { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border: 1px solid var(--lc-border-control); border-radius: 10px; color: var(--strong); text-decoration: none; background: var(--btn-bg); font-size: 13px; }
+.catalogLink:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 3px; }
 /* The one header action that switches between two whole modes (guided task <-> free
    exploration) reads as a distinct toggle, not another neutral utility button. */
-.modeToggle { border-color: var(--teal); background: var(--tint); color: var(--strong); }
-.modeToggle:hover { border-color: #17505f; background: var(--tint); }
+.modeToggle { border-color: var(--lc-accent); background: var(--tint); color: var(--strong); font-weight: 650; }
+.modeToggle:hover { border-color: var(--lc-accent); background: var(--tint); }
 
 .statusOverlay {
   position: fixed;
@@ -73,14 +73,14 @@
   padding: 10px 12px;
   border-radius: 7px;
   font-size: 14px;
-  box-shadow: 0 8px 22px rgba(16, 48, 66, .18);
+  box-shadow: var(--lc-card-shadow);
   pointer-events: auto;
 }
 .notice { display: flex; align-items: flex-start; gap: 8px; border: 1px solid #b8743c; background: var(--warm-bg); color: var(--warm-ink); }
 .notice > span { flex: 1; }
-.noticeDismiss { display: grid; flex: 0 0 auto; place-items: center; width: 28px; min-width: 28px; min-height: 28px; margin: -4px -5px -4px 0; padding: 0; border: 0; border-radius: 5px; background: transparent; color: inherit; }
+.noticeDismiss { display: grid; flex: 0 0 auto; place-items: center; width: 44px; min-width: 44px; min-height: 44px; margin: -12px -12px -12px 0; padding: 0; border: 0; border-radius: 5px; background: transparent; color: inherit; }
 .noticeDismiss:hover { background: rgba(159, 69, 26, .12); }
-.noticeDismiss:focus-visible { outline: 3px solid #9a542b; outline-offset: 2px; }
+.noticeDismiss:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
 .shareStatus { border: 1px solid #4e8b7d; background: var(--ok-bg); color: var(--ok-ink); }
 
 .workspace {
@@ -100,10 +100,10 @@
      breakpoint below adds only a generous max-height safety valve for short viewports. */
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border: 1px solid #092333;
-  border-radius: 10px;
+  border: 1px solid var(--lc-border);
+  border-radius: 14px;
   background: #071a27;
-  box-shadow: 0 16px 36px rgba(16, 48, 66, .15);
+  box-shadow: var(--lc-card-shadow);
 }
 .canvasHost { position: absolute; inset: 0; overflow: hidden; }
 /* Gate 3 follow-up: the shared Layer Drawer defaults to `top:0`, which overlaps this lab's own
@@ -119,9 +119,9 @@
 .canvasHelp:hover { border-color: #ffd66f; background: #123d56; }
 .viewportToolbar button:focus-visible,
 .canvasHelp:focus-visible,
-.canvasTipClose:focus-visible { outline: 3px solid #ffd66f; outline-offset: 2px; }
-.canvasTip { position: absolute; z-index: 8; right: 12px; bottom: 12px; max-width: min(380px, calc(100% - 24px)); padding: 3px 28px 3px 0; color: #e7f1f4; font-size: 12px; line-height: 1.45; text-shadow: 0 1px 3px #071a27, 0 0 8px #071a27; }
-.canvasTipClose { position: absolute; top: -4px; right: -3px; display: grid; place-items: center; width: 28px; min-width: 28px; min-height: 28px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #e7f1f4; }
+.canvasTipClose:focus-visible { outline: 2px solid var(--lc-focus-on-dark); outline-offset: 2px; }
+.canvasTip { position: absolute; z-index: 8; right: 12px; bottom: 12px; max-width: min(380px, calc(100% - 24px)); padding: 3px 40px 3px 0; color: #e7f1f4; font-size: 12px; line-height: 1.45; text-shadow: 0 1px 3px #071a27, 0 0 8px #071a27; }
+.canvasTipClose { position: absolute; top: -10px; right: -12px; display: grid; place-items: center; width: 44px; min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #e7f1f4; }
 .canvasTipClose:hover { background: rgba(18, 61, 86, .7); color: #ffd66f; }
 .canvasHelp { position: absolute; z-index: 8; right: 12px; bottom: 12px; }
 .fieldStrengthMapLegend { position: absolute; z-index: 6; left: 12px; bottom: 12px; width: min(272px, calc(100% - 82px)); padding: 8px 10px; border: 1px solid rgba(207,224,229,.48); border-radius: 7px; background: rgba(7,26,39,.88); color: #eef5f6; font-size: 11px; line-height: 1.35; pointer-events: none; }
@@ -218,35 +218,35 @@
 .probePanel,
 .legend {
   min-width: 0;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--surface);
-  box-shadow: 0 8px 22px rgba(16, 48, 66, .07);
+  border: 1px solid var(--lc-border);
+  border-radius: 14px;
+  background: var(--lc-raised);
+  box-shadow: var(--lc-card-shadow);
 }
 .controls { padding: 16px; }
 .intentPanel { display: grid; gap: 12px; padding: 22px; }
-.intentPanel h2 { margin: 0; font: 500 25px/1.25 Georgia, "Noto Serif TC", serif; }
+.intentPanel h2 { margin: 0; font-size: 24px; font-weight: 650; line-height: 1.3; }
 .intentPanel > p:not(.eyebrow) { margin: 0; color: var(--body); line-height: 1.65; }
-.intentChoice { display: grid; gap: 4px; width: 100%; min-height: 72px; padding: 13px 15px; border: 1px solid var(--line-strong); border-radius: 9px; text-align: left; background: var(--field-bg); color: var(--strong); }
-.intentChoice:hover { border-color: var(--teal); background: var(--tint-soft); }
+.intentChoice { display: grid; gap: 4px; width: 100%; min-height: 72px; padding: 13px 15px; border: 1px solid var(--line-strong); border-radius: 12px; text-align: left; background: var(--field-bg); color: var(--strong); }
+.intentChoice:hover { border-color: var(--lc-accent); background: var(--tint-soft); }
 .intentChoice strong { font-size: 17px; }
-.intentChoice span { color: var(--body); font-size: 12px; line-height: 1.5; }
-.taskPreview { display: grid; gap: 5px; padding: 0 8px; color: var(--body); font-size: 12px; }
+.intentChoice span { color: var(--body); font-size: 13px; line-height: 1.5; }
+.taskPreview { display: grid; gap: 5px; padding: 0 8px; color: var(--body); font-size: 13px; }
 .mobileTabs { display: none; }
 .sectionHeading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-.sectionHeading h2 { margin: 0; font: 500 20px Georgia, "Noto Serif TC", serif; }
+.sectionHeading h2 { margin: 0; font-size: 20px; font-weight: 650; line-height: 1.3; }
 .probeSelectionHeading { margin-bottom: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-.controlGroup { margin: 0 0 15px; padding: 11px; border: 1px solid var(--line); border-radius: 7px; }
+.controlGroup { margin: 0 0 15px; padding: 11px; border: 1px solid var(--lc-border); border-radius: 10px; }
 .controlGroup legend { padding: 0 6px; color: var(--strong); font-size: 13px; font-weight: 700; }
-.controlGroup summary { padding: 0 6px; color: var(--strong); font-size: 13px; font-weight: 700; cursor: pointer; }
+.controlGroup summary { box-sizing: border-box; min-height: 44px; padding: 12px 6px; color: var(--strong); font-size: 13px; font-weight: 700; cursor: pointer; }
 .controlGroup summary + .presetGrid { margin-top: 8px; }
 .controls button,
 .controls input { min-height: 44px; }
-.controls button { border-radius: 7px; transform: none; }
+.controls button { border-radius: 10px; transform: none; }
 .controls button:focus-visible,
-.controls input:focus-visible { outline: 3px solid #d9a735; outline-offset: 2px; }
+.controls input:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
 .controls button:disabled { cursor: not-allowed; opacity: .48; }
-.activeButton { border-color: var(--teal) !important; background: var(--tint) !important; box-shadow: inset 0 0 0 1px var(--teal); }
+.activeButton { border-color: var(--lc-accent) !important; background: var(--tint) !important; box-shadow: inset 0 0 0 1px var(--lc-accent); }
 .presetGrid { display: grid; grid-template-columns: 1fr; gap: 6px; }
 .presetGrid button { display: grid; gap: 2px; text-align: left; padding: 9px 11px; }
 .presetGrid button small { color: var(--body); line-height: 1.35; }
@@ -261,12 +261,12 @@
 .parameterGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
 .parameterGrid > button { grid-column: 1 / -1; }
 .parameterGrid label { display: grid; gap: 4px; color: var(--body); font-size: 12px; }
-.parameterGrid input { width: 100%; min-width: 0; padding: 8px 9px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--field-bg); color: var(--strong); }
-.numberField { display: grid; align-content: start; gap: 4px; min-width: 0; color: var(--body); font-size: 11px; font-weight: 700; letter-spacing: .02em; }
+.parameterGrid input { width: 100%; min-width: 0; padding: 8px 9px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--field-bg); color: var(--strong); }
+.numberField { display: grid; align-content: start; gap: 4px; min-width: 0; color: var(--body); font-size: 12px; font-weight: 700; letter-spacing: .02em; }
 .numberFieldLabel { line-height: 1.2; }
 .numberInputWithUnit { display: flex; align-items: center; gap: 7px; min-width: 0; }
-.numberInputWithUnit input { width: min(100%, 120px); min-width: 0; min-height: 44px; padding: 7px 11px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--field-bg); color: var(--strong); font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.numberInputWithUnit input:hover { border-color: #5e91a6; }
+.numberInputWithUnit input { width: min(100%, 120px); min-width: 0; min-height: 44px; padding: 7px 11px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--field-bg); color: var(--strong); font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.numberInputWithUnit input:hover { border-color: var(--lc-accent); }
 .numberUnit { flex: 0 0 auto; color: var(--body); font-size: 14px; font-weight: 800; }
 .probeControls { margin: 0 0 10px; }
 .probeControls .parameterGrid { margin-top: 0; gap: 12px; }
@@ -282,9 +282,11 @@
 .chargeRow { display: grid; grid-template-columns: 88px max-content; align-items: end; justify-content: start; gap: 10px; }
 .signToggle { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
 .signOption { border: 1px solid var(--line-strong); background: var(--field-bg); color: var(--strong); font-size: 17px; font-weight: 700; }
-.signOptionActive { border: 1px solid var(--teal); background: var(--tint); color: var(--strong); font-size: 17px; font-weight: 700; box-shadow: inset 0 0 0 1px var(--teal); }
+.signOptionActive { border: 1px solid var(--lc-accent); background: var(--tint); color: var(--strong); font-size: 17px; font-weight: 700; box-shadow: inset 0 0 0 1px var(--lc-accent); }
 .sourcePositionRow { display: grid; grid-template-columns: repeat(2, max-content); gap: 12px; }
-.fieldError { color: #9a3b29; font-size: 11px; line-height: 1.4; }
+.fieldError { color: #9a3b29; font-size: 12px; line-height: 1.4; }
+:global(html[data-mode="dark"]) .fieldError { color: #f0a998; }
+@media (prefers-color-scheme: dark) { :global(html:not([data-mode])) .fieldError { color: #f0a998; } }
 .numberField input[aria-invalid="true"] { border-color: #b44d38; background: var(--warm-bg); }
 
 /* A selected source has two small, independent edits. At a usable width, place them side by
@@ -297,7 +299,7 @@
   [data-testid="selected-source-controls"] .sourceEditorGroup + .sourceEditorGroup { padding-top: 0; border-top: 0; }
 }
 .helperText,
-.keyboardHelp { margin: 9px 0 0; color: var(--body); font-size: 12px; line-height: 1.55; }
+.keyboardHelp { margin: 9px 0 0; color: var(--body); font-size: 13px; line-height: 1.55; }
 .inspectorLead { margin: 0 0 13px; color: var(--body); line-height: 1.6; }
 .toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: 12px; }
 .inspectorActions { display: grid; gap: 7px; margin-top: 7px; }
@@ -306,26 +308,27 @@
 .hintDisclosure { margin-top: 10px; border-top: 1px solid var(--line); }
 .precisionDisclosure summary,
 .readoutDetails summary,
-.hintDisclosure summary { cursor: pointer; padding: 10px 0 3px; color: var(--strong); font-weight: 700; font-size: 13px; }
+.hintDisclosure summary { box-sizing: border-box; min-height: 44px; cursor: pointer; padding: 12px 0; color: var(--strong); font-weight: 700; font-size: 13px; }
 .hintDisclosure p,
 .readoutDetails p { color: var(--body); font-size: 12px; line-height: 1.6; }
-.shareButton { background: var(--primary) !important; border-color: var(--primary) !important; color: #fff !important; }
+.shareButton { background: var(--lc-accent) !important; border-color: var(--lc-accent) !important; color: var(--lc-on-accent) !important; font-weight: 650; }
 
 .evidenceGrid { display: grid; justify-content: start; grid-template-columns: repeat(auto-fit, minmax(300px, 480px)); gap: 14px; margin-top: 14px; }
 .probePanel,
 .legend { padding: 16px; }
 .readoutPanel { min-width: 0; margin-top: 13px; padding: 13px 16px 16px; border-top: 1px solid var(--line); }
-.readoutPanel h3 { margin: 0 0 9px; font: 500 18px Georgia, "Noto Serif TC", serif; }
+.readoutPanel h3 { margin: 0 0 9px; font-size: 18px; font-weight: 650; line-height: 1.3; }
 .readoutIntro { margin: -2px 0 10px; color: var(--body); font-size: 12px; line-height: 1.55; }
 .heroReadout { display: grid; gap: 4px; padding: 13px; border-radius: 8px; background: var(--tint-soft); }
 .heroReadout span { color: var(--body); font-size: 12px; }
 .heroReadout strong { font-size: 23px; font-variant-numeric: tabular-nums; }
 .heroReadout small { color: var(--body); }
 .probeReadoutPanel { margin-top: 8px; padding: 12px 0 0; border-top-color: var(--line); }
+.probeReadoutPanel[data-probe-state="gated"] { padding: 12px 16px 16px; }
 .probeReadout { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 13px 14px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(135deg, var(--tint-soft), var(--tint-soft)); }
 .probeReadoutMagnitude { display: grid; gap: 4px; min-width: 0; }
 .probeReadoutTitle,
-.probeReadoutDirection > span { color: var(--body); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+.probeReadoutDirection > span { color: var(--body); font-size: 12px; font-weight: 700; letter-spacing: .04em; }
 .probeEquation { display: flex; align-items: baseline; gap: 5px; color: var(--strong); font-size: 16px; line-height: 1.2; white-space: nowrap; }
 .probeEquationFormula { display: inline-flex; align-items: baseline; color: inherit; font-size: 16px; line-height: 1; }
 .probeEquationFormula :global(svg) { width: auto; height: 1.25em; vertical-align: -.12em; }
@@ -335,7 +338,7 @@
 .probeReadoutDirection strong { color: var(--strong); font-size: 16px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .statusStrip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 0 0 10px; }
 .statusStrip div { padding: 8px; border-radius: 6px; background: var(--tint-soft); }
-.statusStrip dt { color: var(--body); font-size: 10px; }
+.statusStrip dt { color: var(--body); font-size: 12px; }
 .statusStrip dd { margin: 3px 0 0; font-size: 12px; font-weight: 700; }
 .invalidReadout { display: grid; gap: 5px; padding: 14px; border: 1px dashed #8a5a35; border-radius: 7px; background: repeating-linear-gradient(135deg, var(--warm-bg), var(--warm-bg) 8px, var(--warm-bg) 8px, var(--warm-bg) 12px); color: var(--warm-ink); }
 .invalidReadout span { font-size: 13px; line-height: 1.55; }
@@ -353,7 +356,7 @@
 .probeTable tbody tr:focus-visible { box-shadow: inset 0 0 0 2px #e3ad36; }
 .totalReadout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0 0; }
 .totalReadout div { padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--field-bg); }
-.totalReadout dt { color: var(--body); font-size: 11px; }
+.totalReadout dt { color: var(--body); font-size: 12px; }
 .totalReadout dd { margin: 4px 0 0; font-size: 13px; font-weight: 700; }
 .legendScale { margin: 0 0 12px; color: var(--body); font-size: 13px; }
 .legendList { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
@@ -361,7 +364,7 @@
 .legendList strong,
 .legendList small { display: block; }
 .legendList strong { font-size: 13px; }
-.legendList small { margin-top: 2px; color: var(--body); font-size: 11px; }
+.legendList small { margin-top: 2px; color: var(--body); font-size: 12px; }
 .legendGlyph { display: grid; place-items: center; width: 34px; height: 28px; color: var(--strong); font-weight: 800; }
 .zeroGlyph { border: 1px solid var(--strong); border-radius: 50%; }
 .lowGlyph { border-bottom: 2px dashed var(--muted); color: var(--muted); }
@@ -374,7 +377,7 @@
 .positiveMark { border-radius: 50%; background: #ef6a64; }
 .negativeMark { background: #76c8d5; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 
-.footer { display: flex; justify-content: space-between; gap: 15px; margin-top: 15px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--body); font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.footer { display: flex; justify-content: space-between; gap: 15px; margin-top: 15px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--lc-muted); font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 .headerActions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
@@ -383,58 +386,58 @@
 .headerActions .catalogLink { font: 500 13px/1.2 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 .headerActions button { cursor: pointer; }
 /* Keep the active trigger above the right-side drawer so a second click is a true close affordance. */
-.activeHeaderAction { position: relative; z-index: 71; border-color: var(--teal); background: var(--tint); box-shadow: inset 0 0 0 1px var(--teal); }
+.activeHeaderAction { position: relative; z-index: 71; border-color: var(--lc-accent); background: var(--tint); box-shadow: inset 0 0 0 1px var(--lc-accent); }
 .guidedPanel { padding: 16px; }
 .guidedPanel button,
 .guidedPanel input { min-height: 44px; }
 .guidedPanel button:focus-visible,
-.guidedPanel input:focus-visible { outline: 3px solid #d9a735; outline-offset: 2px; }
+.guidedPanel input:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
 .guidedPanel button:disabled { cursor: not-allowed; opacity: .48; }
 .activityTabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-bottom: 12px; }
-.guidedHeading { margin: 0 0 10px; font: 500 19px Georgia, "Noto Serif TC", serif; }
-.guidedHeading:focus-visible { outline: 3px solid #d9a735; outline-offset: 3px; }
+.guidedHeading { margin: 0 0 10px; font-size: 19px; font-weight: 650; line-height: 1.35; }
+.guidedHeading:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 3px; }
 .taskProgress { margin: -2px 0 14px; padding: 6px 0 8px; }
 .taskProgress ol { display: grid; padding: 0; margin: 0; list-style: none; }
-.taskProgress li { position: relative; display: grid; justify-items: center; align-content: start; gap: 6px; min-width: 0; color: var(--body); font-size: 10px; line-height: 1.25; text-align: center; }
+.taskProgress li { position: relative; display: grid; justify-items: center; align-content: start; gap: 6px; min-width: 0; color: var(--body); font-size: 12px; line-height: 1.25; text-align: center; }
 .taskProgress li::before { content: ""; position: absolute; z-index: 0; top: 6px; right: 50%; width: 100%; height: 2px; background: var(--line); }
 .taskProgress li:first-child::before { display: none; }
 .progressNode { position: relative; z-index: 1; display: block; width: 12px; height: 12px; border: 2px solid var(--line-strong); border-radius: 50%; background: var(--field-bg); }
 .progressLabel { max-width: 100%; min-height: 2.5em; padding: 0 3px; overflow-wrap: anywhere; }
-.taskProgress li[data-complete="true"] { color: var(--teal); font-weight: 700; }
+.taskProgress li[data-complete="true"] { color: var(--lc-accent); font-weight: 700; }
 .taskProgress li[data-complete="true"]::before,
 .taskProgress li[data-current="true"]::before { background: #5791a3; }
-.taskProgress li[data-complete="true"] .progressNode { border-color: var(--teal); background: var(--teal); }
+.taskProgress li[data-complete="true"] .progressNode { border-color: var(--lc-accent); background: var(--lc-accent); }
 .taskProgress li[data-current="true"] { color: var(--strong); font-weight: 800; }
-.taskProgress li[data-current="true"] .progressNode { width: 16px; height: 16px; margin-top: -2px; border: 4px solid var(--surface-solid); background: var(--teal); box-shadow: 0 0 0 2px var(--teal); }
+.taskProgress li[data-current="true"] .progressNode { width: 16px; height: 16px; margin-top: -2px; border: 4px solid var(--surface-solid); background: var(--lc-accent); box-shadow: 0 0 0 2px var(--lc-accent); }
 .guidedForm { display: grid; gap: 10px; margin-bottom: 12px; }
 .guidedPrompt { margin: 0; line-height: 1.6; }
 .trajectoryChoiceGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
 .trajectoryChoice { display: grid; justify-items: center; align-content: start; gap: 3px; min-width: 0; min-height: 112px; padding: 7px 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--field-bg); color: var(--strong); cursor: pointer; text-align: center; }
-.trajectoryChoice:has(input:checked) { border-color: var(--teal); background: var(--tint); box-shadow: inset 0 0 0 1px var(--teal); }
+.trajectoryChoice:has(input:checked) { border-color: var(--lc-accent); background: var(--tint); box-shadow: inset 0 0 0 1px var(--lc-accent); }
 .trajectoryChoice input { width: 18px; height: 18px; min-height: 0; margin: 0; }
 .trajectoryChoice svg { width: min(78px, 100%); height: 58px; overflow: visible; }
 .trajectoryGuide { fill: none; stroke: var(--line-strong); stroke-width: 2; stroke-dasharray: 3 3; }
-.trajectoryPath { fill: none; stroke: var(--teal); stroke-width: 4; stroke-linecap: round; }
+.trajectoryPath { fill: none; stroke: var(--lc-accent); stroke-width: 4; stroke-linecap: round; }
 .trajectoryStart { fill: #d9a735; stroke: var(--strong); stroke-width: 1.5; }
-.trajectoryChoice > span { font-size: 11px; font-weight: 750; line-height: 1.25; }
+.trajectoryChoice > span { font-size: 12px; font-weight: 750; line-height: 1.25; }
 .guidedMagnitudeControl { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--tint-soft); }
 .guidedMagnitudeControl > label { color: var(--strong); font-size: 14px; font-weight: 750; }
 .guidedMagnitudeField { display: inline-flex; align-items: center; gap: 7px; color: var(--strong); font-size: 14px; font-weight: 700; white-space: nowrap; }
 .guidedMagnitudeField input { width: 78px; min-height: 44px; padding: 7px 8px; border: 2px solid var(--line-strong); border-radius: 7px; background: var(--field-bg); color: var(--strong); font: 700 17px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
-.guidedMagnitudeField input:hover { border-color: var(--teal); }
-.guidedVerdict { margin: 0; padding: 10px; border-left: 3px solid var(--teal); background: var(--tint-soft); line-height: 1.55; }
+.guidedMagnitudeField input:hover { border-color: var(--lc-accent); }
+.guidedVerdict { margin: 0; padding: 10px; border-left: 3px solid var(--lc-accent); background: var(--tint-soft); line-height: 1.55; }
 .choiceGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 6px; }
 .choiceGrid[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .choiceGrid[data-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 420px) { .choiceGrid[data-count="3"] { grid-template-columns: 1fr; } }
 .choice { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 7px; cursor: pointer; }
-.choice:has(input:checked) { border-color: var(--teal); background: var(--tint); }
+.choice:has(input:checked) { border-color: var(--lc-accent); background: var(--tint); }
 .choice input { min-height: 0; width: 18px; height: 18px; }
 .revealList { margin: 0; padding-left: 20px; line-height: 1.7; }
 .guidedActions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; margin-top: 8px; }
-.readoutLink { display: inline-flex; align-items: center; width: fit-content; min-height: 36px; padding: 6px 9px; border: 1px solid var(--line-strong); border-radius: 7px; color: var(--strong); font-size: 13px; font-weight: 700; text-decoration: none; }
-.readoutLink:hover { border-color: var(--teal); background: var(--tint-soft); }
-.readoutLink:focus-visible { outline: 3px solid #d9a735; outline-offset: 2px; }
+.readoutLink { display: inline-flex; align-items: center; width: fit-content; min-height: 44px; padding: 6px 12px; border: 1px solid var(--line-strong); border-radius: 10px; color: var(--strong); font-size: 13px; font-weight: 700; text-decoration: none; }
+.readoutLink:hover { border-color: var(--lc-accent); background: var(--tint-soft); }
+.readoutLink:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
 .comparisonCard { display: grid; gap: 10px; padding: 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--field-bg); }
 .feedbackStatus { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 8px; padding: 8px; border-radius: 6px; }
 .feedbackStatus > svg { margin-top: 1px; }
@@ -445,11 +448,11 @@
 .feedbackMiss { background: var(--warm-bg); color: var(--warm-ink); }
 .comparisonGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin: 0; }
 .comparisonGrid > div { min-width: 0; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--tint-soft); }
-.comparisonGrid dt { color: var(--body); font-size: 11px; }
+.comparisonGrid dt { color: var(--body); font-size: 12px; }
 .comparisonGrid dd { margin: 3px 0 0; color: var(--strong); font-size: 14px; font-weight: 800; }
 .feedbackExplanation { margin: 0; color: var(--body); font-size: 13px; line-height: 1.55; }
 .feedbackDetails { color: var(--body); font-size: 13px; line-height: 1.55; }
-.feedbackDetails summary { cursor: pointer; font-weight: 700; }
+.feedbackDetails summary { box-sizing: border-box; min-height: 44px; padding: 12px 0; cursor: pointer; font-weight: 700; }
 .feedbackDetails p { margin: 7px 0 0; }
 
 /* Spatial direction chooser: real radio inputs laid out NW/N/NE, W/·/E, SW/S/SE so the choice
@@ -487,37 +490,42 @@
   opacity: 0;
   cursor: pointer;
 }
-.compassCell:has(input:checked) { border-color: var(--teal); border-width: 2px; background: var(--tint); }
+.compassCell:has(input:checked) { border-color: var(--lc-accent); border-width: 2px; background: var(--tint); }
 .compassCell:has(input:checked) .compassArrow { font-weight: 900; }
 .compassCell:has(input:checked) .compassWord { color: var(--strong); font-weight: 700; }
-.compassCell:has(input:focus-visible) { outline: 3px solid #d9a735; outline-offset: 2px; }
+.compassCell:has(input:focus-visible) { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
 .compassArrow { font-size: 19px; line-height: 1; color: var(--strong); }
-.compassWord { font-size: 9px; color: var(--muted); }
+.compassWord { font-size: 11px; color: var(--muted); }
 
 /* Compact single dock (Projectile's `.projectile-transport` grammar): ~34px controls, one row
    that wraps rather than a permanent second row for the scrub bar or the help sentence. */
-.timeControls { padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--field-bg); box-shadow: 0 7px 18px rgba(16,48,66,.07); }
+.timeControls { padding: 8px 12px; border: 1px solid var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
 .iconButton { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .transportRow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .transportRow button,
-.transportRow select { min-height: 34px; padding: 0 11px; border-radius: 7px; font-size: 12px; }
+.transportRow select { min-height: 44px; padding: 0 12px; border-radius: 10px; font-size: 13px; }
+.transportRow > .helpPopoverWrap > summary { min-width: 44px; min-height: 44px; border-radius: 10px; }
 .transportRow button:focus-visible,
-.transportRow select:focus-visible { outline: 3px solid #d9a735; outline-offset: 2px; }
+.transportRow select:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
 /* Disabled dock controls are muted with an explicit colour rather than opacity: at the compact
    dock's 12px type, `opacity: .48` blended the label into the card at 3.29:1, below the 4.5:1
    minimum. This keeps the same "inactive" read at 4.7:1. */
 .transportRow button:disabled { cursor: not-allowed; color: var(--body); border-color: var(--line); background: var(--tint-soft); }
 .speedSelect { width: auto; min-width: 56px; flex: 0 0 auto; }
-.timelineLabel { color: var(--body); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
-.timelineInput { flex: 1 1 110px; min-width: 90px; -webkit-appearance: none; appearance: none; height: 8px; border-radius: 4px; cursor: pointer;
-  background: linear-gradient(to right, #7fa9bb var(--simulated, 0%), var(--line) var(--simulated, 0%)); }
-.timelineInput::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--teal); border: 2px solid var(--surface-solid); box-shadow: 0 0 0 1px var(--teal); }
-.timelineInput::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--teal); border: 2px solid var(--surface-solid); }
-.timelineInput:focus-visible { outline: 3px solid #d9a735; outline-offset: 3px; }
+.timelineLabel { color: var(--body); font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
+.timelineInput { flex: 1 1 110px; min-width: 90px; -webkit-appearance: none; appearance: none; cursor: pointer; }
+/* lab-c2.css gives every range a 44px hit band and a transparent background (specificity 0,2,1);
+   the progress fill therefore lives on the track pseudo-elements, which that rule does not reach. */
+.labShell .timelineInput[type="range"] { height: 44px; border-radius: 4px; background: transparent; }
+.timelineInput::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: linear-gradient(to right, var(--lc-accent) var(--simulated, 0%), var(--lc-border-control) var(--simulated, 0%)); }
+.timelineInput::-moz-range-track { height: 8px; border-radius: 4px; background: linear-gradient(to right, var(--lc-accent) var(--simulated, 0%), var(--lc-border-control) var(--simulated, 0%)); }
+.timelineInput::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -6px; border-radius: 50%; background: var(--lc-accent); border: 2px solid var(--lc-raised); box-shadow: 0 0 0 1px var(--lc-accent); }
+.timelineInput::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--lc-accent); border: 2px solid var(--lc-raised); }
+.timelineInput:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 3px; }
 .helpPopoverWrap { position: relative; }
 .helpPopoverWrap > summary { list-style: none; cursor: pointer; }
 .helpPopoverWrap > summary::-webkit-details-marker { display: none; }
-.helpPopoverWrap > summary:focus-visible { outline: 3px solid #d9a735; outline-offset: 2px; }
+.helpPopoverWrap > summary:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
 /* Opens upward: the dock sits near the bottom of the page, so a downward popover ran off the
    bottom edge. Stays absolutely positioned (it scrolls with the dock); only its horizontal
    offset is measured in TimeControls.tsx, because the transport row wraps at narrow widths and
@@ -531,7 +539,7 @@
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--field-bg);
-  box-shadow: 0 12px 28px rgba(16, 48, 66, .18);
+  box-shadow: var(--lc-card-shadow);
   color: var(--body);
   font-size: 12px;
   line-height: 1.55;
@@ -540,7 +548,7 @@
 .presetPopoverWrap { position: relative; }
 .presetPopoverWrap > summary { list-style: none; cursor: pointer; }
 .presetPopoverWrap > summary::-webkit-details-marker { display: none; }
-.presetPopoverWrap > summary:focus-visible { outline: 3px solid #e3ad36; outline-offset: 3px; }
+.presetPopoverWrap > summary:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 3px; }
 /* Fixed to the viewport rather than anchored to the (often icon-narrow) trigger's own box —
    an absolute `right:0` anchor made the popover jump far to the left of its trigger once the
    trigger collapsed to icon-only width on phones. Fixed positioning anchors it to the app bar
@@ -557,7 +565,7 @@
   border: 1px solid var(--line);
   border-radius: 9px;
   background: var(--field-bg);
-  box-shadow: 0 16px 36px rgba(16, 48, 66, .18);
+  box-shadow: var(--lc-card-shadow);
 }
 .presetCategory + .presetCategory { margin-top: 14px; }
 .presetCategory h2 { margin: 0 0 7px; color: var(--strong); font-size: 13px; font-weight: 700; }
@@ -596,7 +604,7 @@
   /* One-line compact app bar even at phone widths: brand collapses to its icon and the header
      actions collapse to icon-only (Solar/Projectile's existing narrow-header convention), rather
      than wrapping the bar to a second or third line. */
-  .appBar { flex-wrap: nowrap; gap: 6px; }
+  .appBar { flex-wrap: nowrap; gap: 6px 8px; }
   .appBarDivider { display: none; }
   /* Collapse the wordmark to just its icon so the bar stays one line; the global
      .catalog-brand rule itself is left untouched, so it still matches the homepage
@@ -604,10 +612,11 @@
   .appBarLeft :global(.catalog-brand) { gap: 0; font-size: 0; }
   .appBarLeft :global(.catalog-brand) :global(.kakau-lab-mark__wordmark) { display: none; }
   .appBarLeft :global(.catalog-brand) :global(.kakau-lab-mark__symbol) { display: block; width: 18px; height: 18px; }
-  .appBarTitle { font-size: 16px; }
+  .labShell .appBarTitle { font-size: 17px; }
   .statusChip { padding: 3px 6px; font-size: 9px; }
-  .headerActions { flex-wrap: nowrap; gap: 3px; }
-  .headerActions .catalogLink { gap: 0; min-height: 36px; padding: 0 8px; font-size: 0; }
+  .headerActions { flex-wrap: nowrap; justify-content: flex-start; gap: 6px; }
+  .headerActions .catalogLink { gap: 0; min-width: 44px; min-height: 44px; justify-content: center; padding: 0; font-size: 0; }
+  .appBarLeft :global(.catalog-brand) { min-width: 44px; min-height: 44px; justify-content: center; }
   .workspace { gap: 10px; margin-top: 10px; }
   .viewportCard { min-height: 360px; }
   .controls { grid-template-columns: 1fr; }
@@ -616,11 +625,20 @@
   .primaryActions { grid-column: auto; }
   .evidenceGrid { gap: 10px; margin-top: 10px; }
   .footer { flex-direction: column; }
-  .mobileTabs { position: fixed; z-index: 30; right: 8px; bottom: 8px; left: 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 6px; border: 1px solid var(--line); border-radius: 12px; background: rgba(250,253,254,.96); box-shadow: 0 8px 28px rgba(10,42,60,.22); backdrop-filter: blur(10px); }
-  .mobileTabs button { min-height: 44px; border-radius: 8px; }
-  .mobileTabs button[aria-pressed="true"] { border-color: var(--teal); background: var(--tint); }
+  .mobileTabs { position: fixed; z-index: 30; right: 8px; bottom: 8px; left: 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 6px; border: 1px solid var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+  .mobileTabs button { min-height: 44px; border-radius: 10px; }
+  .mobileTabs button[aria-pressed="true"] { border-color: var(--lc-accent); background: var(--tint); box-shadow: inset 0 0 0 1px var(--lc-accent); font-weight: 650; }
+  .mobileTabs button:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
   .labShell { padding-bottom: 80px; }
   .timelineInput { flex-basis: 100%; }
+}
+
+/* Below ~420px the one-line bar cannot hold the brand, title and five 44px actions: the actions take a
+   second row (icon-only, as before) instead of shrinking under 44px. */
+@media (max-width: 420px) {
+  .appBar { flex-wrap: wrap; }
+  .appBarLeft { flex: 1 1 auto; }
+  .headerActions { flex: 1 1 100%; }
 }
 
 @media (max-width: 480px) {
@@ -652,7 +670,7 @@
 
 /* Guided attention: a persistent, static "look here" treatment. Nothing here animates, so
    prefers-reduced-motion keeps exactly the same cue. */
-.focusInstruction { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; margin: 10px 0; padding: 9px 12px; border-left: 4px solid #d9a735; border-radius: 0 7px 7px 0; background: var(--warm-bg); color: #3d3418; font-size: 14px; line-height: 1.55; }
+.focusInstruction { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; margin: 10px 0; padding: 9px 12px; border-left: 4px solid #d9a735; border-radius: 0 7px 7px 0; background: var(--warm-bg); color: var(--warm-ink); font-size: 14px; line-height: 1.55; }
 .focusBadge { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #d9a735; color: #2b2410; font-size: 11px; font-weight: 700; letter-spacing: .02em; white-space: nowrap; }
 .focusedPanel { border-left: 4px solid #d9a735; background: var(--warm-bg); }
 .focusHalo {
@@ -670,6 +688,6 @@
 
 .headingRow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 0 10px; }
 .headingRow .guidedHeading { margin: 0; }
-.phaseChip { padding: 2px 10px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--tint-soft); color: var(--body); font-size: 12px; white-space: nowrap; }
+.phaseChip { padding: 4px 10px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--tint-soft); color: var(--body); font-size: 12px; white-space: nowrap; }
 .heroLine { margin: 0; font-size: 15px; color: var(--strong); }
 .readoutInline { margin-top: 10px; }

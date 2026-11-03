@@ -585,7 +585,7 @@ export default function ElectrostaticFieldLab({ share }: ElectrostaticFieldLabPr
   return (
     <MathProvider><main
       ref={shellRef}
-      className={styles.labShell}
+      className={`${styles.labShell} lab-c2`}
       data-testid="electrostatic-lab"
       data-source-count={setup.sources.length}
       data-mode={entryPending ? "intent" : learning ? "guided" : "sandbox"}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { socialMetadata } from "@/lib/site-metadata";
 import ElectrostaticFieldLab from "@/components/ElectrostaticFieldLab";
 import type { ShareRouteInput } from "@/components/electrostatic/share";
+import "../lab-c2.css";
 
 export const metadata: Metadata = {
   title: "靜電學｜Kakau Lab",
