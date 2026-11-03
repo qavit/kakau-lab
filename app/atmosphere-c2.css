@@ -53,6 +53,8 @@
 /* ---- Layer drawer: shared rows in lab-c2.css; the axis-scale rows are Atmosphere-only ---- */
 /* The closed drawer is parked off-canvas but its shadow reached back onto the page's right edge. */
 .atmosphere-c2 .layer-drawer:not(.open) { box-shadow: none; }
+/* The layer drawer starts below the header so the header's right end (the appearance menu) stays usable while it is open. */
+.atmosphere-c2 .layer-drawer { top: var(--lab-appbar-bottom, 0); }
 .atmosphere-c2 .drawer-scroll details { border-bottom-color: var(--lc-border); }
 .atmosphere-c2 .layer-drawer>header button { border-color: var(--lc-border-control); }
 .atmosphere-profile-lab.atmosphere-c2 .layer-drawer .coordinate-row strong { color: var(--lc-text); }

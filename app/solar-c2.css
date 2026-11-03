@@ -31,6 +31,8 @@
 .solar-c2 .header-actions button.primary-action:hover:not(:disabled),
 .solar-c2 .export-modal button.primary-action:hover:not(:disabled) { background: var(--lc-accent); filter: brightness(.92); }
 .solar-c2 button:disabled, .solar-c2 select:disabled { cursor: not-allowed; opacity: .5; }
+/* The layer drawer starts below the header so the header's right end (the appearance menu) stays usable while it is open. */
+.solar-c2 .layer-drawer { top: var(--lab-appbar-bottom, 0); }
 /* ---- Focus: 2px in the interface colour. No focusable control sits on the dark canvases. ---- */
 .solar-c2 :is(button, a, input, select, summary):focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
 /* ---- Computed results ---- */

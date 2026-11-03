@@ -27,6 +27,7 @@ import ExportDialog from "@/components/solar/ExportDialog";
 import LayerDrawer from "@/components/solar/LayerDrawer";
 import KakauLabMark from "@/components/KakauLabMark";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useAppBarClearance } from "@/components/layers/useAppBarClearance";
 
 export default function SolarLab() {
   const globalRef = useRef<HTMLDivElement>(null);
@@ -34,6 +35,9 @@ export default function SolarLab() {
   const sceneRef = useRef<SolarSceneApi | null>(null);
   const directoryRef = useRef<DirectoryHandle | null>(null);
   const layersTriggerRef = useRef<HTMLButtonElement>(null);
+  const shellRef = useRef<HTMLElement>(null);
+  const appBarRef = useRef<HTMLElement>(null);
+  useAppBarClearance(shellRef, appBarRef);
   const previousTraceTime = useRef<number | null>(null);
 
   const [state, setState] = useState<SolarLabState>(initialSolarState);
@@ -151,8 +155,8 @@ export default function SolarLab() {
   }, [exportTarget, exportMode, lineWidth, exportShadowTimes, state.latitude, state.day]);
 
   return (
-    <main className="lab-shell solar-c2 lab-c2">
-      <header className="topbar">
+    <main ref={shellRef} className="lab-shell solar-c2 lab-c2">
+      <header ref={appBarRef} className="topbar">
         <div>
           <Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link>
           <div className="eyebrow"><span className="live-dot" /> 模型 01</div>
