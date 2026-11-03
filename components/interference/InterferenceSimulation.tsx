@@ -1,5 +1,6 @@
 "use client";
 
+import ThemeToggle from "@/components/ThemeToggle";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { mountInterference } from "@/components/interference/mountInterference";
 import { MathProvider, Tex, TexBlock } from "@/components/math/MathJax";
@@ -77,6 +78,7 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
       <p className="if-mode" data-mode-status>課本模式</p>
       <button type="button" className="btn btn--ghost" data-action="projection" aria-pressed="false" onClick={toggleProjection}>投影模式</button>
       <button type="button" className="btn btn--ghost" data-action="reset-parameters">重設參數</button>
+      <ThemeToggle />
     </header>
     <div className="if-body">
       <div className="if-stage">

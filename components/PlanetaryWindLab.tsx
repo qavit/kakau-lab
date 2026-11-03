@@ -365,7 +365,7 @@ export default function PlanetaryWindLab() {
           <h1><span className="live-dot" />全球行星風系</h1>
         </div>
         <div className="header-actions">
-          <ThemeToggle />
+          <ThemeToggle variant="segmented" />
           <Link className="model-index-link" href="/">模型目錄</Link>
           <button onClick={() => setState(initialAtmosphereState())}><RotateCcw size={14} /> 重設</button>
         </div>

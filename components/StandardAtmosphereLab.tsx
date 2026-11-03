@@ -529,11 +529,11 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
           <nav className="language-switcher" aria-label={copy.language.label}>
             {(["zh-TW", "en"] as const).map((target) => <Link key={target} href={localizedPath(target, "/atmosphere-profile")} lang={target} aria-current={target === locale ? "page" : undefined}>{copy.language[target]}</Link>)}
           </nav>
-          <ThemeToggle locale={locale} />
           <button className={state.swapAxes ? "active" : ""} aria-pressed={state.swapAxes} onClick={() => patchState({ swapAxes: !state.swapAxes })}><ArrowLeftRight size={14} /> {copy.actions.swapAxes}</button>
           <button ref={layersTriggerRef} className={showLayers ? "active" : ""} aria-expanded={showLayers} aria-controls="atmosphere-layer-drawer" onClick={() => setShowLayers((v) => !v)}><Layers3 size={14} /> {copy.actions.layers}</button>
           <button onClick={handleExport}><Download size={14} /> {copy.actions.export}</button>
           <button onClick={() => setState(initialStandardAtmosphereState())}><RotateCcw size={14} /> {copy.actions.reset}</button>
+          <ThemeToggle locale={locale} />
         </div>
       </div>
 

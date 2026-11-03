@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function ProjectileNotesPage() {
   return (
     <main className="about-page">
-      <nav className="about-nav"><Link href="/projectile">← 返回模型</Link><ThemeToggle /></nav>
+      <nav className="about-nav"><Link href="/projectile">← 返回模型</Link><ThemeToggle variant="segmented" /></nav>
       <article><TheoryNotes /></article>
     </main>
   );

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main className="about-page">
-      <nav className="about-nav"><Link href="/solar">← 返回模型</Link><ThemeToggle /></nav>
+      <nav className="about-nav"><Link href="/solar">← 返回模型</Link><ThemeToggle variant="segmented" /></nav>
       <article>
         <div className="eyebrow">Kakau Lab · Model notes</div>
         <h1>模型的理想化設計</h1>

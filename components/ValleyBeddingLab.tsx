@@ -316,7 +316,7 @@ export default function ValleyBeddingLab() {
           <h1><span className="live-dot" />岩層位態 × 河谷地形</h1>
         </div>
         <div className="header-actions">
-          <ThemeToggle />
+          <ThemeToggle variant="segmented" />
           <Link className="model-index-link" href="/">模型目錄</Link>
           <button onClick={reset}><RotateCcw size={14} /> 題目預設</button>
         </div>

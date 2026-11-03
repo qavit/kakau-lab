@@ -1,0 +1,115 @@
+/* Lab W45 — the one appearance menu every Lab page shares (Catalog and the five model workspaces).
+ * Imported by ThemeToggle.tsx, so any page that renders the menu also gets this sheet.
+ *
+ * Colours read the C2 --lc-* tokens when the page defines them (.catalog-c2, .lab-c2) and fall back to the
+ * global Lab tokens from globals.css (Electrostatics, Interference). Nothing here touches a canvas,
+ * an SVG, a 3D scene or a scientific palette.
+ *
+ * Selectors carry an extra class or element so they out-rank the per-module header-button recipes
+ * (.solar-c2 .header-actions button …) and the ≤660px `font-size: 0` rule in globals.css. */
+.theme-menu {
+  --tm-raised: var(--lc-raised, var(--surface-solid));
+  --tm-sunken: var(--lc-sunken, var(--tint-soft));
+  --tm-text: var(--lc-text, var(--ink));
+  --tm-muted: var(--lc-muted, var(--muted));
+  --tm-border: var(--lc-border, var(--line));
+  --tm-control: var(--lc-border-control, var(--line-strong));
+  --tm-accent: var(--lc-accent, var(--teal));
+  --tm-accent-subtle: var(--lc-accent-subtle, var(--tint));
+  --tm-focus: var(--lc-focus, var(--teal));
+  --tm-shadow: var(--lc-card-shadow, 0 8px 24px rgba(16, 44, 66, .22));
+  position: relative;
+  flex: none;
+}
+
+.theme-menu button.theme-menu__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--tm-control);
+  border-radius: 10px;
+  background: var(--tm-raised);
+  color: var(--tm-text);
+  font-size: 14px;
+  transform: none;
+}
+.theme-menu button.theme-menu__trigger:hover,
+.theme-menu button.theme-menu__trigger[aria-expanded="true"] {
+  border-color: var(--tm-accent);
+  background: var(--tm-sunken);
+  box-shadow: inset 0 0 0 1px var(--tm-accent);
+  transform: none;
+}
+.theme-menu button.theme-menu__trigger svg { width: 18px; height: 18px; }
+
+/* The list opens below and to the left of the trigger (it sits at the right end of the header). ThemeToggle
+ * sets data-align="start" when that would cross the left edge and data-side="top" when there is no room below. */
+.theme-menu .theme-menu__list {
+  position: absolute;
+  z-index: 90;
+  top: calc(100% + 8px);
+  right: 0;
+  display: grid;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 14rem;
+  max-width: calc(100vw - 16px);
+  padding: 8px;
+  border: 1px solid var(--tm-border);
+  border-radius: 14px;
+  background: var(--tm-raised);
+  color: var(--tm-text);
+  box-shadow: var(--tm-shadow);
+}
+.theme-menu .theme-menu__list[data-align="start"] { right: auto; left: 0; }
+.theme-menu .theme-menu__list[data-side="top"] { top: auto; bottom: calc(100% + 8px); }
+
+.theme-menu .theme-menu__title {
+  padding: 4px 10px 6px;
+  color: var(--tm-muted);
+  font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .08em;
+}
+
+.theme-menu .theme-menu__list button.theme-menu__option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--tm-text);
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  transform: none;
+}
+.theme-menu .theme-menu__list button.theme-menu__option:hover {
+  border-color: var(--tm-control);
+  background: var(--tm-sunken);
+  transform: none;
+}
+/* Selected row: tint + accent ring + check mark + heavier weight, so state is never colour alone. */
+.theme-menu .theme-menu__list button.theme-menu__option[aria-pressed="true"] {
+  border-color: var(--tm-accent);
+  background: var(--tm-accent-subtle);
+  box-shadow: inset 0 0 0 1px var(--tm-accent);
+  font-weight: 650;
+}
+.theme-menu button.theme-menu__option svg { width: 18px; height: 18px; }
+.theme-menu button.theme-menu__option svg.theme-menu__check { width: 16px; height: 16px; margin-left: auto; color: var(--tm-accent); }
+
+.theme-menu button.theme-menu__trigger:focus-visible { outline: 2px solid var(--tm-focus); outline-offset: 3px; }
+.theme-menu .theme-menu__list button.theme-menu__option:focus-visible { outline: 2px solid var(--tm-focus); outline-offset: -4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-menu button { transition: none !important; }
+}
