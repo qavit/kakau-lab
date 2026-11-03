@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { socialMetadata } from "@/lib/site-metadata";
 import ProjectileLab from "@/components/ProjectileLab";
+import "../projectile-c2.css";
 
 export const metadata: Metadata = {
   title: "拋體運動｜Kakau Lab",
