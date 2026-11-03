@@ -34,7 +34,7 @@ Minimal fix proposal (not in this PR): run these in a dev-server job, or tag the
 
 | Spec | Assertion | Evidence | Class |
 | --- | --- | --- | --- |
-| `interference-c3-visual.spec.ts:29` (1280×800) | `plot.width >= 480` | received 475.9 | Layout geometry vs a fixed threshold. The plot is height-limited (toolbar wraps to two rows at 1280); the floor is stale against the current toolbar. Not a physics or rendering defect. |
+| `interference-c3-visual.spec.ts:29` (1280×800) | `plot.width >= 480` | received 475.9 on main | Layout geometry vs a fixed threshold; the 480 px floor is stale against main's own toolbar. Not a physics or rendering defect. On this branch the plot is 487 px, so the spec now passes as a side effect of the toolbar re-layout; the threshold itself is not fixed and still fails on main. |
 | `interference-c4.spec.ts:72` (390 px, root font 200 %) | `scrollWidth <= innerWidth` | document 435 px at a 390 px viewport, identical on main and this branch | Real accessibility overflow at 200 % text size, present before this slice; not caused or fixed by it. |
 
 CI (`.github/workflows/ci.yml`) runs lint + `npm test` (build + unit) only; none of these E2E specs gate a merge.
@@ -72,7 +72,7 @@ CSS boundary: every rule in the new sheet is prefixed `.interference-lab.lab-c2`
 
 Mobile projection: after placing P, the focused plot scrolled the fixed shell and the exit button sat under the plot (hit test returned the SVG). The header is now sticky in projection; a spec asserts the button is hittable.
 
-Layout: at 1440×900 the plot stays 623 px and the waveform stays inside the rail (toolbar 70 / time bar 53 px, same as main). At 1280×800 the plot is 461 px (main 476): both already fail the stale 480 px floor; the 15 px loss is the 44 px second toolbar row.
+Layout: at 1440×900 the plot stays 623 px and the waveform stays inside the rail (toolbar 70 / time bar 53 px, same as main). At 1280×800 the plot is 487 px (main 476; the first iteration of this slice measured 461 px). From 1100 to 1439 px the toolbar's field / line labels and slider labels sit beside their 44 px controls instead of above them, so the two wrapped rows are 44 px each (toolbar 106 px, main 119 px). Targets, 12 px text, contrast and focus are unchanged. Trade-offs: in that band the λ / d range tracks are 115–134 px at 1280 (main 168 px) and 116 px at 1100–1279; between 1024 and 1099 px labels stay stacked and the plot is 461 px at 1099×800 (main about 476) and equal to main at 1024×768 (407 px, width-limited).
 
 ## 4. Regression (main vs slice, same flow)
 
@@ -86,8 +86,8 @@ Layout: at 1440×900 the plot stays 623 px and the waveform stays inside the rai
 ## 5. Checks run
 
 `npm run lint` 0 errors (2 existing warnings in `StandardAtmosphereLab.tsx`); `npm run build`; `npm run test:unit` 450 / 450.
-Interference + ThemeMenu E2E: production, main 84 passed / 12 failed; this branch 84 passed / 12 failed with the identical 12 specs (10 lifecycle 404 + the 2 in B), ThemeMenu 48 / 48 on both. New `interference-w45-c2.spec.ts`: 11 / 11 on the branch, 1 / 11 on main (negative control). Dev: the 2 B specs fail on both; `theme-menu.spec.ts` list-visibility checks fail intermittently on every module's page in dev (hydration timing, not Interference-specific) and pass 48 / 48 in production.
+Interference + ThemeMenu E2E: production, main 84 passed / 12 failed (10 lifecycle 404 + the 2 in B). This branch after the 1280 iteration: 100 passed / 11 failed (the 10 lifecycle + the 200 % text overflow; the 1280 spec now passes), ThemeMenu 48 / 48. Dev on the branch: 62 passed / 1 failed (200 % overflow). New `interference-w45-c2.spec.ts` (now 15 specs incl. 1280×800 and 1440×900 plot-size checks): 15 / 15 on the branch; 11 / 11 before the 1280 additions and 1 / 11 on main (negative control). Targeted 1280×800 equivalence (54 keyboard / data-space snapshots, main vs branch): readouts, SVG overlay, waveform and runtime attributes identical; pointer-placed P differs only at float level. Dev: the 2 B specs fail on both; `theme-menu.spec.ts` list-visibility checks fail intermittently on every module's page in dev (hydration timing, not Interference-specific) and pass 48 / 48 in production.
 
 ## 6. Not verified
 
-Firefox / WebKit, a physical phone, screen-reader pass, Safari `100svh` behaviour, the 200 % text overflow (pre-existing, left open), `/en` (no English Interference route), pixel parity of the HTML overlay text (changed on purpose), the lifecycle specs against a production build (route is dev-only by design).
+Firefox / WebKit, a physical phone, screen-reader pass, Safari `100svh` behaviour, the 200 % text overflow (pre-existing real accessibility defect, still failing, left for follow-up accessibility work), `/en` (no English Interference route), pixel parity of the HTML overlay text (changed on purpose), the lifecycle specs against a production build (route is dev-only by design).

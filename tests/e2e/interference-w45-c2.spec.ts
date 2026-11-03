@@ -61,7 +61,7 @@ const lowContrast = (page: Page) => page.evaluate(() => {
   return bad;
 });
 
-for (const [width, height] of [[1440, 900], [390, 844], [360, 740]] as const) {
+for (const [width, height] of [[1440, 900], [1280, 800], [390, 844], [360, 740]] as const) {
   for (const mode of ["light", "dark"] as const) {
     test(`C2 ${width}px ${mode}: 44px targets, 12px text, AA contrast, no horizontal overflow @w45`, async ({ page }) => {
       await open(page, width, height, mode);
@@ -149,4 +149,20 @@ test("C2: reduced motion removes button and summary transitions @w45 @a11y", asy
   await open(page, 1440, 900, "light");
   const durations = await page.evaluate(() => [...new Set([...document.querySelectorAll(".interference-lab button, .interference-lab summary")].map((e) => getComputedStyle(e).transitionDuration))]);
   expect(durations).toEqual(["0s"]);
+});
+
+test("C2 1280x800: toolbar keeps 44px targets in two 44px rows and the plot is not smaller than main's 476px @w45", async ({ page }) => {
+  await open(page, 1280, 800, "light");
+  const box = (await page.locator("[data-interference-plot]").boundingBox())!;
+  expect(box.width).toBeGreaterThanOrEqual(476);
+  expect(Math.abs(box.width - box.height)).toBeLessThan(2);
+  const toolbar = (await page.locator(".interference-controls").boundingBox())!;
+  expect(toolbar.height).toBeLessThanOrEqual(110);
+  expect(await undersized(page)).toEqual([]);
+});
+
+test("C2 1440x900: plot stays at main's 623px @w45", async ({ page }) => {
+  await open(page, 1440, 900, "light");
+  const box = (await page.locator("[data-interference-plot]").boundingBox())!;
+  expect(box.width).toBeGreaterThanOrEqual(622);
 });

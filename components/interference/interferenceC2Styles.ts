@@ -108,7 +108,20 @@ html[data-mode="dark"] .interference-lab.lab-c2{--if-on-good:#0b1a1d}
 .interference-lab.lab-c2 .interference-dialog p,.interference-lab.lab-c2 .interference-dialog li{font-size:15px}
 /* projection: the exit button must stay reachable even when the focused plot scrolled the fixed shell */
 .interference-lab.lab-c2.interference-projection .if-header{position:sticky;top:0;z-index:30;background:var(--lc-raised)}
-@media(min-width:1024px) and (max-width:1279px){.interference-lab.lab-c2 .if-control--slider{width:7.5rem}}
+/* 1100–1439px: the toolbar wraps to two rows here, so labels sit beside their 44px controls instead of above them (each row 44px, not 57px); this returns the height to the plot */
+@media(min-width:1100px) and (max-width:1439px){
+  .interference-lab.lab-c2 .interference-controls{align-items:center}
+  .interference-lab.lab-c2 .if-control--views,.interference-lab.lab-c2 .if-layers{display:flex;flex-wrap:nowrap;align-items:center;gap:0 .5rem}
+  .interference-lab.lab-c2 .if-control--views legend,.interference-lab.lab-c2 .if-layers legend{float:left;width:auto;margin:0 .5rem 0 0;line-height:44px}
+  .interference-lab.lab-c2 .if-layers{gap:0 .1rem}
+  .interference-lab.lab-c2 .if-control--slider{display:flex;align-items:center;gap:.5rem;width:14.5rem}
+  .interference-lab.lab-c2 .if-control--slider>span:first-child{flex:none;min-width:5.6rem;white-space:nowrap;line-height:1.2}
+  .interference-lab.lab-c2 .if-control--slider output{float:none;margin-left:.3rem}
+  .interference-lab.lab-c2 .if-control--slider input[type=range]{flex:1;min-width:4rem}
+  .interference-lab.lab-c2 .if-advanced-grid .if-control--slider{width:auto}
+}
+@media(min-width:1100px) and (max-width:1279px){.interference-lab.lab-c2 .if-control--slider{width:11rem}}
+@media(min-width:1024px) and (max-width:1099px){.interference-lab.lab-c2 .if-control--slider{width:7.5rem}}
 @media(max-width:640px){.interference-lab.lab-c2 .if-control--slider{width:calc(50% - .5rem)}}
 @media(max-width:640px){
   .interference-lab.lab-c2 .if-header{padding:.5rem .75rem}
