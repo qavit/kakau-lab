@@ -59,7 +59,7 @@ export default function FbdLab() {
   return <main ref={shellRef} className={`lab-shell ${styles.shell}`}>
     <header className="topbar">
       <div><Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link><div className="eyebrow">Mechanics · FBD v0.1</div><h1>自由體圖：先找交互作用</h1></div>
-      <div className="header-actions"><ThemeToggle /><button onClick={restart}>重新開始</button></div>
+      <div className="header-actions"><ThemeToggle variant="segmented" /><button onClick={restart}>重新開始</button></div>
     </header>
     <ol className={styles.steps} aria-label="學習流程">{["基線建模", "基線檢查", "撤除桌面", "先做預測", "修訂模型", "證據與回顧"].map((label, index) => {
       const current = phase === "scene" || phase === "system" || phase === "interactions" || phase === "forces" ? 0

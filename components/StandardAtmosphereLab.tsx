@@ -28,6 +28,7 @@ import { saveDataUrl } from "@/lib/render/export";
 import AtmosphereLayerDrawer from "@/components/atmosphere/AtmosphereLayerDrawer";
 import KakauLabMark from "@/components/KakauLabMark";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useAppBarClearance } from "@/components/layers/useAppBarClearance";
 import { atmosphereProfileCopy, defaultLocale, localizedPath, type AtmosphereProfileCopy, type Locale } from "@/lib/i18n";
 
 const CHART_W = 760;
@@ -477,6 +478,9 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
   const chartSvgRef = useRef<SVGSVGElement | null>(null);
   const chartCardRef = useRef<HTMLElement | null>(null);
   const layersTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const shellRef = useRef<HTMLElement | null>(null);
+  const appBarRef = useRef<HTMLDivElement | null>(null);
+  useAppBarClearance(shellRef, appBarRef);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const usesTemperature = state.quantityA === "temperature" || state.quantityB === "temperature";
   const usesPressure = state.quantityA === "pressure" || state.quantityB === "pressure";
@@ -514,8 +518,8 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
   };
 
   return (
-    <main className="lab-shell atmosphere-profile-lab atmosphere-c2 lab-c2">
-      <div className="topbar">
+    <main ref={shellRef} className="lab-shell atmosphere-profile-lab atmosphere-c2 lab-c2">
+      <div ref={appBarRef} className="topbar">
         <div>
           {locale === "en" ? (
             <span className="lab-brand" aria-label={copy.catalog}><KakauLabMark /></span>
@@ -529,11 +533,11 @@ export default function StandardAtmosphereLab({ locale = defaultLocale }: { loca
           <nav className="language-switcher" aria-label={copy.language.label}>
             {(["zh-TW", "en"] as const).map((target) => <Link key={target} href={localizedPath(target, "/atmosphere-profile")} lang={target} aria-current={target === locale ? "page" : undefined}>{copy.language[target]}</Link>)}
           </nav>
-          <ThemeToggle locale={locale} />
           <button className={state.swapAxes ? "active" : ""} aria-pressed={state.swapAxes} onClick={() => patchState({ swapAxes: !state.swapAxes })}><ArrowLeftRight size={14} /> {copy.actions.swapAxes}</button>
           <button ref={layersTriggerRef} className={showLayers ? "active" : ""} aria-expanded={showLayers} aria-controls="atmosphere-layer-drawer" onClick={() => setShowLayers((v) => !v)}><Layers3 size={14} /> {copy.actions.layers}</button>
           <button onClick={handleExport}><Download size={14} /> {copy.actions.export}</button>
           <button onClick={() => setState(initialStandardAtmosphereState())}><RotateCcw size={14} /> {copy.actions.reset}</button>
+          <ThemeToggle locale={locale} />
         </div>
       </div>
 

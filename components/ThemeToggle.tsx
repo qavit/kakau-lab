@@ -1,9 +1,10 @@
 "use client";
 
 import { Check, Monitor, Moon, Sun } from "lucide-react";
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type FocusEvent, type KeyboardEvent } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type FocusEvent, type KeyboardEvent } from "react";
 import type { Locale } from "@/lib/i18n";
 import { applyTheme, readStoredTheme, subscribeTheme } from "@/lib/theme";
+import "./theme-menu.css";
 
 const copy = {
   "zh-TW": { label: "外觀", light: "亮色", dark: "暗色", system: "跟隨系統" },
@@ -13,9 +14,10 @@ const copy = {
 const icons = { light: Sun, dark: Moon, system: Monitor } as const;
 const targets = ["light", "dark", "system"] as const;
 
-/** `segmented` is the compact three-button group the model workspaces use; `menu` is a single icon
- *  button opening a labelled list, used by the catalog shell. Both drive the same stored choice. */
-export default function ThemeToggle({ locale = "zh-TW", variant = "segmented" }: { locale?: Locale; variant?: "segmented" | "menu" }) {
+/** `menu` (the default) is a single icon button opening a labelled list; the Catalog and every model
+ *  workspace use it, at the end of the header's action row. `segmented` is the older three-button group,
+ *  kept only for pages that have not moved yet and requested explicitly. Both drive the same stored choice. */
+export default function ThemeToggle({ locale = "zh-TW", variant = "menu" }: { locale?: Locale; variant?: "segmented" | "menu" }) {
   const text = copy[locale];
   // The pre-paint script already applied the stored choice to <html>; the store only drives which
   // button reads as pressed, so the server render assumes "system" and the client corrects it.
@@ -48,6 +50,7 @@ function ThemeMenu({ mode, text }: { mode: (typeof targets)[number]; text: (type
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const listId = useId();
   const Current = icons[mode];
 
@@ -58,6 +61,19 @@ function ThemeMenu({ mode, text }: { mode: (typeof targets)[number]; text: (type
     };
     document.addEventListener("pointerdown", onPointer);
     return () => document.removeEventListener("pointerdown", onPointer);
+  }, [open]);
+
+  // Keep the list inside the viewport: flip to the left-aligned or upward position only when the default
+  // (below, right edges aligned) would be clipped. Measured after layout so it never paints in the wrong place.
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!open || !list) return;
+    list.removeAttribute("data-align");
+    list.removeAttribute("data-side");
+    const rect = list.getBoundingClientRect();
+    if (rect.left < 8) list.setAttribute("data-align", "start");
+    const anchor = root.current?.getBoundingClientRect();
+    if (anchor && rect.bottom > window.innerHeight - 8 && anchor.top - rect.height - 8 >= 8) list.setAttribute("data-side", "top");
   }, [open]);
 
   const options = () => Array.from(root.current?.querySelectorAll<HTMLButtonElement>(".theme-menu__option") ?? []);
@@ -96,7 +112,7 @@ function ThemeMenu({ mode, text }: { mode: (typeof targets)[number]; text: (type
         <Current size={18} aria-hidden="true" />
       </button>
       {open && (
-        <div className="theme-menu__list" id={listId} role="group" aria-label={text.label}>
+        <div className="theme-menu__list" ref={listRef} id={listId} role="group" aria-label={text.label}>
           <span className="theme-menu__title" aria-hidden="true">{text.label}</span>
           {targets.map((target) => {
             const Icon = icons[target];

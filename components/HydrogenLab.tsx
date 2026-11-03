@@ -120,7 +120,7 @@ export default function HydrogenLab() {
           <h1><span className="live-dot" />氫原子能階與光譜</h1>
         </div>
         <div className="header-actions">
-          <ThemeToggle />
+          <ThemeToggle variant="segmented" />
           <Link className="model-index-link" href="/">模型目錄</Link>
           {labMode !== "intent" ? (
             <>

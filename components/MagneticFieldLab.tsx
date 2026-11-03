@@ -232,7 +232,7 @@ export default function MagneticFieldLab() {
           </h1>
         </div>
         <div className="header-actions">
-          <ThemeToggle />
+          <ThemeToggle variant="segmented" />
           <Link className="model-index-link" href="/">模型目錄</Link>
           <button onClick={reset}><RotateCcw size={14} /> 重設為範例題</button>
         </div>

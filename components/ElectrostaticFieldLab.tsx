@@ -602,7 +602,6 @@ export default function ElectrostaticFieldLab({ share }: ElectrostaticFieldLabPr
           <span className={styles.statusChip} title="MODEL 09" aria-label="Beta 版">Beta</span>
         </div>
         <div className={styles.headerActions}>
-          <ThemeToggle />
           {!entryPending && !learning ? <QuickPresetsMenu setup={setup} onPreset={applyPreset} /> : null}
           {!entryPending && (learning
             ? <button type="button" className={`${styles.catalogLink} ${styles.modeToggle}`} onClick={() => exploreSandbox(false)} data-testid="direct-explore"><ArrowLeftRight size={16} aria-hidden="true" />自由探索</button>
@@ -632,6 +631,7 @@ export default function ElectrostaticFieldLab({ share }: ElectrostaticFieldLabPr
               <Info size={16} aria-hidden="true" />理論與計算
             </button>
           ) : null}
+          <ThemeToggle />
         </div>
       </header>
 
