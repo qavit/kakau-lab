@@ -84,8 +84,11 @@ test("Projectile mobile controls, layers, theme and keyboard @mobile", async ({ 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.keyboard.press("Escape");
   for (const appearance of ["亮色", "暗色", "跟隨系統"]) {
+    await page.locator(".theme-menu__trigger").click();
     await page.getByRole("button", { name: appearance, exact: true }).click();
+    await page.locator(".theme-menu__trigger").click();
     await expect(page.getByRole("button", { name: appearance, exact: true })).toHaveAttribute("aria-pressed", "true");
+    await page.keyboard.press("Escape");
   }
   await page.screenshot({ path: "/tmp/mechanics-projectile-mobile.png", fullPage: true });
 });

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { socialMetadata } from "@/lib/site-metadata";
 import StandardAtmosphereLab from "@/components/StandardAtmosphereLab";
+import "../lab-c2.css";
+import "../atmosphere-c2.css";
 
 export const metadata: Metadata = {
   title: "大氣垂直結構｜Kakau Lab",

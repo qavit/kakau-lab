@@ -1500,7 +1500,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
 
   return (
     <MathProvider>
-    <main ref={shellRef} className="lab-shell projectile-lab" style={{ "--projectile-appbar-bottom": `${appBarBottom}px` } as React.CSSProperties}>
+    <main ref={shellRef} className="lab-shell projectile-lab projectile-c2 lab-c2" style={{ "--projectile-appbar-bottom": `${appBarBottom}px` } as React.CSSProperties}>
       <div ref={appBarRef} className="topbar projectile-topbar">
         <div>
           <Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link>
@@ -1508,12 +1508,11 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
           <h1><span className="live-dot" />拋體運動</h1>
         </div>
         <div className="header-actions">
-          <ThemeToggle />
           {freeStateControlsAvailable && (
             <>
               <Menu label="情境">
-                <button className={!isStairs ? "active" : ""} onClick={() => { patchState({ scenario: "field", ...SCENARIO_DEFAULTS.field }); setManualView(null); }}>平地拋射</button>
-                <button className={isStairs ? "active" : ""} onClick={() => { patchState({ scenario: "staircase", ...SCENARIO_DEFAULTS.staircase }); setManualView(null); }}>階梯落點</button>
+                <button className={!isStairs ? "active" : ""} aria-pressed={!isStairs} onClick={() => { patchState({ scenario: "field", ...SCENARIO_DEFAULTS.field }); setManualView(null); }}>平地拋射</button>
+                <button className={isStairs ? "active" : ""} aria-pressed={isStairs} onClick={() => { patchState({ scenario: "staircase", ...SCENARIO_DEFAULTS.staircase }); setManualView(null); }}>階梯落點</button>
               </Menu>
               <Menu label="教學預設">
                 {Object.entries(PROJECTILE_PRESETS).map(([key, preset]) => {
@@ -1558,6 +1557,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
             if (guidedSession) selectGuidedActivity(guidedSession.activityId);
             else { setState(initialProjectileState()); setLayers({ ...INITIAL_PROJECTILE_LAYERS }); setSelectedPreset(null); setCursorFraction(0); setManualView(null); }
           }}><RotateCcw size={14} /> 重設</button>
+          <ThemeToggle />
         </div>
       </div>
 
@@ -1649,7 +1649,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
                   <p className="projectile-group-label">重力加速度 <Tex>{"g"}</Tex></p>
                   <div className="projectile-btn-grid">
                     {Object.entries(GRAVITY_PRESETS).map(([key, preset]) => (
-                      <button key={key} className={Math.abs(state.gravity - preset.value) < 1e-6 ? "active" : ""} onClick={() => patchState({ gravity: preset.value })}>
+                      <button key={key} className={Math.abs(state.gravity - preset.value) < 1e-6 ? "active" : ""} aria-pressed={Math.abs(state.gravity - preset.value) < 1e-6} onClick={() => patchState({ gravity: preset.value })}>
                         {preset.label} {preset.value.toFixed(2)} m/s²
                       </button>
                     ))}
@@ -1657,7 +1657,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
                   <p className="projectile-group-label">空氣阻力 <Tex>{"b"}</Tex></p>
                   <div className="projectile-btn-grid">
                     {Object.entries(DRAG_PRESETS).map(([key, preset]) => (
-                      <button key={key} disabled={isStairs} className={Math.abs(state.dragFactor - preset.value) < 1e-9 ? "active" : ""} onClick={() => patchState({ dragFactor: preset.value, showDrag: preset.value > 0 })}>
+                      <button key={key} disabled={isStairs} className={Math.abs(state.dragFactor - preset.value) < 1e-9 ? "active" : ""} aria-pressed={Math.abs(state.dragFactor - preset.value) < 1e-9} onClick={() => patchState({ dragFactor: preset.value, showDrag: preset.value > 0 })}>
                         {preset.label} {preset.value.toFixed(3)} m⁻¹
                       </button>
                     ))}
@@ -1680,8 +1680,8 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
               {showComponents && (
                 <div className="projectile-mini-column">
                   <div className="projectile-btn-grid">
-                    <button className={mergedCharts ? "active" : ""} onClick={() => setMergedCharts(true)}>合併顯示</button>
-                    <button className={!mergedCharts ? "active" : ""} onClick={() => setMergedCharts(false)}>分開顯示</button>
+                    <button className={mergedCharts ? "active" : ""} aria-pressed={mergedCharts} onClick={() => setMergedCharts(true)}>合併顯示</button>
+                    <button className={!mergedCharts ? "active" : ""} aria-pressed={!mergedCharts} onClick={() => setMergedCharts(false)}>分開顯示</button>
                   </div>
                   {componentCharts(charts, mergedCharts).map((chart) => (
                     <MiniChart key={chart.key} chart={chart} duration={charts.duration} cursorT={cursor.t} />
@@ -1762,7 +1762,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
               {state.playing ? <Pause size={14} /> : <Play size={14} />}{state.playing ? "暫停" : "播放"}
             </button>
             <button disabled={!timeManipulationAllowed} onClick={() => stepBy(STEP_SECONDS)} aria-label={`進 ${STEP_SECONDS} 秒`}>+{STEP_SECONDS}s</button>
-            <button disabled={!timeManipulationAllowed} className={state.direction < 0 ? "active" : ""} onClick={() => patchState({ direction: state.direction < 0 ? 1 : -1 })} aria-label="反向播放" title="反向播放"><Undo2 size={14} /></button>
+            <button disabled={!timeManipulationAllowed} className={state.direction < 0 ? "active" : ""} aria-pressed={state.direction < 0} onClick={() => patchState({ direction: state.direction < 0 ? 1 : -1 })} aria-label="反向播放" title="反向播放"><Undo2 size={14} /></button>
             <button disabled={!timeManipulationAllowed} onClick={() => { patchState({ playing: false }); setCursorFraction(1); }} aria-label="跳到結束" title="跳到結束"><SkipForward size={14} /></button>
           </div>
           <input
@@ -1785,7 +1785,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
           <output className="projectile-clock">{cursor.clockTime.toFixed(2)} / {model.clockDuration.toFixed(2)} s</output>
           <div className="projectile-transport-speeds">
             {[0.25, 0.5, 1, 2].map((speed) => (
-              <button disabled={!timeManipulationAllowed} key={speed} className={Math.abs(state.animationSpeed - speed) < 0.01 ? "active" : ""} onClick={() => patchState({ animationSpeed: speed })}>{speed}×</button>
+              <button disabled={!timeManipulationAllowed} key={speed} className={Math.abs(state.animationSpeed - speed) < 0.01 ? "active" : ""} aria-pressed={Math.abs(state.animationSpeed - speed) < 0.01} onClick={() => patchState({ animationSpeed: speed })}>{speed}×</button>
             ))}
           </div>
         </div>

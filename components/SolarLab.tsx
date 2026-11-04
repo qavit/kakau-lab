@@ -27,6 +27,7 @@ import ExportDialog from "@/components/solar/ExportDialog";
 import LayerDrawer from "@/components/solar/LayerDrawer";
 import KakauLabMark from "@/components/KakauLabMark";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useAppBarClearance } from "@/components/layers/useAppBarClearance";
 
 export default function SolarLab() {
   const globalRef = useRef<HTMLDivElement>(null);
@@ -34,6 +35,9 @@ export default function SolarLab() {
   const sceneRef = useRef<SolarSceneApi | null>(null);
   const directoryRef = useRef<DirectoryHandle | null>(null);
   const layersTriggerRef = useRef<HTMLButtonElement>(null);
+  const shellRef = useRef<HTMLElement>(null);
+  const appBarRef = useRef<HTMLElement>(null);
+  useAppBarClearance(shellRef, appBarRef);
   const previousTraceTime = useRef<number | null>(null);
 
   const [state, setState] = useState<SolarLabState>(initialSolarState);
@@ -151,22 +155,22 @@ export default function SolarLab() {
   }, [exportTarget, exportMode, lineWidth, exportShadowTimes, state.latitude, state.day]);
 
   return (
-    <main className="lab-shell">
-      <header className="topbar">
+    <main ref={shellRef} className="lab-shell solar-c2 lab-c2">
+      <header ref={appBarRef} className="topbar">
         <div>
           <Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link>
           <div className="eyebrow"><span className="live-dot" /> 模型 01</div>
           <h1>太陽、天球與竿影</h1>
         </div>
         <div className="header-actions">
-          <ThemeToggle />
-          <button className={appearance.directManipulation ? "active" : ""} onClick={() => patchAppearance({ directManipulation: !appearance.directManipulation })}><MousePointer2 size={15} />直接操控</button>
+          <button className={appearance.directManipulation ? "active" : ""} aria-pressed={appearance.directManipulation} onClick={() => patchAppearance({ directManipulation: !appearance.directManipulation })}><MousePointer2 size={15} />直接操控</button>
           <button ref={layersTriggerRef} className={showLayers ? "active" : ""} onClick={() => setShowLayers((value) => !value)} aria-expanded={showLayers} aria-controls="solar-layer-drawer"><Layers3 size={15} />圖層</button>
-          <button className={showControls ? "active" : ""} onClick={() => setShowControls((value) => !value)}><Settings2 size={15} />控制台</button>
+          <button className={showControls ? "active" : ""} aria-expanded={showControls} onClick={() => setShowControls((value) => !value)}><Settings2 size={15} />控制台</button>
           <button onClick={() => sceneRef.current?.reset()} aria-label="重設視角"><RotateCcw size={15} />重設</button>
           <Link className="model-index-link" href="/">模型目錄</Link>
           <Link className="model-index-link" href="/about"><Info size={15} />模型說明</Link>
           <button className="primary-action" onClick={() => setExportOpen(true)}><Download size={15} />匯出</button>
+          <ThemeToggle />
         </div>
       </header>
 

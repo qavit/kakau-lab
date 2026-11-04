@@ -1,0 +1,145 @@
+/* Lab W45 — C2 Neutral Scientific Workbench, Projectile workspace only.
+ * Every rule is scoped to .projectile-c2 (the <main> of /projectile). Shared tokens and rules live in
+ * lab-c2.css (import that first); this sheet keeps what only Projectile needs. Nothing here changes the
+ * physics, the trajectory/chart SVG, the guided activities or the playback logic; the dark chart
+ * surfaces and their scientific data colours are deliberately left as they are in both themes.
+ * Gold stays a decorative brand point only (live dot, readout bullets); it is never a state or focus colour.
+ */
+/* ---- Header: flat workbench bar with a ruled base, one 44px control height ---- */
+.projectile-c2 .projectile-topbar {
+  align-items: flex-end;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--lc-border);
+}
+.projectile-c2 .lab-brand { margin-bottom: 0; }
+.projectile-c2 :is(.header-actions, .projectile-menu-list, .projectile-transport, .projectile-side-inner, .guided-inner, .layer-drawer > header, .projectile-share-notice) button {
+  min-height: 44px;
+  border-color: var(--lc-border-control);
+  border-radius: 10px;
+  background: var(--lc-raised);
+  color: var(--lc-text);
+  font-size: 14px;
+  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+.projectile-c2 :is(.header-actions, .projectile-menu-list, .projectile-transport, .projectile-side-inner, .guided-inner) button:hover:not(:disabled) {
+  transform: none;
+  border-color: var(--lc-accent);
+  background: var(--lc-sunken);
+}
+/* Selected/open: tint + ring + heavier weight, so the state is not carried by colour alone. */
+.projectile-c2 :is(.header-actions, .projectile-menu-list, .projectile-transport, .projectile-side-inner, .guided-inner) button:is(.active, .selected, [aria-pressed="true"], [aria-expanded="true"]) {
+  border-color: var(--lc-accent);
+  background: var(--lc-accent-subtle);
+  box-shadow: inset 0 0 0 1px var(--lc-accent);
+  color: var(--lc-text);
+  font-weight: 650;
+}
+.projectile-c2 button:disabled { cursor: not-allowed; opacity: .5; }
+/* Scenario / preset dropdowns */
+.projectile-c2 .projectile-menu-list { padding: 8px; border-radius: 14px; border-color: var(--lc-border); background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+.projectile-c2 .projectile-menu-list button { border-color: transparent; background: transparent; font-size: 14px; }
+/* ---- Focus: 2px in the interface colour, chosen for the surface it sits on ---- */
+.projectile-lab.projectile-c2 :is(button, a, input, select, summary, [role="separator"]):focus-visible {
+  outline: 2px solid var(--lc-focus);
+  outline-offset: 2px;
+}
+.projectile-lab.projectile-c2 .projectile-path-card :is(button, a, input):focus-visible,
+.projectile-lab.projectile-c2 .projectile-mini :is(button, a, input):focus-visible {
+  outline-color: var(--lc-focus-on-dark);
+  outline-offset: -2px;
+}
+/* ---- Chart card: the dark data surface stays; only its frame follows C2 ---- */
+.projectile-c2 .projectile-zoom-group button,
+.projectile-c2 .projectile-map-reset { width: 44px; height: 44px; min-height: 44px; }
+.projectile-c2 .projectile-zoom-group,
+.projectile-c2 .projectile-map-reset { border-radius: 10px; }
+.projectile-c2 .projectile-path-card .projectile-map-controls svg { width: 18px; height: 18px; }
+.projectile-c2 .projectile-map-reset.active { border-color: #9bd7dd66; color: #9bd7dd; }
+/* ---- Side panel and dock surfaces ---- */
+.projectile-c2 .projectile-side-inner,
+.projectile-c2 .projectile-dock { border-color: var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+.projectile-c2 .projectile-dock { margin-top: 1rem; }
+.projectile-c2 .projectile-side-grip::after { transition: none; background: var(--lc-border-control); }
+.projectile-c2 .projectile-group { padding: 1rem 1.125rem; }
+/* Flush groups hold the disclosure rows, which carry their own padding; the rule above would otherwise double it. */
+.projectile-c2 .projectile-group.projectile-group-flush { padding: 0; }
+.projectile-c2 .projectile-group-label {
+  margin-bottom: 12px;
+  color: var(--lc-muted);
+  font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .08em;
+}
+.projectile-c2 .projectile-slider-stack { gap: 6px; }
+.projectile-c2 .projectile-slider-stack label>span,
+.projectile-c2 .projectile-inline-slider b { font-size: 14px; }
+.projectile-c2 .projectile-slider-stack label b { font-size: 14px; font-weight: 650; }
+/* Native range: a 44px hit band around the unchanged thin track. */
+.projectile-c2 input[type="range"]:disabled { cursor: not-allowed; }
+.projectile-c2 .projectile-hint,
+.projectile-c2 .projectile-note { color: var(--lc-muted); font-size: 12px; line-height: 1.65; }
+.projectile-c2 .projectile-btn-grid { gap: 8px; }
+.projectile-c2 .projectile-btn-column { gap: 8px; }
+.projectile-c2 .projectile-btn-grid button,
+.projectile-c2 .projectile-btn-column button { padding: 8px 10px; font-size: 14px; }
+.projectile-c2 .projectile-disclosure {
+  min-height: 48px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 650;
+}
+.projectile-c2 .projectile-disclosure:hover:not(:disabled) { background: var(--lc-sunken); border: 0; }
+.projectile-c2 .projectile-disclosure[aria-expanded="true"] { background: transparent; box-shadow: none; }
+.projectile-c2 .projectile-disclosure small { color: var(--lc-muted); font-size: 12px; }
+.projectile-c2 .projectile-inline-slider { gap: 8px; }
+/* ---- Transport and readout ---- */
+.projectile-c2 .projectile-transport { gap: 8px 12px; padding: 12px 14px; }
+.projectile-c2 .projectile-transport-buttons,
+.projectile-c2 .projectile-transport-speeds { gap: 6px; }
+.projectile-c2 .projectile-transport button { min-width: 44px; padding: 8px 12px; font-size: 14px; }
+.projectile-c2 .projectile-transport-speeds button { min-width: 52px; }
+.projectile-c2 .projectile-clock { color: var(--lc-muted); font-size: 13px; }
+.projectile-c2 .projectile-readout { gap: 8px 24px; padding: 12px 14px; border-top-color: var(--lc-border); }
+.projectile-c2 .projectile-readout span { font-family: inherit; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.projectile-c2 .projectile-readout i { color: var(--lc-muted); font-size: 12px; font-weight: 400; }
+/* ---- Layer drawer ---- */
+/* ---- Guided rail ---- */
+.projectile-c2 .guided-head { padding: 1rem 1.125rem .75rem; }
+.projectile-c2 .guided-head>div>span { color: var(--lc-muted); font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace; letter-spacing: .08em; }
+.projectile-c2 .guided-head h2 { font-family: inherit; font-weight: 650; }
+.projectile-c2 .guided-head>button { width: 44px; height: 44px; }
+.projectile-c2 .guided-progress button { min-height: 44px; font-size: 12px; }
+.projectile-c2 .guided-progress button.active { border-color: var(--lc-accent); background: var(--lc-accent-subtle); box-shadow: inset 0 0 0 1px var(--lc-accent); }
+.projectile-c2 .guided-progress button.active span { background: var(--lc-accent); color: var(--lc-on-accent); }
+.projectile-c2 .guided-question { font-family: inherit; font-weight: 600; }
+.projectile-c2 .guided-choices button { min-height: 44px; }
+.projectile-c2 .guided-block button.primary { border-color: var(--lc-accent); background: var(--lc-accent); color: var(--lc-on-accent); }
+.projectile-c2 .guided-block button.primary:hover:not(:disabled) { background: var(--lc-accent); filter: brightness(.92); }
+.projectile-c2 .guided-footer button { min-height: 44px; font-size: 13px; }
+.projectile-c2 .guided-footer span { font-size: 12px; }
+.projectile-c2 .guided-measures dt,
+.projectile-c2 .guided-table thead th { font-size: 12px; }
+.projectile-c2 .guided-block p { color: var(--lc-body); }
+.projectile-c2 .projectile-share-notice { border-radius: 10px; }
+.projectile-c2 .projectile-share-notice input { min-height: 44px; border-color: var(--lc-border-control); border-radius: 10px; }
+/* ---- Narrow screens: ruled header, wrapped 44px controls, no horizontal scroll ---- */
+@media (max-width: 660px) {
+  .projectile-c2 .projectile-topbar { align-items: stretch; gap: .75rem; }
+  .projectile-c2 .projectile-topbar .header-actions { justify-content: flex-start; }
+  .projectile-c2 .projectile-topbar .header-actions button { min-height: 44px; font-size: 14px; padding: 8px 12px; }
+  .projectile-c2 .projectile-topbar .header-actions button svg { width: 16px; height: 16px; }
+  .projectile-c2 .projectile-transport { padding: 12px 10px; }
+  .projectile-c2 .projectile-transport-buttons,
+  .projectile-c2 .projectile-transport-speeds { gap: 4px; }
+  /* Six controls fit one row: three icon buttons stay 44px, the three labelled ones share the rest. */
+  .projectile-c2 .projectile-transport-buttons { display: grid; grid-template-columns: 44px repeat(3, minmax(0, 1fr)) 44px 44px; width: 100%; }
+  .projectile-c2 .projectile-transport button { padding: 8px 4px; font-size: 13px; white-space: nowrap; }
+  .projectile-c2 .projectile-transport-speeds button { min-width: 48px; }
+  .projectile-c2 .projectile-transport button svg { flex: none; }
+  .projectile-c2 .projectile-group { padding: 1rem; }
+  .projectile-c2 .projectile-group.projectile-group-flush { padding: 0; }
+}

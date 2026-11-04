@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { socialMetadata } from "@/lib/site-metadata";
 import SolarLab from "@/components/SolarLab";
+import "../lab-c2.css";
+import "../solar-c2.css";
 
 export const metadata: Metadata = {
   title: "太陽、天球與竿影｜Kakau Lab",

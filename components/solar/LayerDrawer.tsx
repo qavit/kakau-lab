@@ -25,6 +25,7 @@ export default function LayerDrawer({ open, layers, appearance, onClose, onToggl
   );
   const observerSelect = (key: "globalObserver" | "localObserver") => (
     <select
+      aria-label={key === "globalObserver" ? "地心模型觀察者外觀" : "觀察者模型中心外觀"}
       disabled={!layers.observer}
       value={appearance[key]}
       onChange={(event) => onAppearanceChange({ [key]: event.target.value as AppearanceState["globalObserver"] })}
@@ -56,7 +57,7 @@ export default function LayerDrawer({ open, layers, appearance, onClose, onToggl
 
         <LayerGroup title="地球與觀察者"><div className="layer-list">
           <span className="field-label">地球外觀</span>
-          <select value={appearance.earthOpaque ? "opaque" : "transparent"} onChange={(event) => onAppearanceChange({ earthOpaque: event.target.value === "opaque" })}>
+          <select aria-label="地球外觀" value={appearance.earthOpaque ? "opaque" : "transparent"} onChange={(event) => onAppearanceChange({ earthOpaque: event.target.value === "opaque" })}>
             <option value="opaque">不透明</option>
             <option value="transparent">透明</option>
           </select>

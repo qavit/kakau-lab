@@ -1,0 +1,141 @@
+/* Lab W45 — C2 Neutral Scientific Workbench: rules shared by the module workspaces (Projectile, Solar).
+ * Every rule is scoped to .lab-c2, a class the workspace <main> carries next to its own module class
+ * (.projectile-c2, .solar-c2). Nothing here touches a canvas, an SVG, a 3D scene or any scientific
+ * colour, and nothing applies outside a .lab-c2 page. Catalog styles live in catalog-c2.css.
+ *
+ * What lives here: the --lc-* tokens (Light, System-dark, explicit Dark), the legacy-token mapping, the
+ * flat page background, header type, the scene-card frame, the 44px
+ * range band, the layer-drawer rows and the reduced-motion rule. Only rules that were byte-identical in
+ * both module sheets were moved, so each selector keeps the specificity it had before.
+ *
+ * Cascade: import this file BEFORE the module sheet. No shared rule and module rule set the same
+ * property on the same element at the same specificity, so order is a convention, not a dependency.
+ * Gold stays decorative (live dot, readout bullets); it is never a state or focus colour.
+ */
+/* ---- Tokens: Light, System-dark (no stored choice) and explicit Dark. Names mirror catalog-c2.css. ---- */
+body:has(.lab-c2) {
+  background: #f5f5f6;
+  background-image: none;
+}
+
+.lab-c2 {
+  --lc-page: #f5f5f6;
+  --lc-raised: #fff;
+  --lc-sunken: #ebebed;
+  --lc-text: #16181d;
+  --lc-body: #3d434d;
+  --lc-muted: #555b66;
+  --lc-border: #16181d1f;
+  --lc-border-control: #6b7280;
+  --lc-accent: #216e84;
+  --lc-accent-subtle: #e4f1f3;
+  --lc-on-accent: #fff;
+  --lc-focus: #216e84;
+  --lc-focus-on-dark: #9bd7dd;
+  --lc-card-shadow: 0 0 0 1px #16181d0f, 0 1px 3px #16181d0f, 0 8px 24px #16181d0a;
+  /* Re-point the legacy Lab tokens so the existing projectile rules pick up the C2 surfaces. */
+  --ink: var(--lc-text);
+  --strong: var(--lc-text);
+  --body: var(--lc-body);
+  --muted: var(--lc-muted);
+  --line: var(--lc-border);
+  --line-strong: var(--lc-border-control);
+  --line-hover: var(--lc-accent);
+  --link: var(--lc-accent);
+  --surface: var(--lc-raised);
+  --surface-solid: var(--lc-raised);
+  --cream: var(--lc-raised);
+  --btn-bg: var(--lc-raised);
+  --field-bg: var(--lc-raised);
+  --tint: var(--lc-accent-subtle);
+  --tint-soft: var(--lc-page);
+  --tint-alpha: #216e8414;
+  --formula-bg: var(--lc-page);
+  color: var(--lc-text);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-mode]) body:has(.lab-c2) { background: #101114; }
+  html:not([data-mode]) .lab-c2 {
+    --lc-page: #101114;
+    --lc-raised: #1a1c21;
+    --lc-sunken: #0b0c0e;
+    --lc-text: #edeef0;
+    --lc-body: #c3c7ce;
+    --lc-muted: #a5aab4;
+    --lc-border: #ffffff1f;
+    --lc-border-control: #8a909c;
+    --lc-accent: #9bd7dd;
+    --lc-accent-subtle: #173139;
+    --lc-on-accent: #0b1a1d;
+    --lc-focus: #9bd7dd;
+    --lc-card-shadow: 0 0 0 1px #ffffff14, 0 8px 24px #00000066;
+    --tint-alpha: #9bd7dd1a;
+  }
+}
+
+html[data-mode="dark"] body:has(.lab-c2) { background: #101114; }
+
+html[data-mode="dark"] .lab-c2 {
+  --lc-page: #101114;
+  --lc-raised: #1a1c21;
+  --lc-sunken: #0b0c0e;
+  --lc-text: #edeef0;
+  --lc-body: #c3c7ce;
+  --lc-muted: #a5aab4;
+  --lc-border: #ffffff1f;
+  --lc-border-control: #8a909c;
+  --lc-accent: #9bd7dd;
+  --lc-accent-subtle: #173139;
+  --lc-on-accent: #0b1a1d;
+  --lc-focus: #9bd7dd;
+  --lc-card-shadow: 0 0 0 1px #ffffff14, 0 8px 24px #00000066;
+  --tint-alpha: #9bd7dd1a;
+}
+
+/* ---- Header type ---- */
+.lab-c2 .eyebrow {
+  margin-bottom: 2px;
+  color: var(--lc-muted);
+  font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .08em;
+}
+
+.lab-c2 h1 {
+  font-family: inherit;
+  font-size: clamp(1.5rem, 1.15rem + 1.2vw, 2rem);
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+
+.lab-c2 .header-actions { gap: 8px; }
+.lab-c2 .lab-brand { min-width: 44px; min-height: 44px; }
+
+/* ---- Scene card frame: the dark data surface stays; only the frame follows C2 ---- */
+.lab-c2 .viewport-card { border-color: var(--lc-border); border-radius: 14px; box-shadow: var(--lc-card-shadow); }
+
+/* Native range: a 44px hit band around the unchanged thin track. */
+.lab-c2 input[type="range"] { height: 44px; margin: 0; background: transparent; accent-color: var(--lc-accent); cursor: pointer; }
+
+/* ---- Layer drawer (shared LabLayerDrawer markup) ---- */
+.lab-c2 .layer-drawer { background: var(--lc-raised); border-left-color: var(--lc-border); }
+
+.lab-c2 .layer-drawer>header { border-bottom-color: var(--lc-border); }
+
+.lab-c2 .drawer-scroll summary { min-height: 44px; display: flex; align-items: center; color: var(--lc-text); }
+
+.lab-c2 .layer-list label { min-height: 44px; border-color: var(--lc-border-control); border-radius: 10px; background: var(--lc-raised); color: var(--lc-text); font-size: 14px; }
+
+.lab-c2 .layer-list label:hover { background: var(--lc-sunken); }
+
+.lab-c2 .layer-list label:has(input:checked) { border-color: var(--lc-accent); background: var(--lc-accent-subtle); }
+
+.lab-c2 .layer-list input { width: 18px; height: 18px; accent-color: var(--lc-accent); }
+
+/* ---- Reduced motion ----
+ * !important because the module sheets set the 140ms button transition on selectors that out-rank any
+ * plain .lab-c2 rule (their :is() lists count as a class). Transitions only: no animation or JS motion. */
+@media (prefers-reduced-motion: reduce) {
+  .lab-c2 :is(button, a, summary) { transition: none !important; }
+}

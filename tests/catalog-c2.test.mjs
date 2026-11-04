@@ -31,7 +31,7 @@ test("A1 retains existing previews, semantics, navigation and appearance toggle"
   for (const marker of ["model-card-preview", "layers-card-art", "projectile-card-art", "model-card-tags", "catalog-title", "catalog-principle"]) {
     assert.ok(catalog.includes(marker), "missing catalog marker: " + marker);
   }
-  assert.match(catalog, /<ThemeToggle variant="menu" \/>/);
+  assert.match(catalog, /<ThemeToggle \/>/);
   assert.match(catalog, /<KakauLabMark \/>/);
   assert.match(catalog, /<h1>把看不見的規律/);
   assert.match(catalog, /<Link href=\{href\} className=\{className\}>/);
@@ -51,7 +51,6 @@ test("A1 has explicit light/dark and system-dark tokens without changing other r
 test("A1 includes keyboard focus, 44px controls, mobile cards and reduced-motion", () => {
   assert.match(css, /:is\(a, button\):focus-visible/);
   assert.match(css, /min-height: 44px/);
-  assert.match(css, /min-width: 44px/);
   assert.match(css, /@media \(max-width: 660px\)/);
   assert.match(css, /\.catalog-c2 \.model-card \{ grid-template-columns: minmax\(0, 1fr\); \}/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
@@ -74,4 +73,24 @@ test("A1 appearance menu is a disclosure with a button group, not an ARIA menu",
   assert.match(toggle, /aria-controls=\{open \? listId : undefined\}/);
   assert.match(toggle, /aria-pressed=\{mode === target\}/);
   assert.match(toggle, /className="theme-switcher" role="group"/);
+});
+
+test("W45 every Lab page shares one ThemeMenu stylesheet and the menu is the default variant", async () => {
+  const [toggle, menuCss] = await Promise.all([read("../components/ThemeToggle.tsx"), read("../components/theme-menu.css")]);
+  assert.match(toggle, /import "\.\/theme-menu\.css"/);
+  assert.match(toggle, /variant = "menu"/);
+  assert.match(menuCss, /min-width: 44px/);
+  assert.match(menuCss, /min-height: 44px/);
+  assert.match(menuCss, /\.theme-menu__option\[aria-pressed="true"\]/);
+  assert.match(menuCss, /:focus-visible/);
+  assert.doesNotMatch(css, /theme-menu/, "catalog must not carry a private copy of the menu");
+  for (const file of ["solar-c2", "atmosphere-c2", "projectile-c2", "lab-c2"]) {
+    assert.doesNotMatch(await read(`../app/${file}.css`), /theme-switcher|theme-menu/, `${file} keeps no theme control rules`);
+  }
+  // The five workspaces and the catalog use the default menu; only pages outside this slice ask for segmented.
+  for (const file of ["ModelCatalog", "ProjectileLab", "SolarLab", "StandardAtmosphereLab", "ElectrostaticFieldLab", "interference/InterferenceSimulation"]) {
+    const source = await read(`../components/${file}.tsx`);
+    assert.equal(source.match(/<ThemeToggle\b/g)?.length, 1, `${file} renders exactly one appearance control`);
+    assert.doesNotMatch(source, /variant="segmented"/, `${file} uses the shared menu`);
+  }
 });
