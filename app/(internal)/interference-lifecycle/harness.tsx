@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import InterferenceSimulation from "@/components/interference/InterferenceSimulation";
+import "../../lab-c2.css";
 
 /** Development-only controls used to exercise real React StrictMode effect replay. */
 export default function InterferenceLifecycleHarness() {

@@ -4,6 +4,7 @@ import InterferenceSummary from "@/components/interference/InterferenceSummary";
 import { MathProvider } from "@/components/math/MathJax";
 import { interferenceLearningResource, interferenceSeo, serializeJsonLd } from "@/lib/labs/interference-seo";
 import { socialMetadata } from "@/lib/site-metadata";
+import "../lab-c2.css";
 
 export const metadata: Metadata = {
   title: interferenceSeo.title,

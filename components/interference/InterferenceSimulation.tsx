@@ -7,6 +7,7 @@ import { MathProvider, Tex, TexBlock } from "@/components/math/MathJax";
 import InterferenceDialogs from "@/components/interference/InterferenceDialogs";
 import { GeometryFormulas, KinematicsFormula, MeasureFormulas, useInterferenceReadout } from "@/components/interference/InterferenceFormulas";
 import { interferenceStyles } from "@/components/interference/interferenceStyles";
+import { interferenceC2Styles } from "@/components/interference/interferenceC2Styles";
 
 const Num = ({ answer, label }: { answer: string; label: string }) => <label>{label}<input data-answer={answer} type="number" min="0" max="40" inputMode="numeric" /></label>;
 const Slider = ({ name, label, min, max, step, init, out, aria }: { name: string; label: string; min: number; max: number; step: number; init: number; out: string; aria: string }) =>
@@ -71,8 +72,9 @@ export default function InterferenceSimulation({ enabled = true }: InterferenceS
   };
 
   const VIEWS = [["displacement", "瞬時位移 ψ"], ["intensity", "強度 |C|²"], ["amplitude", "合成振幅 |C|"], ["phase", "合成相位 Φ"]] as const;
-  return <MathProvider><section ref={containerRef} className="interference-lab" aria-label="雙點波源干涉模擬器" data-testid="interference-host" data-sidebar="open">
+  return <MathProvider><section ref={containerRef} className="interference-lab lab-c2" aria-label="雙點波源干涉模擬器" data-testid="interference-host" data-sidebar="open">
     <style>{interferenceStyles}</style>
+    <style>{interferenceC2Styles}</style>
     <header className="if-header">
       <div className="if-heading"><h1>雙點波源干涉</h1><p>兩圈一圈的波，為什麼會長出雙曲線？</p></div>
       <p className="if-mode" data-mode-status>課本模式</p>
