@@ -27,6 +27,7 @@ jobs:
 
           const checks = [
             ["worker-specific settings", `/accounts/${encodeURIComponent(accountId)}/workers/scripts/kakau-lab/settings`],
+            ["worker-scoped metadata (new Wrangler)", `/accounts/${encodeURIComponent(accountId)}/workers/workers/kakau-lab`],
             ["account Workers subdomain", `/accounts/${encodeURIComponent(accountId)}/workers/subdomain`],
             ["user memberships", "/memberships"],
           ];
@@ -44,7 +45,10 @@ jobs:
                 ? payload.errors.map((e) => Number(e.code)).filter(Number.isFinite)
                 : [];
               const status = `HTTP ${response.status}; API success=${payload.success === true}; error codes=${codes.join(",") || "none"}`;
-              console.log(`${label}: ${status}`);
+              const hasWorkerSubdomainUrl = label === "worker-scoped metadata (new Wrangler)"
+                ? `; subdomain URL present=${typeof payload?.result?.subdomain?.url === "string"}`
+                : "";
+              console.log(`${label}: ${status}${hasWorkerSubdomainUrl}`);
               if (response.status >= 500) unexpected = true;
             } catch {
               console.log(`${label}: request/parse failed (details suppressed)`);
