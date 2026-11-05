@@ -7,7 +7,12 @@
  * changes what a guided step reveals or when. Gold stays decorative (live dot); it is never a state or focus colour.
  */
 /* ---- Header: flat workbench bar with a ruled base, one 44px control height ---- */
-.hydrogen-c2 .topbar { align-items: flex-end; flex-wrap: wrap; gap: 1rem 1.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--lc-border); }
+.hydrogen-c2 .topbar { align-items: center; flex-wrap: wrap; gap: .75rem 1.5rem; margin-bottom: .75rem; padding-bottom: .75rem; border-bottom: 1px solid var(--lc-border); }
+/* Logo and module title share one row; the title keeps its own two lines beside the mark. */
+.hydrogen-c2 .hydrogen-brandline { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 18px; }
+.hydrogen-c2 .hydrogen-brandline .lab-brand { margin: 0; }
+.hydrogen-c2 .hydrogen-title { padding-left: 18px; border-left: 1px solid var(--lc-border); }
+.hydrogen-c2 .hydrogen-title h1 { margin: 0; }
 .hydrogen-c2 .header-actions { flex-wrap: wrap; align-items: center; }
 .hydrogen-c2 :is(.header-actions, .hydrogen-task-card, .hydrogen-controls, .hydrogen-intent) :is(button, .model-index-link) {
   min-height: 44px;
@@ -36,6 +41,7 @@
 /* Mobile: the shared header rule hides button labels; the mode switch must keep its words. */
 @media (max-width: 660px) {
   .hydrogen-c2 .topbar { align-items: flex-start; flex-direction: column; }
+  .hydrogen-c2 .hydrogen-title { padding-left: 0; border-left: 0; }
   .hydrogen-c2 .header-actions button { font-size: 14px; padding: 8px 12px; }
   .hydrogen-c2 .header-actions .model-index-link { font-size: 14px; }
 }
@@ -88,3 +94,37 @@
 /* A submitted answer is locked, not dimmed: keep the chosen option legible. */
 .hydrogen-c2 .hydrogen-task-card button[aria-pressed]:disabled { opacity: 1; }
 .hydrogen-c2 .hydrogen-task-card button[aria-pressed="false"]:disabled { opacity: .6; }
+
+/* ---- Verdict: match / mismatch carry an icon, a word, a colour and a heavier frame ---- */
+.hydrogen-c2 { --hy-ok: #18794e; --hy-ok-bg: #e3f4ea; --hy-ok-on: #fff; --hy-off: #b4440e; --hy-off-bg: #fdece3; --hy-off-on: #fff; }
+@media (prefers-color-scheme: dark) {
+  html:not([data-mode]) .hydrogen-c2 { --hy-ok: #7fd9a8; --hy-ok-bg: #12301f; --hy-ok-on: #0a1f13; --hy-off: #f2a37a; --hy-off-bg: #3a2015; --hy-off-on: #2a1208; }
+}
+html[data-mode="dark"] .hydrogen-c2 { --hy-ok: #7fd9a8; --hy-ok-bg: #12301f; --hy-ok-on: #0a1f13; --hy-off: #f2a37a; --hy-off-bg: #3a2015; --hy-off-on: #2a1208; }
+.hydrogen-c2 .hydrogen-verdict { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; margin-top: 14px; padding: 10px 12px; border: 2px solid var(--hy-c); border-radius: 12px; background: var(--hy-bg); }
+.hydrogen-c2 .hydrogen-verdict.ok { --hy-c: var(--hy-ok); --hy-bg: var(--hy-ok-bg); --hy-on: var(--hy-ok-on); }
+.hydrogen-c2 .hydrogen-verdict.off { --hy-c: var(--hy-off); --hy-bg: var(--hy-off-bg); --hy-on: var(--hy-off-on); }
+.hydrogen-c2 .hydrogen-verdict h2 { margin: 0; font-size: 18px; }
+.hydrogen-c2 .hydrogen-verdict-mark { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 8px; border-radius: 999px; background: var(--hy-c); color: var(--hy-on); font-size: 15px; font-weight: 700; white-space: nowrap; }
+.hydrogen-c2 .hydrogen-task-card p.hydrogen-feedback.ok { border-left: 5px solid var(--hy-ok); background: var(--hy-ok-bg); }
+.hydrogen-c2 .hydrogen-task-card p.hydrogen-feedback.off { border-left: 5px solid var(--hy-off); background: var(--hy-off-bg); }
+
+/* ---- Guided: the evidence panels are landscape so spectrum, diagrams and the card fit one screen ---- */
+.hydrogen-c2 .hydrogen-guided-evidence .hydrogen-card { aspect-ratio: 4 / 3; }
+
+/* ---- Free exploration: observe on the left, operate on the right, no scrolling between them ---- */
+.hydrogen-c2 .hydrogen-free-side { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.hydrogen-c2 .hydrogen-free-side .hydrogen-metrics,
+.hydrogen-c2 .hydrogen-free-side .hydrogen-controls { margin-top: 0; }
+@media (min-width: 1100px) {
+  .hydrogen-c2 .hydrogen-free-layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 14px; align-items: start; }
+  .hydrogen-c2 .hydrogen-free-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); margin-top: 0; overflow-y: auto; }
+  .hydrogen-c2 .hydrogen-free-stage .hydrogen-card { min-height: 380px; }
+  .hydrogen-c2 .hydrogen-free-stage .hydrogen-spectrum-card { margin-top: 14px; }
+  .hydrogen-c2 .hydrogen-free-side .hydrogen-metrics { grid-template-columns: 1fr 1fr; }
+  .hydrogen-c2 .hydrogen-free-side .hydrogen-metrics>div { border-bottom: 1px solid var(--lc-border); }
+  .hydrogen-c2 .hydrogen-free-side .hydrogen-metrics>div:nth-child(2n) { border-right: 0; }
+  .hydrogen-c2 .hydrogen-free-side .hydrogen-metrics>div:last-child { grid-column: 1 / -1; border-bottom: 0; }
+  .hydrogen-c2 .hydrogen-free-side .hydrogen-control-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (min-height: 950px) { .hydrogen-c2 .hydrogen-guided-evidence .hydrogen-card { aspect-ratio: 1 / 1; } }

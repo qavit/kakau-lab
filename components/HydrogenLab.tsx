@@ -127,10 +127,12 @@ export default function HydrogenLab() {
   return (
     <main className="lab-shell hydrogen-lab hydrogen-c2 lab-c2" data-mode={labMode}>
       <div className="topbar">
-        <div>
+        <div className="hydrogen-brandline">
           <Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link>
-          <div className="eyebrow">Model 10</div>
-          <h1><span className="live-dot" />氫原子能階與光譜</h1>
+          <div className="hydrogen-title">
+            <div className="eyebrow">Model 10</div>
+            <h1><span className="live-dot" />氫原子能階與光譜</h1>
+          </div>
         </div>
         <div className="header-actions">
           <ThemeToggle />
@@ -236,6 +238,8 @@ export default function HydrogenLab() {
 
       {labMode === "free" ? (
         <>
+        <div className="hydrogen-free-layout">
+        <div className="hydrogen-free-stage">
         <div className="hydrogen-stage-grid">
           <section className="viewport-card hydrogen-card">
             <div className="card-label">
@@ -265,7 +269,9 @@ export default function HydrogenLab() {
           <div className="hydrogen-strip"><SpectrumStrip readout={readout} mode={state.mode} range={spectrumRange} selectedUpper={readout.selected.upper} onPick={(t) => pick(t.upper, t.lower)} /></div>
           <p className="hydrogen-strip-note">一個氫原子一次只做一次躍遷；整條光譜是大量原子各自躍遷的總和。「可見」只表示肉眼看得到，紫外線與紅外線的光子同樣存在。</p>
         </section>
+        </div>
 
+        <aside className="hydrogen-free-side" aria-label="數值與控制">
         <div className="hydrogen-metrics">
           <div><span>躍遷</span><strong>{selected.upper} {state.mode === "emission" ? "→" : "←"} {selected.lower}</strong></div>
           <div><span>光子能量</span><strong>{selected.photonEnergy.toFixed(3)} eV</strong></div>
@@ -333,6 +339,8 @@ export default function HydrogenLab() {
             ))}
           </div>
         </section>
+        </aside>
+        </div>
 
         <p className="hydrogen-note">
           這張圖描述單一氫原子：電子一次只在一個能階。發射需要電子先在高能階，吸收需要電子先在低能階，而且吸收的光子能量必須恰等於能階差；把電子激發到高能階的來源（如碰撞或先前吸收）不在模型之內。

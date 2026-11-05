@@ -1,5 +1,6 @@
 "use client";
 
+import VerdictMark from "@/components/hydrogen/VerdictMark";
 import {
   TARGET_LOWER,
   balmerCompareFeedback,
@@ -39,6 +40,9 @@ export default function BalmerCompareCard({ compare, handlers }: { compare: Balm
       </div>
       {compare.submitted && compare.guess !== null ? (
         <>
+          <div className={`hydrogen-verdict ${compare.guess === largerUpper ? "ok" : "off"}`}>
+            <VerdictMark match={compare.guess === largerUpper} label={compare.guess === largerUpper ? "吻合" : "與模型不同"} />
+          </div>
           <p className={`hydrogen-feedback ${compare.guess === largerUpper ? "ok" : "off"}`} role="status" data-testid="compare-feedback">{balmerCompareFeedback(compare.guess)}</p>
           <dl className="hydrogen-compare" data-testid="compare-results">
             {lines.map((t) => (

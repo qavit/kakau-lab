@@ -263,3 +263,11 @@ test("the comparison card is display-only and mounts only in the evidence phase"
   assert.doesNotMatch(card, /HydrogenState|fireTransition|placeElectron/);
   assert.match(lab, /policy\.transitionReadout \? \(\s*<BalmerCompareCard/);
 });
+
+test("match and mismatch verdicts carry an icon and a word, not colour alone", async () => {
+  const [mark, guided, balmer] = await Promise.all(["VerdictMark", "GuidedCard", "BalmerCompareCard"].map((n) => readFile(new URL(`../components/hydrogen/${n}.tsx`, import.meta.url), "utf8")));
+  assert.match(mark, /<Check\b[^>]*aria-hidden/);
+  assert.match(mark, /<CircleAlert\b[^>]*aria-hidden/);
+  assert.match(guided, /label=\{comparison\.correct \? "吻合" : "不吻合"\}/);
+  assert.match(balmer, /VerdictMark/);
+});
