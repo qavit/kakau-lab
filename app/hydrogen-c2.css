@@ -85,3 +85,6 @@
 .hydrogen-c2 .hydrogen-controls .hydrogen-row--tight button { min-width: 44px; }
 .hydrogen-c2 .hydrogen-note { color: var(--lc-muted); }
 .hydrogen-c2 .lab-footer { color: var(--lc-muted); }
+/* A submitted answer is locked, not dimmed: keep the chosen option legible. */
+.hydrogen-c2 .hydrogen-task-card button[aria-pressed]:disabled { opacity: 1; }
+.hydrogen-c2 .hydrogen-task-card button[aria-pressed="false"]:disabled { opacity: .6; }
