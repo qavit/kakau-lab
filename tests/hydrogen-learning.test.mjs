@@ -201,3 +201,10 @@ test("labelledLines keeps forced labels first and drops neighbours instead of ov
   const lone = labelledLines([10, 200, 400], 40, [2]);
   assert.deepEqual(lone, [true, true, true]);
 });
+
+test("every guess agrees with the independent Rydberg-formula wavelength", () => {
+  for (const n of GUESS_OPTIONS) {
+    const c = compareGuess(n);
+    assert.ok(Math.abs(c.wavelength - h.rydbergWavelength(n, 2)) < 0.01, `n=${n}: energy route and Rydberg route differ`);
+  }
+});
