@@ -120,7 +120,6 @@ html[data-mode="dark"] .hydrogen-c2 { --hy-ok: #7fd9a8; --hy-ok-bg: #12301f; --h
   .hydrogen-c2 .hydrogen-free-layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 14px; align-items: start; }
   .hydrogen-c2 .hydrogen-free-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); margin-top: 0; overflow-y: auto; }
   .hydrogen-c2 .hydrogen-free-stage .hydrogen-card { min-height: 380px; }
-  .hydrogen-c2 .hydrogen-free-stage .hydrogen-spectrum-card { margin-top: 14px; }
   .hydrogen-c2 .hydrogen-free-side .hydrogen-metrics { grid-template-columns: 1fr 1fr; }
   .hydrogen-c2 .hydrogen-free-side .hydrogen-metrics>div { border-bottom: 1px solid var(--lc-border); }
   .hydrogen-c2 .hydrogen-free-side .hydrogen-metrics>div:nth-child(2n) { border-right: 0; }
