@@ -208,3 +208,18 @@ test("every guess agrees with the independent Rydberg-formula wavelength", () =>
     assert.ok(Math.abs(c.wavelength - h.rydbergWavelength(n, 2)) < 0.01, `n=${n}: energy route and Rydberg route differ`);
   }
 });
+
+test("C2 workspace: the page loads the shared sheets and the C2 sheet never styles SVG data or the spectrum canvas", async () => {
+  const [page, lab, css] = await Promise.all([
+    readFile(new URL("../app/hydrogen/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/HydrogenLab.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/hydrogen-c2.css", import.meta.url), "utf8"),
+  ]);
+  assert.ok(page.indexOf('"../lab-c2.css"') !== -1 && page.indexOf('"../lab-c2.css"') < page.indexOf('"../hydrogen-c2.css"'), "shared C2 sheet is imported before the module sheet");
+  assert.match(lab, /className="lab-shell hydrogen-lab hydrogen-c2 lab-c2"/);
+  const rules = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  for (const selector of rules.match(/[^{}]+(?=\{)/g) ?? []) {
+    assert.doesNotMatch(selector, /\bsvg\b|\bcanvas\b|\.hydrogen-strip|\.hydrogen-canvas|\.hydrogen-spectrum-card|\.viewport-card/, `scientific surface must stay untouched: ${selector.trim()}`);
+  }
+  assert.doesNotMatch(rules, /#f2c66d|#e0b050/i, "gold is never a state or focus colour");
+});

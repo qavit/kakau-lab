@@ -112,7 +112,7 @@ export default function HydrogenLab() {
   const predicted = policy.predictionMarker && learning.compared !== null ? compareGuess(learning.compared) : null;
 
   return (
-    <main className="lab-shell hydrogen-lab" data-mode={labMode}>
+    <main className="lab-shell hydrogen-lab hydrogen-c2 lab-c2" data-mode={labMode}>
       <div className="topbar">
         <div>
           <Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link>
@@ -120,7 +120,7 @@ export default function HydrogenLab() {
           <h1><span className="live-dot" />氫原子能階與光譜</h1>
         </div>
         <div className="header-actions">
-          <ThemeToggle variant="segmented" />
+          <ThemeToggle />
           <Link className="model-index-link" href="/">模型目錄</Link>
           {labMode !== "intent" ? (
             <>
