@@ -208,3 +208,43 @@ test("every guess agrees with the independent Rydberg-formula wavelength", () =>
     assert.ok(Math.abs(c.wavelength - h.rydbergWavelength(n, 2)) < 0.01, `n=${n}: energy route and Rydberg route differ`);
   }
 });
+
+test("Hα/Hβ comparison: values come from the science layer and the larger gap is Hβ", async () => {
+  const { compareBalmerLines, balmerCompareFeedback, chooseLarger, submitCompare, retryCompare, initialBalmerCompare } = await import("../models/hydrogen-learning.ts");
+  const c = compareBalmerLines();
+  assert.equal(c.alpha.wavelength, h.transition(3, 2).wavelength);
+  assert.equal(c.beta.wavelength, h.transition(4, 2).wavelength);
+  assert.ok(Math.abs(c.alpha.wavelength - 656.1) < 0.2 && Math.abs(c.beta.wavelength - 486.0) < 0.1);
+  assert.equal(c.alpha.lower, c.beta.lower, "same final level");
+  assert.equal(c.largerUpper, 4);
+  assert.ok(c.beta.photonEnergy > c.alpha.photonEnergy && c.beta.wavelength < c.alpha.wavelength, "larger ΔE, shorter λ");
+  for (const t of [c.alpha, c.beta]) assert.ok(Math.abs(t.photonEnergy * t.wavelength - h.HC_EV_NM) < 1e-9, "ΔE and λ agree through hc");
+
+  // Predict first, evidence only after a submit; invalid picks are ignored; retry starts fresh.
+  let s = initialBalmerCompare();
+  assert.equal(submitCompare(s), s, "no submit without a choice");
+  assert.equal(chooseLarger(s, 5), s);
+  s = submitCompare(chooseLarger(s, 3));
+  assert.equal(s.submitted, true);
+  assert.equal(chooseLarger(s, 4), s, "no changing the answer after submitting");
+  assert.deepEqual(retryCompare(s), initialBalmerCompare());
+
+  const right = balmerCompareFeedback(4);
+  const wrong = balmerCompareFeedback(3);
+  assert.match(right, /吻合/);
+  assert.match(wrong, /與模型不同/);
+  for (const text of [right, wrong]) {
+    assert.ok(text.includes(c.beta.wavelength.toFixed(1)) && text.includes(c.alpha.wavelength.toFixed(1)));
+    assert.match(text, /波長越短/);
+    assert.match(text, /不預測各線的強度/);
+  }
+});
+
+test("the comparison card is display-only and mounts only in the evidence phase", async () => {
+  const [card, lab] = await Promise.all([
+    readFile(new URL("../components/hydrogen/BalmerCompareCard.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/HydrogenLab.tsx", import.meta.url), "utf8"),
+  ]);
+  assert.doesNotMatch(card, /HydrogenState|fireTransition|placeElectron/);
+  assert.match(lab, /policy\.transitionReadout \? \(\s*<BalmerCompareCard/);
+});
