@@ -1,0 +1,87 @@
+/* Lab W45 — C2 Neutral Scientific Workbench, Hydrogen workspace only.
+ * Every rule is scoped to .hydrogen-c2 (the <main> of /hydrogen). Tokens and shared rules live in
+ * lab-c2.css (import that first). This sheet restyles the interface around the model: header, workspace
+ * surfaces, the Guided/Free switch, the guided task card, the intent choice and the free-exploration
+ * readouts and controls. The Bohr orbit and energy-level SVGs, the dark spectrum canvases, the photon
+ * colours drawn from wavelength and the electron/transition colours are untouched, and nothing here
+ * changes what a guided step reveals or when. Gold stays decorative (live dot); it is never a state or focus colour.
+ */
+/* ---- Header: flat workbench bar with a ruled base, one 44px control height ---- */
+.hydrogen-c2 .topbar { align-items: flex-end; flex-wrap: wrap; gap: 1rem 1.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--lc-border); }
+.hydrogen-c2 .header-actions { flex-wrap: wrap; align-items: center; }
+.hydrogen-c2 :is(.header-actions, .hydrogen-task-card, .hydrogen-controls, .hydrogen-intent) :is(button, .model-index-link) {
+  min-height: 44px;
+  border-color: var(--lc-border-control);
+  border-radius: 10px;
+  background: var(--lc-raised);
+  color: var(--lc-text);
+  font-size: 14px;
+  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+.hydrogen-c2 .header-actions .model-index-link { padding: 8px 12px; border: 1px solid transparent; background: transparent; color: var(--lc-accent); }
+.hydrogen-c2 :is(.header-actions, .hydrogen-task-card, .hydrogen-controls, .hydrogen-intent) :is(button, .model-index-link):hover:not(:disabled) { transform: none; border-color: var(--lc-accent); background: var(--lc-sunken); }
+/* Selected/open: tint + ring + heavier weight, so the state is not carried by colour alone. */
+.hydrogen-c2 :is(.header-actions, .hydrogen-task-card, .hydrogen-controls) button:is(.active, .selected, [aria-pressed="true"], [aria-expanded="true"]) {
+  border-color: var(--lc-accent);
+  background: var(--lc-accent-subtle);
+  box-shadow: inset 0 0 0 1px var(--lc-accent);
+  color: var(--lc-text);
+  font-weight: 650;
+}
+.hydrogen-c2 :is(.hydrogen-task-card, .hydrogen-controls) button.primary-action:not(:disabled) { border-color: var(--lc-accent); background: var(--lc-accent); box-shadow: none; color: var(--lc-on-accent); }
+.hydrogen-c2 :is(.hydrogen-task-card, .hydrogen-controls) button.primary-action:hover:not(:disabled) { background: var(--lc-accent); filter: brightness(.92); }
+.hydrogen-c2 button:disabled, .hydrogen-c2 select:disabled { cursor: not-allowed; opacity: .5; }
+/* A disabled primary action must not read as an enabled one: drop the accent fill. */
+.hydrogen-c2 .hydrogen-task-card button.primary-action:disabled { border-color: var(--lc-border-control); background: var(--lc-sunken); color: var(--lc-muted); }
+/* Mobile: the shared header rule hides button labels; the mode switch must keep its words. */
+@media (max-width: 660px) {
+  .hydrogen-c2 .topbar { align-items: flex-start; flex-direction: column; }
+  .hydrogen-c2 .header-actions button { font-size: 14px; padding: 8px 12px; }
+  .hydrogen-c2 .header-actions .model-index-link { font-size: 14px; }
+}
+
+/* ---- Focus: 2px in the interface colour on every interface control (SVG hit targets keep their own ring) ---- */
+.hydrogen-c2 :is(button, a, input, select, summary):focus-visible,
+.hydrogen-c2 .hydrogen-task-card :is(button, summary):focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
+.hydrogen-c2 .hydrogen-task-card h2:focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 4px; }
+.hydrogen-c2 .hydrogen-range button:focus-visible { outline-color: var(--lc-focus-on-dark); }
+
+/* ---- Entry choice: Guided and Free are two peers, not a primary and a fallback ---- */
+.hydrogen-c2 .hydrogen-intent-choice { min-height: 170px; align-items: flex-start; justify-content: flex-start; border-radius: 14px; box-shadow: var(--lc-card-shadow); }
+.hydrogen-c2 .hydrogen-intent-choice strong { font-family: inherit; font-weight: 650; }
+.hydrogen-c2 .hydrogen-intent h2 { font-family: inherit; font-weight: 650; }
+
+/* ---- Guided task card ---- */
+.hydrogen-c2 .hydrogen-task-card { border-color: var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+.hydrogen-c2 .hydrogen-task-card h2 { font-family: inherit; font-size: 20px; font-weight: 650; }
+.hydrogen-c2 .hydrogen-steps li { border-color: var(--lc-border); color: var(--lc-muted); }
+.hydrogen-c2 .hydrogen-steps li span { background: var(--lc-sunken); color: var(--lc-text); }
+.hydrogen-c2 .hydrogen-steps li.current { border-color: var(--lc-accent); background: var(--lc-accent-subtle); color: var(--lc-text); }
+.hydrogen-c2 .hydrogen-steps li.current span { background: var(--lc-accent); color: var(--lc-on-accent); }
+.hydrogen-c2 .hydrogen-guess-row button { min-height: 52px; font-size: 19px; font-weight: 600; }
+.hydrogen-c2 .hydrogen-hint,
+.hydrogen-c2 .hydrogen-task-card p.hydrogen-feedback,
+.hydrogen-c2 .hydrogen-equation { border-left-color: var(--lc-accent); background: var(--lc-accent-subtle); }
+/* A mismatch is told apart by its heading and numbers; the neutral rule keeps it from reading as an error state. */
+.hydrogen-c2 .hydrogen-task-card p.hydrogen-feedback.off { border-left-color: var(--lc-border-control); background: var(--lc-sunken); }
+.hydrogen-c2 .hydrogen-task-card p.hydrogen-feedback.ok { border-left-color: var(--lc-accent); }
+.hydrogen-c2 .hydrogen-link-button { min-height: 44px; padding: 6px 0; border: 0; background: none; color: var(--lc-accent); }
+.hydrogen-c2 .hydrogen-link-button:hover:not(:disabled) { border: 0; background: none; text-decoration-thickness: 2px; }
+.hydrogen-c2 .hydrogen-compare { border-color: var(--lc-border); border-radius: 10px; background: var(--lc-border); }
+.hydrogen-c2 .hydrogen-compare>div { background: var(--lc-raised); }
+.hydrogen-c2 .hydrogen-compare dd { font-family: inherit; font-weight: 600; font-variant-numeric: tabular-nums; }
+.hydrogen-c2 .hydrogen-extension { border-color: var(--lc-border); border-radius: 10px; }
+.hydrogen-c2 .hydrogen-extension summary { min-height: 44px; display: flex; align-items: center; color: var(--lc-text); }
+.hydrogen-c2 .hydrogen-task-card p.hydrogen-task-question { color: var(--lc-text); }
+
+/* ---- Free exploration: readouts and control deck ---- */
+.hydrogen-c2 .hydrogen-metrics { border-color: var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+.hydrogen-c2 .hydrogen-metrics>div { border-color: var(--lc-border); }
+.hydrogen-c2 .hydrogen-metrics span { font-size: 12px; }
+.hydrogen-c2 .hydrogen-metrics strong { font-family: inherit; font-weight: 600; font-variant-numeric: tabular-nums; }
+.hydrogen-c2 .hydrogen-controls { border-color: var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+.hydrogen-c2 .hydrogen-controls .control-panel-heading { border-bottom-color: var(--lc-border); }
+.hydrogen-c2 .hydrogen-controls .control-panel-heading>div { font-weight: 650; }
+.hydrogen-c2 .hydrogen-controls .hydrogen-row--tight button { min-width: 44px; }
+.hydrogen-c2 .hydrogen-note { color: var(--lc-muted); }
+.hydrogen-c2 .lab-footer { color: var(--lc-muted); }
