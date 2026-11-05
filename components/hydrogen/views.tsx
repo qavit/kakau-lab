@@ -157,12 +157,15 @@ export function EnergyView({
   readout,
   onPlace,
   onPick,
+  marks,
 }: {
   state: HydrogenState;
   readout: HydrogenReadout;
   /** Omit both handlers for a read-only diagram: nothing is focusable or clickable. */
   onPlace?: (n: number) => void;
   onPick?: (upper: number, lower: number) => void;
+  /** Transitions to call out with a bold arrow and a label, e.g. the two lines of the Hα/Hβ comparison. */
+  marks?: { upper: number; lower: number; label: string }[];
 }) {
   const yOf = (energy: number) => ENERGY_TOP + (-energy / Math.abs(readout.levels[0].energy)) * ENERGY_SPAN;
   const levelY = readout.levels.map((level) => yOf(level.energy));
@@ -190,7 +193,8 @@ export function EnergyView({
         const x = arrowX(index);
         const yTop = levelY[line.upper - 1];
         const yBottom = levelY[line.lower - 1];
-        const selected = line.upper === state.upper && line.lower === state.lower;
+        const mark = marks?.find((m) => m.upper === line.upper && m.lower === line.lower);
+        const selected = (line.upper === state.upper && line.lower === state.lower) || mark !== undefined;
         const color = photonColor(line);
         const [fromY, toY] = state.mode === "emission" ? [yTop, yBottom] : [yBottom, yTop];
         const head = toY > fromY ? -9 : 9;
@@ -202,6 +206,9 @@ export function EnergyView({
             <line x1={x} y1={fromY} x2={x} y2={toY + head * 0.2} stroke="transparent" strokeWidth={16} />
             <line x1={x} y1={fromY} x2={x} y2={toY + head * 0.2} stroke={color} strokeWidth={selected ? 3.2 : 1.6} opacity={selected ? 1 : 0.55} />
             <path d={`M ${x - 5} ${toY + head} L ${x} ${toY} L ${x + 5} ${toY + head}`} fill="none" stroke={color} strokeWidth={selected ? 3.2 : 1.6} opacity={selected ? 1 : 0.55} />
+            {mark ? (
+              <text x={x + 8} y={(fromY + toY) / 2} fill="#f2f6f8" fontSize={14} fontWeight={700} stroke="#10202b" strokeWidth={3} paintOrder="stroke">{mark.label}</text>
+            ) : null}
           </g>
         );
       })}

@@ -19,21 +19,28 @@ import {
   type HydrogenState,
 } from "@/models/hydrogen";
 import {
+  COMPARE_UPPERS,
   TARGET_LOWER,
+  balmerLineName,
   beginPredicting,
   chooseGuess,
+  chooseLarger,
   compareGuess,
   evidencePolicy,
   evidenceTransition,
   guidedPhysicsState,
+  initialBalmerCompare,
   initialLearning,
+  retryCompare,
   retryGuess,
   revealHint,
   showEvidence,
+  submitCompare,
   submitGuess,
 } from "@/models/hydrogen-learning";
 import { type SpectrumRangeMode } from "@/components/hydrogen/spectrum";
 import GuidedCard from "@/components/hydrogen/GuidedCard";
+import BalmerCompareCard from "@/components/hydrogen/BalmerCompareCard";
 import {
   EnergyView,
   OrbitView,
@@ -50,6 +57,9 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 type LabMode = "intent" | "free" | "guided";
 
+/** The two transitions called out on the energy diagram once the Hα/Hβ comparison is submitted. */
+const COMPARE_MARKS = COMPARE_UPPERS.map((upper) => ({ upper, lower: TARGET_LOWER, label: `${balmerLineName(upper)} ${upper}→${TARGET_LOWER}` }));
+
 /** The guided spectrum: Balmer lines up to n=6, independent of the physical state so it cannot reveal the selection. */
 const GUIDED_SPECTRUM = { series: seriesLines(TARGET_LOWER, 6), seriesLimit: seriesLimitWavelength(TARGET_LOWER) };
 
@@ -57,6 +67,7 @@ export default function HydrogenLab() {
   const [labMode, setLabMode] = useState<LabMode>("intent");
   const [state, setState] = useState<HydrogenState>(initialHydrogenState);
   const [learning, setLearning] = useState(initialLearning);
+  const [balmer, setBalmer] = useState(initialBalmerCompare);
   const [orbitScale, setOrbitScale] = useState<OrbitScale>("true");
   const [spectrumRange, setSpectrumRange] = useState<SpectrumRangeMode>("auto");
   const readout = useMemo(() => deriveHydrogenModel(state), [state]);
@@ -94,11 +105,13 @@ export default function HydrogenLab() {
   const enterFree = () => {
     setState(initialHydrogenState());
     setLearning(initialLearning());
+    setBalmer(initialBalmerCompare());
     setLabMode("free");
   };
   const enterGuided = () => {
     setState(guidedPhysicsState());
     setLearning(initialLearning());
+    setBalmer(initialBalmerCompare());
     setLabMode("guided");
   };
   const reset = () => (guided ? enterGuided() : enterFree());
@@ -112,15 +125,17 @@ export default function HydrogenLab() {
   const predicted = policy.predictionMarker && learning.compared !== null ? compareGuess(learning.compared) : null;
 
   return (
-    <main className="lab-shell hydrogen-lab" data-mode={labMode}>
+    <main className="lab-shell hydrogen-lab hydrogen-c2 lab-c2" data-mode={labMode}>
       <div className="topbar">
-        <div>
+        <div className="hydrogen-brandline">
           <Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link>
-          <div className="eyebrow">Model 10</div>
-          <h1><span className="live-dot" />氫原子能階與光譜</h1>
+          <div className="hydrogen-title">
+            <div className="eyebrow">Model 10</div>
+            <h1><span className="live-dot" />氫原子能階與光譜</h1>
+          </div>
         </div>
         <div className="header-actions">
-          <ThemeToggle variant="segmented" />
+          <ThemeToggle />
           <Link className="model-index-link" href="/">模型目錄</Link>
           {labMode !== "intent" ? (
             <>
@@ -193,7 +208,7 @@ export default function HydrogenLab() {
                     <span>2</span>
                     <div><strong>能階圖</strong><small>Eₙ = −13.6 eV / n²；箭頭是這條譜線的躍遷</small></div>
                   </div>
-                  <div className="canvas-host hydrogen-canvas"><EnergyView state={state} readout={readout} /></div>
+                  <div className="canvas-host hydrogen-canvas"><EnergyView state={state} readout={readout} marks={balmer.submitted ? COMPARE_MARKS : undefined} /></div>
                 </section>
               ) : null}
               {policy.orbitView ? (
@@ -208,6 +223,13 @@ export default function HydrogenLab() {
             </div>
           ) : null}
 
+          {policy.transitionReadout ? (
+            <BalmerCompareCard
+              compare={balmer}
+              handlers={{ onChoose: (n) => setBalmer((b) => chooseLarger(b, n)), onSubmit: () => setBalmer(submitCompare), onRetry: () => setBalmer(retryCompare) }}
+            />
+          ) : null}
+
           <p className="hydrogen-note">
             一個氫原子一次只做一次躍遷；整條光譜是大量原子各自躍遷的總和，線的粗細與亮度只是示意，並未計算各能階的原子數或躍遷機率。本任務使用無限重原子核的玻耳模型，數值與實測有約 0.05 % 的差（模型 {evidenceTransition().wavelength.toFixed(1)} nm 對實測約 486.27 nm 的真空波長）。它描述單一氫原子的躍遷；真實電子沒有固定軌跡，只有機率分布。
           </p>
@@ -216,6 +238,8 @@ export default function HydrogenLab() {
 
       {labMode === "free" ? (
         <>
+        <div className="hydrogen-free-layout">
+        <div className="hydrogen-free-stage">
         <div className="hydrogen-stage-grid">
           <section className="viewport-card hydrogen-card">
             <div className="card-label">
@@ -245,7 +269,9 @@ export default function HydrogenLab() {
           <div className="hydrogen-strip"><SpectrumStrip readout={readout} mode={state.mode} range={spectrumRange} selectedUpper={readout.selected.upper} onPick={(t) => pick(t.upper, t.lower)} /></div>
           <p className="hydrogen-strip-note">一個氫原子一次只做一次躍遷；整條光譜是大量原子各自躍遷的總和。「可見」只表示肉眼看得到，紫外線與紅外線的光子同樣存在。</p>
         </section>
+        </div>
 
+        <aside className="hydrogen-free-side" aria-label="數值與控制">
         <div className="hydrogen-metrics">
           <div><span>躍遷</span><strong>{selected.upper} {state.mode === "emission" ? "→" : "←"} {selected.lower}</strong></div>
           <div><span>光子能量</span><strong>{selected.photonEnergy.toFixed(3)} eV</strong></div>
@@ -313,6 +339,8 @@ export default function HydrogenLab() {
             ))}
           </div>
         </section>
+        </aside>
+        </div>
 
         <p className="hydrogen-note">
           這張圖描述單一氫原子：電子一次只在一個能階。發射需要電子先在高能階，吸收需要電子先在低能階，而且吸收的光子能量必須恰等於能階差；把電子激發到高能階的來源（如碰撞或先前吸收）不在模型之內。
