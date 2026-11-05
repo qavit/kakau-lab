@@ -1,4 +1,4 @@
-import { HC_EV_NM, seriesLimitWavelength, transition } from "../lib/science/hydrogen.ts";
+import { HC_EV_NM, seriesLimitWavelength, transition, type Transition } from "../lib/science/hydrogen.ts";
 import { MAX_SHOWN_LEVELS, initialHydrogenState, type HydrogenState } from "./hydrogen.ts";
 
 /**
@@ -188,4 +188,57 @@ export function evidencePolicy(state: HydrogenLearning | null): EvidencePolicy {
 export function balmerLineName(upper: number): string | null {
   const greek = ["α", "β", "γ", "δ", "ε", "ζ"][upper - 3];
   return greek ? `H${greek}` : null;
+}
+
+// ---- Hα / Hβ comparison (v0.3 slice) ------------------------------------------------------
+
+/** The two lines compared after the evidence phase: same final level n=2, different upper levels. */
+export const COMPARE_UPPERS = [3, 4] as const;
+export type CompareUpper = (typeof COMPARE_UPPERS)[number];
+
+export type BalmerCompare = {
+  /** The transition the student thinks has the larger energy difference, not yet submitted. */
+  readonly guess: CompareUpper | null;
+  readonly submitted: boolean;
+};
+
+export function initialBalmerCompare(): BalmerCompare {
+  return { guess: null, submitted: false };
+}
+
+export function chooseLarger(state: BalmerCompare, upper: number): BalmerCompare {
+  if (state.submitted || !COMPARE_UPPERS.includes(upper as CompareUpper)) return state;
+  return { ...state, guess: upper as CompareUpper };
+}
+
+export function submitCompare(state: BalmerCompare): BalmerCompare {
+  return state.guess === null || state.submitted ? state : { ...state, submitted: true };
+}
+
+export function retryCompare(state: BalmerCompare): BalmerCompare {
+  return state.submitted ? initialBalmerCompare() : state;
+}
+
+export type BalmerComparison = {
+  readonly alpha: Transition;
+  readonly beta: Transition;
+  /** The upper level of the transition with the larger energy difference. */
+  readonly largerUpper: CompareUpper;
+};
+
+/** Model values for both lines, from the science layer; the larger gap is derived, not hard-coded. */
+export function compareBalmerLines(): BalmerComparison {
+  const [alpha, beta] = COMPARE_UPPERS.map((u) => transition(u, TARGET_LOWER));
+  return { alpha, beta, largerUpper: beta.photonEnergy > alpha.photonEnergy ? 4 : 3 };
+}
+
+/** Short physical explanation after submitting; it describes line positions only, not emission intensity. */
+export function balmerCompareFeedback(guess: CompareUpper): string {
+  const { alpha, beta, largerUpper } = compareBalmerLines();
+  const [big, small] = largerUpper === beta.upper ? [beta, alpha] : [alpha, beta];
+  const lead =
+    guess === largerUpper
+      ? `吻合：n=${big.upper} → n=${big.lower} 的能量差較大。`
+      : `與模型不同：能量差較大的是 n=${big.upper} → n=${big.lower}，不是 n=${small.upper} → n=${small.lower}。`;
+  return `${lead}兩者終態都是 n=${TARGET_LOWER}，只有初態不同：ΔE = ${big.photonEnergy.toFixed(2)} eV 對 ${small.photonEnergy.toFixed(2)} eV。光子能量越高，波長越短（${big.wavelength.toFixed(1)} nm 對 ${small.wavelength.toFixed(1)} nm）。譜線是離散的，因為束縛態能階本身是離散的。此模型只說明線的位置，不預測各線的強度。`;
 }

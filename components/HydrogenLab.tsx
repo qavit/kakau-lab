@@ -19,21 +19,28 @@ import {
   type HydrogenState,
 } from "@/models/hydrogen";
 import {
+  COMPARE_UPPERS,
   TARGET_LOWER,
+  balmerLineName,
   beginPredicting,
   chooseGuess,
+  chooseLarger,
   compareGuess,
   evidencePolicy,
   evidenceTransition,
   guidedPhysicsState,
+  initialBalmerCompare,
   initialLearning,
+  retryCompare,
   retryGuess,
   revealHint,
   showEvidence,
+  submitCompare,
   submitGuess,
 } from "@/models/hydrogen-learning";
 import { type SpectrumRangeMode } from "@/components/hydrogen/spectrum";
 import GuidedCard from "@/components/hydrogen/GuidedCard";
+import BalmerCompareCard from "@/components/hydrogen/BalmerCompareCard";
 import {
   EnergyView,
   OrbitView,
@@ -50,6 +57,9 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 type LabMode = "intent" | "free" | "guided";
 
+/** The two transitions called out on the energy diagram once the Hα/Hβ comparison is submitted. */
+const COMPARE_MARKS = COMPARE_UPPERS.map((upper) => ({ upper, lower: TARGET_LOWER, label: `${balmerLineName(upper)} ${upper}→${TARGET_LOWER}` }));
+
 /** The guided spectrum: Balmer lines up to n=6, independent of the physical state so it cannot reveal the selection. */
 const GUIDED_SPECTRUM = { series: seriesLines(TARGET_LOWER, 6), seriesLimit: seriesLimitWavelength(TARGET_LOWER) };
 
@@ -57,6 +67,7 @@ export default function HydrogenLab() {
   const [labMode, setLabMode] = useState<LabMode>("intent");
   const [state, setState] = useState<HydrogenState>(initialHydrogenState);
   const [learning, setLearning] = useState(initialLearning);
+  const [balmer, setBalmer] = useState(initialBalmerCompare);
   const [orbitScale, setOrbitScale] = useState<OrbitScale>("true");
   const [spectrumRange, setSpectrumRange] = useState<SpectrumRangeMode>("auto");
   const readout = useMemo(() => deriveHydrogenModel(state), [state]);
@@ -94,11 +105,13 @@ export default function HydrogenLab() {
   const enterFree = () => {
     setState(initialHydrogenState());
     setLearning(initialLearning());
+    setBalmer(initialBalmerCompare());
     setLabMode("free");
   };
   const enterGuided = () => {
     setState(guidedPhysicsState());
     setLearning(initialLearning());
+    setBalmer(initialBalmerCompare());
     setLabMode("guided");
   };
   const reset = () => (guided ? enterGuided() : enterFree());
@@ -193,7 +206,7 @@ export default function HydrogenLab() {
                     <span>2</span>
                     <div><strong>能階圖</strong><small>Eₙ = −13.6 eV / n²；箭頭是這條譜線的躍遷</small></div>
                   </div>
-                  <div className="canvas-host hydrogen-canvas"><EnergyView state={state} readout={readout} /></div>
+                  <div className="canvas-host hydrogen-canvas"><EnergyView state={state} readout={readout} marks={balmer.submitted ? COMPARE_MARKS : undefined} /></div>
                 </section>
               ) : null}
               {policy.orbitView ? (
@@ -206,6 +219,13 @@ export default function HydrogenLab() {
                 </section>
               ) : null}
             </div>
+          ) : null}
+
+          {policy.transitionReadout ? (
+            <BalmerCompareCard
+              compare={balmer}
+              handlers={{ onChoose: (n) => setBalmer((b) => chooseLarger(b, n)), onSubmit: () => setBalmer(submitCompare), onRetry: () => setBalmer(retryCompare) }}
+            />
           ) : null}
 
           <p className="hydrogen-note">
