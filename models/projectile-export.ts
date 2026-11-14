@@ -52,15 +52,17 @@ export function projectileResultSvg(result: ProjectileResult): string {
   const y = (v: number) => 440 - (v - ymin) * scale;
   const colors = ["#125b82", "#8a4600", "#6e3696"];
   const text = (value: string, px: number, py: number, size = 14) => `<text x="${px}" y="${py}" font-size="${size}">${escapeXml(value)}</text>`;
-  const paths = result.trajectories.map((t, i) => `<polyline fill="none" stroke="${colors[i]}" stroke-width="2.5" stroke-dasharray="${i === 0 ? "none" : i === 1 ? "8 4" : "2 4"}" points="${t.samples.map(s => `${x(s.point.x)},${y(s.point.y)}`).join(" ")}"/>${text(t.label + (t.termination === "time-cap" ? " (120 s 截止 / capped)" : ""), 80 + i * 280, 490)}`).join("");
+  const paths = result.trajectories.map((t, i) => `<polyline fill="none" stroke="${colors[i]}" stroke-width="2.5" stroke-dasharray="${i === 0 ? "none" : i === 1 ? "8 4" : "2 4"}" points="${t.samples.map(s => `${x(s.point.x)},${y(s.point.y)}`).join(" ")}"/>${text(t.label + (t.termination === "time-cap" ? " (120 s 截止 / capped)" : ""), 80 + i * 280, 502)}`).join("");
   const launch = result.setup.launch;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="790" viewBox="0 0 1000 790" role="img" aria-labelledby="title desc">
 <title id="title">拋體軌跡 / Projectile trajectories</title><desc id="desc">Equal axis scales; conditions, units and model assumptions below. 等比例座標；條件、單位及假設如下。</desc>
 <metadata>${escapeXml(JSON.stringify(result))}</metadata><rect width="1000" height="790" fill="white"/>
 <g fill="#17232e" font-family="Arial, sans-serif">${text("拋體軌跡 / Projectile trajectories", 40, 35, 24)}
 ${text(`v₀=${launch.speed} m/s  θ=${launch.angle}°  h=${result.effectiveHeight} m  g=${launch.gravity} m/s²  b=${launch.dragFactor} m⁻¹`, 40, 62)}
-<path d="M80 80V440H920" fill="none" stroke="#66717b"/>
-${text(`y (m): ${ymin.toFixed(2)} … ${ymax.toFixed(2)}`, 80, 78)}${text(`x (m): ${xmin.toFixed(2)} … ${xmax.toFixed(2)} | 等比例 / equal scale`, 80, 465)}
+<path d="M${x(xmin)} ${y(ymax)}V${y(ymin)}H${x(xmax)}" fill="none" stroke="#66717b"/>
+${text(ymin.toFixed(2), 40, y(ymin) + 4, 12)}${text(ymax.toFixed(2), 40, y(ymax) + 4, 12)}
+${text(xmin.toFixed(2), x(xmin), 455, 12)}${text(xmax.toFixed(2), x(xmax), 455, 12)}
+${text(`y (m): ${ymin.toFixed(2)} … ${ymax.toFixed(2)}`, 80, 78)}${text(`x (m): ${xmin.toFixed(2)} … ${xmax.toFixed(2)} | 等比例 / equal scale`, 80, 478)}
 ${paths}<circle cx="${x(result.cursor.point.x)}" cy="${y(result.cursor.point.y)}" r="5" fill="#17232e"/>
 ${text(`● 主軌跡游標 / Vacuum cursor: t=${result.cursor.t.toFixed(3)} s, x=${result.cursor.point.x.toFixed(3)} m, y=${result.cursor.point.y.toFixed(3)} m`, 40, 525)}
 ${text(`模型 / Model: ${result.modelVersion}; result-1; share v1`, 40, 555)}
