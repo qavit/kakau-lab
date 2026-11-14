@@ -34,7 +34,7 @@ export default function BalmerCompareCard({ compare, handlers }: { compare: Balm
             data-testid={`compare-${t.upper}`}
           >
             n={t.upper} → n={t.lower}
-            <small>{balmerLineName(t.upper)}・{t.wavelength.toFixed(1)} nm</small>
+            <small>{balmerLineName(t.upper)}{compare.submitted ? `・${t.wavelength.toFixed(1)} nm` : ""}</small>
           </button>
         ))}
       </div>
