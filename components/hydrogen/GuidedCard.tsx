@@ -16,6 +16,7 @@ import {
   type GuidedPhase,
   type HydrogenLearning,
 } from "@/models/hydrogen-learning";
+import VerdictMark from "@/components/hydrogen/VerdictMark";
 import type { HydrogenReadout, HydrogenState } from "@/models/hydrogen";
 
 const STEPS: { phase: GuidedPhase[]; label: string }[] = [
@@ -125,7 +126,10 @@ export default function GuidedCard({
 
       {phase === "compared" && comparison ? (
         <>
-          <h2 ref={headingRef} tabIndex={-1}>n={comparison.upper} → n={comparison.lower}：{comparison.correct ? "與觀察吻合" : "與觀察不一致"}</h2>
+          <div className={`hydrogen-verdict ${comparison.correct ? "ok" : "off"}`} data-testid="verdict">
+            <VerdictMark match={comparison.correct} label={comparison.correct ? "吻合" : "不吻合"} />
+            <h2 ref={headingRef} tabIndex={-1}>n={comparison.upper} → n={comparison.lower}：{comparison.correct ? "與觀察吻合" : "與觀察不一致"}</h2>
+          </div>
           <p className={`hydrogen-feedback ${comparison.correct ? "ok" : "off"}`} role="status" data-testid="comparison-feedback">{comparisonFeedback(comparison)}</p>
           <ComparisonTable c={comparison} />
           <div className="hydrogen-task-actions">
