@@ -55,6 +55,7 @@
 .projectile-c2 .projectile-map-reset { width: 44px; height: 44px; min-height: 44px; }
 .projectile-c2 .projectile-zoom-group,
 .projectile-c2 .projectile-map-reset { border-radius: 10px; }
+.projectile-c2 .projectile-zoom-group { position:relative; z-index:1; }
 .projectile-c2 .projectile-path-card .projectile-map-controls svg { width: 18px; height: 18px; }
 .projectile-c2 .projectile-map-reset.active { border-color: #9bd7dd66; color: #9bd7dd; }
 /* ---- Side panel and dock surfaces ---- */
@@ -142,4 +143,85 @@
   .projectile-c2 .projectile-transport button svg { flex: none; }
   .projectile-c2 .projectile-group { padding: 1rem; }
   .projectile-c2 .projectile-group.projectile-group-flush { padding: 0; }
+}
+
+/* Pilot workspace: compact identity and mode controls, with instruments beside the science view. */
+.projectile-c2 .projectile-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+.projectile-c2 .projectile-identity { display:flex; align-items:center; gap:10px; min-width:0; }
+.projectile-c2 .projectile-identity .eyebrow { font-size:11px; }
+.projectile-c2 .projectile-identity h1 { margin:0; font-size:22px; white-space:nowrap; }
+.projectile-c2 .projectile-topbar .header-actions { flex:none; }
+.projectile-c2 .projectile-modebar { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+.projectile-c2 .projectile-modebar button { min-height:44px; }
+.projectile-c2 .projectile-modebar button.active { border-color:var(--lc-accent); background:var(--lc-accent-subtle); }
+.projectile-c2 .projectile-theory-entry { margin-left:auto; }
+.projectile-c2 .projectile-disclosure-note { margin:0 0 5px; color:var(--lc-muted); font-size:12px; }
+.projectile-c2 .projectile-panel-actions { display:flex; gap:6px; margin:0 0 6px; }
+.projectile-c2 .projectile-panel-actions button { min-height:44px; }
+.projectile-c2 .projectile-stage { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:8px 12px; }
+.projectile-c2 .projectile-path-card { grid-column:1; grid-row:1; width:100%; }
+.projectile-c2 .projectile-dock { grid-column:1; grid-row:2; min-width:0; margin:0; }
+.projectile-c2 .projectile-side[data-open="true"], .projectile-c2 .guided-side { grid-column:2; grid-row:1 / span 2; }
+.projectile-c2 .projectile-side-inner { max-height:calc(100vh - 175px); }
+.projectile-c2 .projectile-setup { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.projectile-c2 .projectile-setup .projectile-group-label { flex-basis:100%; margin:0; }
+.projectile-c2 .projectile-setup .projectile-menu-list { left:0; right:auto; }
+.projectile-c2 .projectile-expand-actions { position:absolute; z-index:5; top:10px; right:10px; display:flex; gap:6px; }
+.projectile-c2 .projectile-expand-actions button { min-height:44px; background:#092439; color:#fff; }
+.projectile-c2 .projectile-expand-notice { position:absolute; z-index:5; top:60px; right:10px; max-width:260px; padding:8px; border-radius:6px; background:#092439; color:#fff; font-size:13px; }
+.projectile-c2 .projectile-stage[data-expanded="true"] { position:fixed; z-index:90; inset:0; display:grid; grid-template-columns:1fr; grid-template-rows:minmax(0,1fr) auto; overflow:auto; padding:12px; background:var(--lc-sunken); }
+.projectile-c2 .projectile-stage[data-expanded="true"] .projectile-path-card { grid-column:1; grid-row:1; height:100%; max-height:none; min-height:0; aspect-ratio:auto; }
+.projectile-c2 .projectile-stage[data-expanded="true"] .projectile-dock { grid-column:1; grid-row:2; }
+.projectile-c2 .projectile-stage[data-expanded="true"] :is(.projectile-side,.guided-side) { display:none; }
+.projectile-c2 .projectile-stage[data-expanded="true"] .canvas-host { min-height:0; }
+.projectile-c2 .projectile-readout .projectile-masked-readout { font-size:14px; }
+@media (max-width:900px) {
+  .projectile-c2 .projectile-stage { grid-template-columns:minmax(0,1fr); }
+  .projectile-c2 .projectile-path-card { grid-column:1; grid-row:1; }
+  .projectile-c2 .projectile-dock { grid-column:1; grid-row:2; }
+  .projectile-c2 .projectile-side[data-open="true"], .projectile-c2 .guided-side { grid-column:1; grid-row:3; width:100% !important; }
+  .projectile-c2 .projectile-stage[data-panel="true"] .projectile-path-card { aspect-ratio:1.9; height:auto; min-height:280px; }
+  .projectile-c2 .projectile-stage[data-expanded="true"] .projectile-path-card { aspect-ratio:auto; height:100%; min-height:0; }
+  .projectile-c2 .projectile-side-inner { width:100% !important; max-height:none; }
+}
+@media (max-width:660px) {
+  .projectile-c2.lab-shell { padding:8px 8px 64px; }
+  .projectile-c2 .projectile-topbar { flex-direction:row; gap:6px; }
+  .projectile-c2 .projectile-identity h1 { font-size:18px; }
+  .projectile-c2 .projectile-identity .eyebrow { display:none; }
+  .projectile-c2 .projectile-topbar .header-actions button { min-height:44px; padding:8px; font-size:14px; }
+  .projectile-c2 .projectile-modebar button { flex:1; min-width:0; padding:6px; font-size:13px; }
+  .projectile-c2 .projectile-theory-entry { flex:1.25 !important; }
+  .projectile-c2 .projectile-panel-actions button { flex:1; min-width:0; padding:6px; font-size:13px; }
+  .projectile-c2 .projectile-stage { gap:4px; }
+  .projectile-c2 .projectile-path-card { aspect-ratio:auto; min-height:0; padding-top:50px; }
+  .projectile-c2 .projectile-path-card .canvas-host svg[role="img"] { height:clamp(235px,39vh,350px); }
+  .projectile-c2 .projectile-dock { margin:0; }
+  .projectile-c2 .projectile-readout { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; padding:6px; }
+  .projectile-c2 .projectile-readout span { display:flex; flex-direction:column; gap:0; min-width:0; font-size:13px; }
+  .projectile-c2 .projectile-readout span:not(.live):not(.projectile-masked-readout) { display:none; }
+  .projectile-c2 .projectile-readout .projectile-masked-readout { grid-column:1/-1; }
+  .projectile-c2 .projectile-transport-speeds { display:none; }
+  .projectile-c2 .projectile-transport { gap:4px; padding:5px; }
+  .projectile-c2 .projectile-transport-buttons { grid-template-columns:44px repeat(3,minmax(0,1fr)) 44px 44px; }
+  .projectile-c2 .projectile-transport button { min-height:44px; }
+  .projectile-c2 .projectile-stage[data-expanded="true"] .projectile-path-card .canvas-host svg[role="img"] { height:calc(100vh - 280px); min-height:220px; }
+  .projectile-c2 .projectile-stage[data-expanded="true"] .card-label>div { display:none; }
+}
+.projectile-c2 .projectile-extra-readouts { flex-basis:100%; color:var(--lc-body); }
+.projectile-c2 .projectile-extra-readouts summary { cursor:pointer; min-height:44px; display:flex; align-items:center; font-size:13px; }
+.projectile-c2 .projectile-extra-readouts>div { display:flex; flex-wrap:wrap; gap:8px 24px; padding:5px 0 8px; border-top:1px solid var(--lc-border); }
+@media (min-width:901px) {
+  .projectile-c2 .projectile-path-card { max-height:calc(100vh - 320px); min-height:320px; }
+}
+@media (max-width:660px) {
+  .projectile-c2 .projectile-extra-readouts { grid-column:1/-1; }
+  .projectile-c2 .projectile-extra-readouts>div { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .projectile-c2 .projectile-extra-readouts>div span { display:flex !important; }
+}
+@media (max-width:660px) {
+  .projectile-c2 .projectile-topbar { padding-bottom:0; min-height:44px; }
+  .projectile-c2 .projectile-stage { order:1; }
+  .projectile-c2 .projectile-panel-actions { order:2; position:sticky; bottom:0; z-index:20; margin:6px 0 0; padding:4px 0; background:var(--lc-raised); }
+  .projectile-c2 .projectile-path-card .canvas-host svg[role="img"] { height:235px; }
 }
