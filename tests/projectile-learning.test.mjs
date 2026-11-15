@@ -6,8 +6,10 @@ import {
   comparisonVisible,
   isNearApex,
   isRaisedHeightReady,
+  hasGuidedProgress,
   newGuidedSession,
   projectileLearningActivities,
+  projectileEvidencePolicy,
   recordManipulation,
   revealNextHint,
   revealObservation,
@@ -88,4 +90,29 @@ test("time manipulation is blocked only until a guided prediction is committed",
   assert.equal(canManipulateTime(predicting), false, "prediction cannot be bypassed with the cursor");
   assert.equal(canManipulateTime(manipulating), true, "manipulation begins immediately after prediction");
   assert.equal(canManipulateTime(observing), true, "observation keeps the instruments available");
+});
+
+test("all three predictions hide answer channels and reveal evidence after commitment", () => {
+  const free = projectileEvidencePolicy(null);
+  assert.deepEqual(free, { theory: true, modelInfo: true, numericResults: true, comparison: true, share: true, export: true });
+  for (const activity of activities) {
+    const predicting = projectileEvidencePolicy(newGuidedSession(activity.id));
+    assert.deepEqual(predicting, { theory: false, modelInfo: false, numericResults: false, comparison: false, share: false, export: false }, activity.id);
+    const submitted = projectileEvidencePolicy(submitPrediction(newGuidedSession(activity.id), activity.choices[0].id));
+    assert.equal(submitted.theory, true, activity.id);
+    assert.equal(submitted.numericResults, true, activity.id);
+    assert.equal(submitted.comparison, true, activity.id);
+    assert.equal(submitted.share, false, activity.id);
+    assert.equal(submitted.export, false, activity.id);
+  }
+});
+
+test("only a committed, unfinished task counts as progress worth confirming before leaving", () => {
+  for (const activity of activities) {
+    const fresh = newGuidedSession(activity.id);
+    assert.equal(hasGuidedProgress(fresh), false, `${activity.id}: nothing to lose before predicting`);
+    const committed = submitPrediction(fresh, activity.choices[0].id);
+    assert.equal(hasGuidedProgress(committed), true, `${activity.id}: a prediction is progress`);
+    assert.equal(hasGuidedProgress({ ...committed, phase: "complete" }), false, `${activity.id}: a finished task leaves freely`);
+  }
 });

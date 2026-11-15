@@ -4,8 +4,10 @@ async function open(page: Page) {
   await expect(page.locator("main")).toHaveAttribute("data-interactive", "true");
 }
 async function preset(page: Page, name: string) {
+  await page.getByRole("button", { name: "參數", exact: true }).click();
   await page.getByRole("button", { name: "教學預設", exact: true }).click();
   await page.getByRole("button", { name, exact: true }).click();
+  await page.getByRole("button", { name: "參數", exact: true }).click();
 }
 test("Projectile layers, probe/readout, presets and validated deep link", async ({ page }) => {
   const errors: string[] = [];
@@ -22,6 +24,7 @@ test("Projectile layers, probe/readout, presets and validated deep link", async 
   await expect(page.getByRole("button", { name: "圖層", exact: true })).toBeFocused();
   await page.getByRole("slider", { name: "時間游標" }).fill("0.5");
   const readout = page.locator('.projectile-readout');
+  await readout.getByText("完整讀值").click();
   for (const label of ["游標 t", "x", "y", "vₓ", "vᵧ", "aₓ", "aᵧ"]) await expect(readout.locator("i").filter({ hasText: new RegExp(`^${label}$`) })).toBeVisible();
   const point = await page.getByTestId("projectile-main-trajectory").evaluate((element) => {
     const path = element as SVGPathElement;
@@ -31,13 +34,14 @@ test("Projectile layers, probe/readout, presets and validated deep link", async 
   });
   await page.mouse.move(point.x, point.y);
   await expect(page.locator(".projectile-tip")).toBeVisible();
+  await page.getByRole("button", { name: "工具", exact: true }).click();
   await page.getByRole("button", { name: "分享設定", exact: true }).click();
   const url = await page.getByLabel("分享連結", { exact: true }).inputValue();
   expect(JSON.parse(new URL(url).searchParams.get("s")!)).toMatchObject({ v: 1, mode: "free", launch: { height: 25, angle: 0, x: 0 }, layers: { grid: false }, preset: "horizontal" });
   await page.goto(url);
   await expect(page.locator("main")).toHaveAttribute("data-interactive", "true");
   await expect(page.getByRole("button", { name: "播放", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "調整參數", exact: true }).click();
+  await page.getByRole("button", { name: "參數", exact: true }).click();
   await expect(page.getByLabel("發射高度 h", { exact: true })).toHaveValue("25");
   await page.getByRole("button", { name: "圖層", exact: true }).click();
   await expect(page.getByRole("checkbox", { name: "座標網格", exact: true })).not.toBeChecked();
@@ -54,9 +58,10 @@ test("Projectile guided prediction and free state restore; modal focus; standalo
   await page.getByRole("button", { name: "我看到了，繼續", exact: true }).click();
   await page.getByRole("group", { name: "你的解釋" }).getByRole("button").first().click();
   await expect(page.locator(".guided-complete")).toBeVisible();
-  await page.locator(".projectile-topbar").getByRole("button", { name: "離開探索任務", exact: true }).click();
-  await page.getByRole("button", { name: "調整參數", exact: true }).click();
+  await page.getByRole("button", { name: "自由探索", exact: true }).click();
+  await page.getByRole("button", { name: "參數", exact: true }).click();
   await expect(page.getByLabel("發射高度 h", { exact: true })).toHaveValue("25");
+  await page.getByRole("button", { name: "工具", exact: true }).click();
   const trigger = page.getByRole("button", { name: "模型資訊", exact: true });
   await trigger.click();
   const dialog = page.getByRole("dialog", { name: "拋體運動模型資訊" });
@@ -74,7 +79,7 @@ test("Projectile guided prediction and free state restore; modal focus; standalo
 test("Projectile mobile controls, layers, theme and keyboard @mobile", async ({ page }) => {
   await open(page);
   await preset(page, "一般斜拋：30°");
-  await page.getByRole("button", { name: "調整參數", exact: true }).click();
+  await page.getByRole("button", { name: "參數", exact: true }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole("slider", { name: "時間游標" }).focus();
   await page.keyboard.press("ArrowRight");
