@@ -33,6 +33,7 @@ import {
   initialLearning,
   retryCompare,
   retryGuess,
+  hasLearningProgress,
   revealHint,
   showEvidence,
   submitCompare,
@@ -40,6 +41,8 @@ import {
 } from "@/models/hydrogen-learning";
 import { type SpectrumRangeMode } from "@/components/hydrogen/spectrum";
 import GuidedCard from "@/components/hydrogen/GuidedCard";
+import { ViewCard, type HydrogenView } from "@/components/hydrogen/ViewCard";
+import { useExpandedView } from "@/components/workspace/useExpandedView";
 import BalmerCompareCard from "@/components/hydrogen/BalmerCompareCard";
 import {
   EnergyView,
@@ -74,6 +77,12 @@ export default function HydrogenLab() {
   const guided = labMode === "guided";
   const policy = evidencePolicy(guided ? learning : null);
   const evidenceRef = useRef<HTMLDivElement>(null);
+  /* Narrow screens show one of the two diagrams at a time; the spectrum stays underneath as the
+     linked observable. Wide screens ignore this and show both. */
+  const [mainView, setMainView] = useState<"energy" | "orbit">("energy");
+  const [leaveConfirm, setLeaveConfirm] = useState(false);
+  const expander = useExpandedView<HydrogenView>();
+  const controlsRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     let frame = 0;
@@ -107,7 +116,11 @@ export default function HydrogenLab() {
     setLearning(initialLearning());
     setBalmer(initialBalmerCompare());
     setLabMode("free");
+    setLeaveConfirm(false);
   };
+  /* Switching still resets both sides. A task with a guess in it asks first, in words on the page,
+     because a tooltip is invisible on a touch screen. */
+  const requestFree = () => (hasLearningProgress(learning) ? setLeaveConfirm(true) : enterFree());
   const enterGuided = () => {
     setState(guidedPhysicsState());
     setLearning(initialLearning());
@@ -122,6 +135,10 @@ export default function HydrogenLab() {
   const { selected, electron } = readout;
   const modeLabel = state.mode === "emission" ? "發射" : "吸收";
   const verb = state.mode === "emission" ? "放出光子" : "吸收光子";
+  /* The linked selection, carried into an enlarged view. Null whenever the policy hides the transition. */
+  const linkedCaption = policy.transitionReadout
+    ? <>{selected.upper} {state.mode === "emission" ? "→" : "←"} {selected.lower}　<i className="hydrogen-swatch" data-visible={selected.region === "visible"} style={{ background: photonColor(selected) }} aria-hidden="true" />{formatWavelength(selected.wavelength)}　{selected.photonEnergy.toFixed(3)} eV　{REGION_ZH[selected.region]}</>
+    : null;
   const predicted = policy.predictionMarker && learning.compared !== null ? compareGuess(learning.compared) : null;
 
   return (
@@ -139,12 +156,20 @@ export default function HydrogenLab() {
           <Link className="model-index-link" href="/">模型目錄</Link>
           {labMode !== "intent" ? (
             <>
-              <button onClick={guided ? enterFree : enterGuided} title="切換會重設畫面" data-testid="mode-toggle"><ArrowLeftRight size={14} /> {guided ? "自由探索" : "帶著問題探索"}</button>
+              <button onClick={guided ? requestFree : enterGuided} title="切換會重設畫面" data-testid="mode-toggle"><ArrowLeftRight size={14} /> {guided ? "自由探索" : "帶著問題探索"}</button>
               <button onClick={reset}><RotateCcw size={14} /> 重設</button>
             </>
           ) : null}
         </div>
       </div>
+
+      {leaveConfirm && guided ? (
+        <div className="hydrogen-leave-confirm" role="alertdialog" aria-label="離開探索任務" aria-describedby="hydrogen-leave-text" data-testid="leave-confirm" onKeyDown={(event) => { if (event.key === "Escape") setLeaveConfirm(false); }}>
+          <p id="hydrogen-leave-text">切換到自由探索會重設畫面，這次的猜測與進度不會保留。</p>
+          <button autoFocus onClick={() => setLeaveConfirm(false)} data-testid="leave-stay">繼續任務</button>
+          <button onClick={enterFree} data-testid="leave-go">切換並重設</button>
+        </div>
+      ) : null}
 
       {labMode === "intent" ? (
         <section className="hydrogen-intent" data-testid="intent-choice" aria-labelledby="hydrogen-intent-title">
@@ -167,11 +192,7 @@ export default function HydrogenLab() {
 
       {guided ? (
         <div className="hydrogen-guided" data-phase={learning.phase}>
-          <section className="viewport-card hydrogen-spectrum-card hydrogen-guided-spectrum">
-            <div className="card-label">
-              <span>1</span>
-              <div><strong>巴耳末系發射光譜</strong><small>終態 n = {TARGET_LOWER}；亮線落在暗背景上</small></div>
-            </div>
+          <ViewCard view="spectrum" number={1} title="巴耳末系發射光譜" subtitle={<>終態 n = {TARGET_LOWER}；亮線落在暗背景上</>} className="hydrogen-spectrum-card hydrogen-guided-spectrum" expander={expander} caption={linkedCaption}>
             <div className="hydrogen-strip">
               <SpectrumStrip
                 readout={GUIDED_SPECTRUM}
@@ -183,7 +204,7 @@ export default function HydrogenLab() {
                 marker={predicted ? { nm: predicted.wavelength, label: `你的預測 ${predicted.wavelength.toFixed(0)} nm` } : undefined}
               />
             </div>
-          </section>
+          </ViewCard>
 
           <GuidedCard
             learning={learning}
@@ -203,22 +224,14 @@ export default function HydrogenLab() {
           {policy.energyView || policy.orbitView ? (
             <div className="hydrogen-guided-evidence" ref={evidenceRef} data-testid="guided-evidence">
               {policy.energyView ? (
-                <section className="viewport-card hydrogen-card">
-                  <div className="card-label">
-                    <span>2</span>
-                    <div><strong>能階圖</strong><small>Eₙ = −13.6 eV / n²；箭頭是這條譜線的躍遷</small></div>
-                  </div>
+                <ViewCard view="energy" number={2} title="能階圖" subtitle="Eₙ = −13.6 eV / n²；箭頭是這條譜線的躍遷" className="hydrogen-card" expander={expander} caption={linkedCaption}>
                   <div className="canvas-host hydrogen-canvas"><EnergyView state={state} readout={readout} marks={balmer.submitted ? COMPARE_MARKS : undefined} /></div>
-                </section>
+                </ViewCard>
               ) : null}
               {policy.orbitView ? (
-                <section className="viewport-card hydrogen-card">
-                  <div className="card-label">
-                    <span>3</span>
-                    <div><strong>玻耳軌道</strong><small>半徑依 rₙ = n²a₀ 等比例繪製</small></div>
-                  </div>
+                <ViewCard view="orbit" number={3} title="玻耳軌道" subtitle="半徑依 rₙ = n²a₀ 等比例繪製" className="hydrogen-card" expander={expander} caption={linkedCaption}>
                   <div className="canvas-host hydrogen-canvas"><OrbitView state={state} readout={readout} scale="true" /></div>
-                </section>
+                </ViewCard>
               ) : null}
             </div>
           ) : null}
@@ -240,47 +253,39 @@ export default function HydrogenLab() {
         <>
         <div className="hydrogen-free-layout">
         <div className="hydrogen-free-stage">
-        <div className="hydrogen-stage-grid">
-          <section className="viewport-card hydrogen-card">
-            <div className="card-label">
-              <span>1</span>
-              <div><strong>玻耳軌道</strong><small>{orbitScale === "true" ? "半徑依 rₙ = n²a₀ 等比例繪製" : "示意比例（rₙ ∝ n），非真實比例"}；點軌道可移動電子</small></div>
-            </div>
+        <div className="hydrogen-view-switch" role="group" aria-label="主要科學視圖">
+          <button className={mainView === "energy" ? "active" : ""} aria-pressed={mainView === "energy"} onClick={() => setMainView("energy")} data-testid="main-energy">能階圖</button>
+          <button className={mainView === "orbit" ? "active" : ""} aria-pressed={mainView === "orbit"} onClick={() => setMainView("orbit")} data-testid="main-orbit">玻耳軌道</button>
+        </div>
+        <div className="hydrogen-stage-grid" data-main={mainView}>
+          <ViewCard view="orbit" number={1} title="玻耳軌道" subtitle={<>{orbitScale === "true" ? "半徑依 rₙ = n²a₀ 等比例繪製" : "示意比例（rₙ ∝ n），非真實比例"}；點軌道可移動電子</>} className="hydrogen-card" expander={expander} caption={linkedCaption}>
             <div className="canvas-host hydrogen-canvas"><OrbitView state={state} readout={readout} scale={orbitScale} onPlace={place} /></div>
-          </section>
-          <section className="viewport-card hydrogen-card">
-            <div className="card-label">
-              <span>2</span>
-              <div><strong>能階圖</strong><small>Eₙ = −13.6 eV / n²；點能階放電子，點箭頭選躍遷</small></div>
-            </div>
+          </ViewCard>
+          <ViewCard view="energy" number={2} title="能階圖" subtitle="Eₙ = −13.6 eV / n²；點能階放電子，點箭頭選躍遷" className="hydrogen-card" expander={expander} caption={linkedCaption}>
             <div className="canvas-host hydrogen-canvas"><EnergyView state={state} readout={readout} onPlace={place} onPick={pick} /></div>
-          </section>
+          </ViewCard>
         </div>
 
-        <section className="viewport-card hydrogen-spectrum-card">
-          <div className="card-label">
-            <span>3</span>
-            <div><strong>{seriesLabel(readout.seriesName)}的{state.mode === "emission" ? "發射" : "吸收"}譜線</strong><small>終態 n = {state.lower}；{state.mode === "emission" ? "亮線落在暗背景上" : "暗線缺在連續光譜中"}；虛線為系限（n→∞）</small></div>
-          </div>
+        <ViewCard view="spectrum" number={3} title={`${seriesLabel(readout.seriesName)}的${state.mode === "emission" ? "發射" : "吸收"}譜線`} subtitle={<>終態 n = {state.lower}；{state.mode === "emission" ? "亮線落在暗背景上" : "暗線缺在連續光譜中"}；虛線為系限（n→∞）</>} className="hydrogen-spectrum-card" expander={expander} caption={linkedCaption}>
           <div className="hydrogen-range" role="group" aria-label="光譜波長範圍">
             <button className={spectrumRange === "auto" ? "active" : ""} aria-pressed={spectrumRange === "auto"} onClick={() => setSpectrumRange("auto")}>自動範圍</button>
             <button className={spectrumRange === "visible" ? "active" : ""} aria-pressed={spectrumRange === "visible"} onClick={() => setSpectrumRange("visible")}>可見光 380–750</button>
           </div>
           <div className="hydrogen-strip"><SpectrumStrip readout={readout} mode={state.mode} range={spectrumRange} selectedUpper={readout.selected.upper} onPick={(t) => pick(t.upper, t.lower)} /></div>
           <p className="hydrogen-strip-note">一個氫原子一次只做一次躍遷；整條光譜是大量原子各自躍遷的總和。「可見」只表示肉眼看得到，紫外線與紅外線的光子同樣存在。</p>
-        </section>
+        </ViewCard>
         </div>
 
         <aside className="hydrogen-free-side" aria-label="數值與控制">
         <div className="hydrogen-metrics">
           <div><span>躍遷</span><strong>{selected.upper} {state.mode === "emission" ? "→" : "←"} {selected.lower}</strong></div>
           <div><span>光子能量</span><strong>{selected.photonEnergy.toFixed(3)} eV</strong></div>
-          <div><span>波長</span><strong style={{ color: photonColor(selected) }}>{formatWavelength(selected.wavelength)}</strong></div>
+          <div><span>波長</span><strong><i className="hydrogen-swatch" data-visible={selected.region === "visible"} style={{ background: photonColor(selected) }} aria-hidden="true" />{formatWavelength(selected.wavelength)}</strong></div>
           <div><span>頻率 · 區域</span><strong>{formatFrequency(selected.frequency)} · {REGION_ZH[selected.region]}</strong></div>
           <div><span>電子現況</span><strong>n={electron.n} · {electron.energy.toFixed(2)} eV · {(electron.radius / 100).toFixed(2)} Å</strong></div>
         </div>
 
-        <section className="control-panel hydrogen-controls">
+        <section className="control-panel hydrogen-controls" ref={controlsRef}>
           <div className="control-panel-heading">
             <div><Atom size={14} /> 同步控制台</div>
             <button className={state.playing ? "active" : ""} onClick={() => setState((s) => ({ ...s, playing: !s.playing }))} aria-label={state.playing ? "暫停動畫" : "播放動畫"}>
@@ -342,10 +347,15 @@ export default function HydrogenLab() {
         </aside>
         </div>
 
+        <div className="hydrogen-quickbar" data-testid="quickbar">
+          <button className="primary-action" onClick={() => setState((s) => fireTransition(s))} disabled={readout.blocked !== null} data-testid="quick-fire"><Zap size={16} /> {verb}</button>
+          <button onClick={() => controlsRef.current?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })} data-testid="quick-controls"><Atom size={16} /> 控制台</button>
+        </div>
+
         <p className="hydrogen-note">
           這張圖描述單一氫原子：電子一次只在一個能階。發射需要電子先在高能階，吸收需要電子先在低能階，而且吸收的光子能量必須恰等於能階差；把電子激發到高能階的來源（如碰撞或先前吸收）不在模型之內。
           {" "}玻耳模型假設電子沿固定圓軌道運行、能量量子化，並忽略氫核質量的有限修正（造成約 0.05 % 的波長差）。電子公轉速度為示意，實際約 10¹⁶ 圈／秒；真實電子沒有軌跡，只有機率分布。
-          {selected.region !== "visible" ? " 此譜線在可見光之外，肉眼看不到；圖中顏色只表示它在可見光的紫外線側或紅外線側。" : ""}
+          {selected.region !== "visible" ? " 此譜線在可見光之外，肉眼看不到，所以圖中用中性灰標示，不代表任何顏色。" : ""}
         </p>
 
         </>

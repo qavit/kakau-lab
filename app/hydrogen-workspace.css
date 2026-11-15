@@ -1,0 +1,79 @@
+/* Hydrogen pilot workspace: layout of the scientific views — which one is on screen, how each is
+   enlarged, and where the linked selection is repeated. It sizes and positions the science cards
+   but never recolours their data; the C2 interface sheet stays off these surfaces by test. */
+/* ---- Pilot workspace: one main view on narrow screens, per-view enlargement, linked selection ---- */
+.hydrogen-lab.hydrogen-c2 .hydrogen-view-tools { position: absolute; z-index: 4; top: 10px; right: 10px; display: flex; gap: 6px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-view-tools button { min-width: 44px; min-height: 44px; padding: 8px 10px; border-color: #9bd7dd55; background: #092439d9; color: #e8f3f6; font-size: 14px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-view-tools button:hover { border-color: #9bd7dd; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-view-tools button:focus-visible { outline-color: var(--lc-focus-on-dark); }
+.hydrogen-lab.hydrogen-c2 .hydrogen-card .card-label, .hydrogen-lab.hydrogen-c2 .hydrogen-spectrum-card .card-label { padding-right: 56px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-spectrum-card .hydrogen-range { right: 66px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-view-switch, .hydrogen-lab.hydrogen-c2 .hydrogen-quickbar { display: none; }
+/* The colour of the light is shown as a chip beside the number; the number itself stays in ink so
+   that cyan or yellow lines remain readable on a light panel. */
+.hydrogen-lab.hydrogen-c2 .hydrogen-swatch { display: inline-block; width: .8em; height: .8em; margin-right: .4em; border: 1px solid var(--lc-border-control); border-radius: 2px; vertical-align: baseline; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-swatch[data-visible="false"] { background-image: repeating-linear-gradient(135deg, transparent 0 2px, #5b6770 2px 3px) !important; background-color: #c5ced6 !important; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-leave-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--lc-accent); border-radius: 10px; background: var(--lc-raised); }
+.hydrogen-lab.hydrogen-c2 .hydrogen-leave-confirm p { flex: 1 1 220px; margin: 0; color: var(--lc-ink); font-size: 15px; line-height: 1.5; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-leave-confirm button { min-height: 44px; padding: 8px 14px; font-size: 15px; }
+
+/* Enlarged view: the same element, restyled to fill the window. */
+.hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] { position: fixed; z-index: 90; inset: 0; display: flex; flex-direction: column; width: auto; height: auto; min-height: 0; max-height: none; margin: 0; padding: 64px 14px 14px; border-radius: 0; aspect-ratio: auto; overflow: auto; }
+.hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] .hydrogen-canvas { padding: 68px 14px 64px; }
+.hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"].hydrogen-spectrum-card { justify-content: center; }
+.hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] .hydrogen-range { position: static; padding: 0 0 10px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-expand-caption { position: absolute; z-index: 4; left: 14px; right: 14px; bottom: 12px; margin: 0; padding: 8px 12px; border-radius: 8px; background: #092439; color: #e8f3f6; font-size: 16px; font-variant-numeric: tabular-nums; text-align: center; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-expand-notice { position: absolute; z-index: 5; top: 62px; right: 10px; max-width: 280px; margin: 0; padding: 8px 10px; border-radius: 6px; background: #092439; color: #fff; font-size: 14px; line-height: 1.45; }
+
+@media (max-width: 900px) {
+  /* One main diagram at a time; the other is one tap away and keeps the same selection. */
+  .hydrogen-lab.hydrogen-c2 .hydrogen-view-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-view-switch button { min-height: 44px; font-size: 15px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-view-switch button.active { border-color: var(--lc-accent); background: var(--lc-accent-subtle); font-weight: 650; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-stage-grid[data-main="energy"] .viewport-card[data-view="orbit"]:not([data-expanded="true"]),
+  .hydrogen-lab.hydrogen-c2 .hydrogen-stage-grid[data-main="orbit"] .viewport-card[data-view="energy"]:not([data-expanded="true"]) { display: none; }
+  /* Tall enough to read at any zoom, short enough that the spectrum and the action bar share the screen. */
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-card:not([data-expanded="true"]) { min-height: 0; height: clamp(280px, 38vh, 340px); }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-spectrum-card { margin-top: 8px; padding: 58px 12px 10px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-strip-note { display: none; }
+  .hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] .hydrogen-strip-note { display: block; }
+  /* Fire and the route to the controls stay on screen while the diagrams are in view. */
+  .hydrogen-lab.hydrogen-c2 .hydrogen-quickbar { position: sticky; z-index: 20; bottom: 0; display: grid; grid-template-columns: 1.4fr 1fr; gap: 6px; margin: 8px -4px 0; padding: 6px 4px; background: var(--lc-raised); border-top: 1px solid var(--lc-border); }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-quickbar button { min-height: 44px; font-size: 15px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-quickbar button.primary-action:not(:disabled) { border-color: var(--lc-accent); background: var(--lc-accent); color: var(--lc-on-accent); }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-controls { scroll-margin-top: 8px; }
+}
+@media (max-width: 660px) {
+  /* Compact identity row: brand, title and actions no longer cost two wrapped rows. */
+  .hydrogen-lab.lab-shell { padding: 8px 8px 0; }
+  .hydrogen-lab.hydrogen-c2 .topbar { gap: 4px; margin-bottom: 6px; padding-bottom: 6px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-title .eyebrow { display: none; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-title h1 { margin: 0; font-size: 19px; }
+  .hydrogen-lab.hydrogen-c2 .header-actions { flex-wrap: nowrap; gap: 4px; width: 100%; }
+  .hydrogen-lab.hydrogen-c2 .header-actions button { min-height: 44px; padding: 6px 8px; white-space: nowrap; }
+  .hydrogen-lab.hydrogen-c2 .header-actions .model-index-link { padding: 6px 4px; white-space: nowrap; }
+  .hydrogen-lab.hydrogen-c2 .lab-footer { padding-bottom: 12px; }
+}
+@media (max-width: 900px) {
+  /* The spectrum's title, range switch and strip stack in order instead of overlapping. */
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-spectrum-card:not([data-expanded="true"]) { padding-top: 12px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-spectrum-card .card-label { position: static; margin: 0 0 8px 4px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-card:not([data-expanded="true"]) .hydrogen-canvas { padding-top: 84px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-card:not([data-expanded="true"]) { height: clamp(300px, 41vh, 370px); }
+}
+/* Enlarged: the title gives way to the exit controls rather than running under them. */
+.hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] .card-label { position: absolute; top: 16px; left: 14px; right: 210px; margin: 0; padding-right: 0; }
+.hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] .card-label strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] .card-label > div { min-width: 0; }
+@media (max-width: 660px) {
+  /* Phone: the enlarged title sits under the exit controls, with its full explanation. */
+  .hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] .card-label { top: 64px; right: 14px; }
+  .hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] .card-label strong { white-space: normal; }
+  .hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] .hydrogen-canvas { padding-top: 140px; }
+  .hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"].hydrogen-spectrum-card { padding-top: 150px; justify-content: flex-start; }
+  .hydrogen-lab.hydrogen-c2 .viewport-card[data-expanded="true"] .hydrogen-expand-notice { top: 62px; left: 10px; max-width: none; z-index: 6; }
+  /* In the page, the spectrum keeps a one-line heading so the strip itself stays on the first screen. */
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-spectrum-card:not([data-expanded="true"]) .card-label small { display: none; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-spectrum-card:not([data-expanded="true"]) .card-label strong { font-size: 16px; line-height: 1.3; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-card:not([data-expanded="true"]) { height: clamp(290px, 38vh, 350px); }
+}

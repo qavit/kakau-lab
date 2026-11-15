@@ -172,6 +172,11 @@ const GUIDED_HIDDEN: EvidencePolicy = {
   comparisonCard: false, energyView: false, orbitView: false, transitionReadout: false,
 };
 
+/** A guess chosen or submitted, or evidence already opened, is progress a mode switch would discard. */
+export function hasLearningProgress(state: HydrogenLearning): boolean {
+  return state.guess !== null || state.attempts > 0 || state.phase === "compared" || state.phase === "evidence";
+}
+
 export function evidencePolicy(state: HydrogenLearning | null): EvidencePolicy {
   if (state === null) return FREE_POLICY;
   switch (state.phase) {

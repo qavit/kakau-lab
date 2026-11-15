@@ -3,6 +3,7 @@ import { socialMetadata } from "@/lib/site-metadata";
 import HydrogenLab from "@/components/HydrogenLab";
 import "../lab-c2.css";
 import "../hydrogen-c2.css";
+import "../hydrogen-workspace.css";
 
 export const metadata: Metadata = {
   title: "氫原子能階與光譜｜Kakau Lab",

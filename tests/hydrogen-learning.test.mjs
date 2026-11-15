@@ -17,6 +17,7 @@ import {
   evidencePolicy,
   evidenceTransition,
   guidedPhysicsState,
+  hasLearningProgress,
   initialLearning,
   retryGuess,
   revealHint,
@@ -270,4 +271,15 @@ test("match and mismatch verdicts carry an icon and a word, not colour alone", a
   assert.match(mark, /<CircleAlert\b[^>]*aria-hidden/);
   assert.match(guided, /label=\{comparison\.correct \? "吻合" : "不吻合"\}/);
   assert.match(balmer, /VerdictMark/);
+});
+
+test("a mode switch only has something to lose once a guess exists", () => {
+  assert.equal(hasLearningProgress(initialLearning()), false, "observing: nothing chosen");
+  assert.equal(hasLearningProgress(predicting()), false, "predicting without a choice");
+  const chosen = chooseGuess(predicting(), 3);
+  assert.equal(hasLearningProgress(chosen), true, "a chosen guess is progress");
+  const compared = submitGuess(chosen);
+  assert.equal(hasLearningProgress(compared), true, "a submitted guess is progress");
+  assert.equal(hasLearningProgress(retryGuess(compared)), true, "an attempt stays on record after retry");
+  assert.equal(hasLearningProgress(showEvidence(compared)), true, "opened evidence is progress");
 });

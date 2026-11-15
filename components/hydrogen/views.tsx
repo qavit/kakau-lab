@@ -17,8 +17,9 @@ export const SERIES_ZH: Record<string, string> = {
   Humphreys: "漢弗萊系",
 };
 export const REGION_ZH: Record<Region, string> = { ultraviolet: "紫外線", visible: "可見光", infrared: "紅外線" };
-/** Photons outside the visible band have no colour; these stand-ins only mark which side of it they are on. */
-const REGION_FALLBACK: Record<Region, string> = { ultraviolet: "#b79cff", visible: "#f4f1e8", infrared: "#ff8a78" };
+/** Photons outside the visible band have no colour, so they are drawn in a neutral grey rather than a hue
+ *  that could be read as "ultraviolet looks violet". Which side they fall on is said in words. */
+const REGION_FALLBACK: Record<Region, string> = { ultraviolet: "#c5ced6", visible: "#f4f1e8", infrared: "#c5ced6" };
 
 export const rgb = ([r, g, b]: [number, number, number]) => `rgb(${r} ${g} ${b})`;
 
@@ -60,7 +61,7 @@ function pressable(action: () => void, label: string, pressed: boolean) {
     tabIndex: 0,
     "aria-label": label,
     "aria-pressed": pressed,
-    style: { cursor: "pointer", outline: "none" },
+    style: { cursor: "pointer" },
     onClick: action,
     onKeyDown: onActivate(action),
   } as const;
