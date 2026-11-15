@@ -6,6 +6,7 @@ import {
   comparisonVisible,
   isNearApex,
   isRaisedHeightReady,
+  hasGuidedProgress,
   newGuidedSession,
   projectileLearningActivities,
   projectileEvidencePolicy,
@@ -103,5 +104,15 @@ test("all three predictions hide answer channels and reveal evidence after commi
     assert.equal(submitted.comparison, true, activity.id);
     assert.equal(submitted.share, false, activity.id);
     assert.equal(submitted.export, false, activity.id);
+  }
+});
+
+test("only a committed, unfinished task counts as progress worth confirming before leaving", () => {
+  for (const activity of activities) {
+    const fresh = newGuidedSession(activity.id);
+    assert.equal(hasGuidedProgress(fresh), false, `${activity.id}: nothing to lose before predicting`);
+    const committed = submitPrediction(fresh, activity.choices[0].id);
+    assert.equal(hasGuidedProgress(committed), true, `${activity.id}: a prediction is progress`);
+    assert.equal(hasGuidedProgress({ ...committed, phase: "complete" }), false, `${activity.id}: a finished task leaves freely`);
   }
 });

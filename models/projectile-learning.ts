@@ -170,6 +170,11 @@ export function projectileEvidencePolicy(session: GuidedSession | null) {
   };
 }
 
+/** A committed prediction that has not reached the summary is progress the student would lose by leaving. */
+export function hasGuidedProgress(session: GuidedSession): boolean {
+  return session.prediction !== null && session.phase !== "complete";
+}
+
 /** Scenario and preset controls belong to free exploration; guided activities own a known state. */
 export function canUseFreeStateControls(session: GuidedSession | null): boolean {
   return session === null;

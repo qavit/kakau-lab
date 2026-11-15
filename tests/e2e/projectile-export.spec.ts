@@ -26,6 +26,8 @@ for (const viewport of [{ width: 1366, height: 768 }, { width: 1280, height: 720
     await page.getByRole('button', { name: '探索任務', exact: true }).click();
     await page.getByRole('button', { name: '工具', exact: true }).click();
     await expect(page.getByRole('button', { name: '匯出軌跡資料 JSON / Export data', exact: true })).toHaveCount(0);
+    await expect(page.locator('.projectile-menu-note')).toBeVisible();
+    await page.keyboard.press('Escape');
     await page.getByRole('button', { name: '自由探索', exact: true }).click();
     await expect(page.getByRole('button', { name: '工具', exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);

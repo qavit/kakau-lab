@@ -18,6 +18,8 @@ import {
   SlidersHorizontal,
   Undo2,
   X,
+  Lock,
+  Maximize2,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
@@ -51,6 +53,7 @@ import {
   isRaisedHeightReady,
   newGuidedSession,
   projectileLearningActivities,
+  hasGuidedProgress,
   projectileEvidencePolicy,
   recordManipulation,
   revealObservation,
@@ -1334,21 +1337,33 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
   const [expandNotice, setExpandNotice] = useState<string | null>(null);
   const expandTriggerRef = useRef<HTMLButtonElement>(null);
   const exitExpandRef = useRef<HTMLButtonElement>(null);
+  const [leaveConfirm, setLeaveConfirm] = useState(false);
+  const sideRef = useRef<HTMLElement>(null);
   const evidence = projectileEvidencePolicy(guidedSession);
+  /* Collapsing un-inerts the page first, so focus can only return to the trigger on the next frame. */
+  const collapseExpanded = useCallback(() => {
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+    setExpanded(false);
+    setExpandNotice(null);
+    requestAnimationFrame(() => expandTriggerRef.current?.focus());
+  }, []);
   useEffect(() => {
     if (!expanded) return;
     exitExpandRef.current?.focus();
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        if (document.fullscreenElement) void document.exitFullscreen();
-        setExpanded(false);
-        setExpandNotice(null);
-        requestAnimationFrame(() => expandTriggerRef.current?.focus());
-      }
-    };
+    const root = document.documentElement;
+    const previousOverflow = root.style.overflow;
+    root.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") collapseExpanded(); };
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [expanded]);
+    return () => { root.style.overflow = previousOverflow; document.removeEventListener("keydown", onKeyDown); };
+  }, [expanded, collapseExpanded]);
+  /* On a narrow screen the panel opens below the instruments; bring it under the pinned chart so
+     the first slider and the trajectory are on screen together. */
+  useEffect(() => {
+    if (!panelOpen || !window.matchMedia("(max-width: 900px)").matches) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    sideRef.current?.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" });
+  }, [panelOpen]);
   const freeStateControlsAvailable = canUseFreeStateControls(guidedSession);
   const timeManipulationAllowed = canManipulateTime(guidedSession);
   /* The panel's width is the reader's to set, but opening it is a fresh start: the button always
@@ -1410,7 +1425,14 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
     }
     setGuidedSession(null);
     setGuidedChartVisible(false);
+    setLeaveConfirm(false);
   }, []);
+
+  /* Leaving discards the prediction and phase, so a task with progress asks first. */
+  const requestLeaveGuided = useCallback(() => {
+    if (guidedSession && hasGuidedProgress(guidedSession)) setLeaveConfirm(true);
+    else closeGuided();
+  }, [closeGuided, guidedSession]);
 
   const submitGuidedPrediction = useCallback((choiceId: string) => {
     setGuidedSession((current) => current ? submitPrediction(current, choiceId) : current);
@@ -1541,7 +1563,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
   return (
     <MathProvider>
     <main ref={shellRef} className="lab-shell projectile-lab projectile-c2 lab-c2" style={{ "--projectile-appbar-bottom": `${appBarBottom}px` } as React.CSSProperties}>
-      <div ref={appBarRef} className="topbar projectile-topbar">
+      <div ref={appBarRef} className="topbar projectile-topbar" inert={expanded}>
         <div className="projectile-identity">
           <Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link>
           <div><div className="eyebrow">Model 07</div><h1><span className="live-dot" />拋體運動</h1></div>
@@ -1562,24 +1584,34 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
               <button onClick={() => exportTrajectory("svg")}>匯出軌跡圖 SVG / Export figure</button>
               <button onClick={() => exportTrajectory("json")}>匯出軌跡資料 JSON / Export data</button>
             </>}
+            {!evidence.share && !evidence.export && <p className="projectile-menu-note">探索任務期間不提供分享與匯出；回到自由探索後可用。</p>}
           </Menu>
           <button className="projectile-model-info" disabled={!evidence.modelInfo} onClick={() => setModelInfoOpen(true)} aria-haspopup="dialog" aria-label="模型資訊" title="模型資訊"><Info size={16} /></button>
           <ThemeToggle />
         </div>
       </div>
+      <div className="projectile-subbar" inert={expanded}>
       <nav className="projectile-modebar" aria-label="學習模式">
-        <button className={!guidedSession ? "active" : ""} aria-current={!guidedSession ? "page" : undefined} onClick={closeGuided}>自由探索</button>
-        <button className={guidedSession ? "active" : ""} aria-current={guidedSession ? "page" : undefined} onClick={() => { if (!guidedSession) selectGuidedActivity("apex"); }}>探索任務</button>
-        <button className="projectile-theory-entry" disabled={!evidence.theory} aria-haspopup="dialog" onClick={() => setTheoryOpen(true)} title={!evidence.theory ? "送出預測後開放" : undefined}>
-          <BookOpen size={14} /> 理論與計算
+        <button className={!guidedSession ? "active" : ""} aria-pressed={!guidedSession} onClick={() => { if (guidedSession) requestLeaveGuided(); }}>自由探索</button>
+        <button className={guidedSession ? "active" : ""} aria-pressed={Boolean(guidedSession)} onClick={() => { if (!guidedSession) selectGuidedActivity("apex"); }}>探索任務</button>
+        <button className="projectile-theory-entry" disabled={!evidence.theory} aria-haspopup="dialog" aria-describedby={!evidence.theory ? "projectile-disclosure-note" : undefined} onClick={() => setTheoryOpen(true)} title={!evidence.theory ? "送出預測後開放" : undefined}>
+          {evidence.theory ? <BookOpen size={14} /> : <Lock size={14} />} 理論與計算
         </button>
+        {!evidence.theory && <span id="projectile-disclosure-note" className="projectile-sr-only">送出預測後開放理論與模型資訊。</span>}
       </nav>
-      {!evidence.theory && <p className="projectile-disclosure-note">送出預測後開放理論與模型資訊。</p>}
       <div className="projectile-panel-actions">
         {freeStateControlsAvailable && <button className={panelOpen ? "active" : ""} aria-expanded={panelOpen} onClick={() => { setPanelOpen((open) => !open); setPanelWidth(PANEL_DEFAULT_WIDTH); }}><SlidersHorizontal size={16} /> 參數</button>}
         {freeStateControlsAvailable && <button ref={layersTriggerRef} aria-expanded={layersOpen} aria-controls="projectile-layer-drawer" onClick={() => setLayersOpen((open) => !open)}><Layers3 size={16} /> 圖層</button>}
-        <button ref={expandTriggerRef} onClick={() => { patchState({ playing: false }); setExpanded(true); }} aria-expanded={expanded}><ZoomIn size={16} /> 放大視圖</button>
+        <button ref={expandTriggerRef} onClick={() => { patchState({ playing: false }); setExpanded(true); }} aria-expanded={expanded}><Maximize2 size={16} /> 放大視圖</button>
       </div>
+      </div>
+      {leaveConfirm && guidedSession && (
+        <div className="projectile-leave-confirm" role="alertdialog" aria-label="離開探索任務" aria-describedby="projectile-leave-text" onKeyDown={(event) => { if (event.key === "Escape") setLeaveConfirm(false); }}>
+          <p id="projectile-leave-text">離開後，這個任務的預測與進度不會保留；自由探索會回到你先前的設定。</p>
+          <button autoFocus onClick={() => setLeaveConfirm(false)}>繼續任務</button>
+          <button className="danger" onClick={closeGuided}>離開任務</button>
+        </div>
+      )}
 
       {exportStatus && !guidedSession && <div className="projectile-share-notice" role="status">{exportStatus}</div>}
       {shareStatus && <div className="projectile-share-notice" role="status">{shareStatus}{shareUrl && <label>分享連結<input readOnly value={shareUrl} onFocus={(event) => event.target.select()} /></label>}</div>}
@@ -1605,7 +1637,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
               try { await document.documentElement.requestFullscreen(); setExpandNotice(null); }
               catch { setExpandNotice("全螢幕不可用；視窗內放大仍可使用。"); }
             }}>全螢幕</button>
-            <button ref={exitExpandRef} className="projectile-expand-exit" onClick={() => { if (document.fullscreenElement) void document.exitFullscreen(); setExpanded(false); setExpandNotice(null); expandTriggerRef.current?.focus(); }}><X size={16} /> 退出放大</button>
+            <button ref={exitExpandRef} className="projectile-expand-exit" onClick={collapseExpanded}><X size={16} /> 退出放大</button>
           </div>}
           {expanded && expandNotice && <p className="projectile-expand-notice" role="status">{expandNotice}</p>}
           <div className="canvas-host" ref={chartHostRef}>
@@ -1678,7 +1710,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
 
 
 
-        <aside className="projectile-side" data-open={panelOpen && !guidedSession} style={{ width: panelOpen && !guidedSession ? panelWidth : undefined }}>
+        <aside ref={sideRef} className="projectile-side" data-open={panelOpen && !guidedSession} style={{ width: panelOpen && !guidedSession ? panelWidth : undefined }}>
           <div
             className="projectile-side-grip"
             onPointerDown={startPanelResize}
@@ -1825,7 +1857,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
                 />
               </div>
             )}
-            onClose={closeGuided}
+            onClose={requestLeaveGuided}
             onRestart={() => selectGuidedActivity(guidedSession.activityId)}
             onSelectActivity={selectGuidedActivity}
             onPrediction={submitGuidedPrediction}
