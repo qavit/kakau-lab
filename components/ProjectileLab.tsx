@@ -27,6 +27,7 @@ import TheoryNotes from "@/components/projectile/TheoryNotes";
 import GuidedActivities from "@/components/projectile/GuidedActivities";
 import KakauLabMark from "@/components/KakauLabMark";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useExpandedView } from "@/components/workspace/useExpandedView";
 import LabInfoDialog from "./overlays/LabInfoDialog";
 import { LabLayerDrawer, LayerGroup, LayerToggle } from "./layers/LabLayerDrawer";
 import { INITIAL_PROJECTILE_LAYERS, PROJECTILE_LAYER_LABELS, type ProjectileLayers } from "./projectile/layers";
@@ -1333,30 +1334,14 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
   const [mergedCharts, setMergedCharts] = useState(true);
   const [guidedSession, setGuidedSession] = useState<GuidedSession | null>(null);
   const [guidedChartVisible, setGuidedChartVisible] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const [expandNotice, setExpandNotice] = useState<string | null>(null);
+  /* Enlargement behaviour (Escape, focus return, scroll lock, fullscreen fallback) is shared with the
+     Hydrogen lab; the page behind the enlarged stage is also made inert here. */
+  const expander = useExpandedView<"chart">();
+  const expanded = expander.expanded === "chart";
   const expandTriggerRef = useRef<HTMLButtonElement>(null);
-  const exitExpandRef = useRef<HTMLButtonElement>(null);
   const [leaveConfirm, setLeaveConfirm] = useState(false);
   const sideRef = useRef<HTMLElement>(null);
   const evidence = projectileEvidencePolicy(guidedSession);
-  /* Collapsing un-inerts the page first, so focus can only return to the trigger on the next frame. */
-  const collapseExpanded = useCallback(() => {
-    if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
-    setExpanded(false);
-    setExpandNotice(null);
-    requestAnimationFrame(() => expandTriggerRef.current?.focus());
-  }, []);
-  useEffect(() => {
-    if (!expanded) return;
-    exitExpandRef.current?.focus();
-    const root = document.documentElement;
-    const previousOverflow = root.style.overflow;
-    root.style.overflow = "hidden";
-    const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") collapseExpanded(); };
-    document.addEventListener("keydown", onKeyDown);
-    return () => { root.style.overflow = previousOverflow; document.removeEventListener("keydown", onKeyDown); };
-  }, [expanded, collapseExpanded]);
   /* On a narrow screen the panel opens below the instruments; bring it under the pinned chart so
      the first slider and the trajectory are on screen together. */
   useEffect(() => {
@@ -1602,7 +1587,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       <div className="projectile-panel-actions">
         {freeStateControlsAvailable && <button className={panelOpen ? "active" : ""} aria-expanded={panelOpen} onClick={() => { setPanelOpen((open) => !open); setPanelWidth(PANEL_DEFAULT_WIDTH); }}><SlidersHorizontal size={16} /> 參數</button>}
         {freeStateControlsAvailable && <button ref={layersTriggerRef} aria-expanded={layersOpen} aria-controls="projectile-layer-drawer" onClick={() => setLayersOpen((open) => !open)}><Layers3 size={16} /> 圖層</button>}
-        <button ref={expandTriggerRef} onClick={() => { patchState({ playing: false }); setExpanded(true); }} aria-expanded={expanded}><Maximize2 size={16} /> 放大視圖</button>
+        <button ref={expandTriggerRef} onClick={() => { patchState({ playing: false }); expander.expand("chart", expandTriggerRef.current); }} aria-expanded={expanded}><Maximize2 size={16} /> 放大視圖</button>
       </div>
       </div>
       {leaveConfirm && guidedSession && (
@@ -1623,7 +1608,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       </LabLayerDrawer>
       {/* The panel takes width from the chart rather than covering it, and the chart is drawn at
           whatever size it is left with, so opening the panel never hides the trajectory. */}
-      <div className="projectile-stage" data-panel={panelOpen || Boolean(guidedSession)} data-expanded={expanded}>
+      <div ref={expander.bind("chart")} className="projectile-stage" data-panel={panelOpen || Boolean(guidedSession)} data-expanded={expanded}>
         <section className="viewport-card projectile-path-card">
           <div className="card-label">
             <span>軌跡</span>
@@ -1633,13 +1618,10 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
             </div>
           </div>
           {expanded && <div className="projectile-expand-actions">
-            <button onClick={async () => {
-              try { await document.documentElement.requestFullscreen(); setExpandNotice(null); }
-              catch { setExpandNotice("全螢幕不可用；視窗內放大仍可使用。"); }
-            }}>全螢幕</button>
-            <button ref={exitExpandRef} className="projectile-expand-exit" onClick={collapseExpanded}><X size={16} /> 退出放大</button>
+            <button onClick={() => void expander.requestFullscreen()}>全螢幕</button>
+            <button data-expanded-exit className="projectile-expand-exit" onClick={expander.collapse}><X size={16} /> 退出放大</button>
           </div>}
-          {expanded && expandNotice && <p className="projectile-expand-notice" role="status">{expandNotice}</p>}
+          {expanded && expander.notice && <p className="projectile-expand-notice" role="status">{expander.notice}</p>}
           <div className="canvas-host" ref={chartHostRef}>
             <TrajectoryView
               state={state}

@@ -89,7 +89,7 @@ for (const viewport of viewports) {
       expect(await page.evaluate(() => document.activeElement === document.body || Boolean(document.activeElement?.closest(".projectile-stage[data-expanded='true']")))).toBe(true);
     }
     await page.evaluate(() => {
-      Object.defineProperty(document.documentElement, "requestFullscreen", { value: () => Promise.reject(new Error("blocked")), configurable: true });
+      Object.defineProperty(document.querySelector(".projectile-stage")!, "requestFullscreen", { value: () => Promise.reject(new Error("blocked")), configurable: true });
     });
     await page.getByRole("button", { name: "全螢幕", exact: true }).click();
     await expect(page.locator(".projectile-expand-notice")).toContainText("視窗內放大仍可使用");
