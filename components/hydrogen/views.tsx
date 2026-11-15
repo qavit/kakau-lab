@@ -43,6 +43,27 @@ export function formatFrequency(hz: number) {
 const SIZE = 480;
 const CENTER = SIZE / 2;
 const ORBIT_EDGE = 228;
+/** Diagram text never renders below this many CSS px, however small the card is. */
+const MIN_TEXT_PX = 12;
+/** Pointer targets inside a diagram aim for this many CSS px, limited by how close their neighbours are. */
+const TARGET_PX = 44;
+
+/** Pixels per viewBox unit of an SVG that is drawn to fit its box, kept in step with the box. */
+function useSvgScale<T extends SVGSVGElement>(viewWidth: number, viewHeight: number) {
+  const ref = useRef<T>(null);
+  const [scale, setScale] = useState(0.65);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      const next = Math.min(entry.contentRect.width / viewWidth, entry.contentRect.height / viewHeight);
+      if (next > 0) setScale(next);
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [viewWidth, viewHeight]);
+  return [ref, scale] as const;
+}
 
 
 function onActivate(action: () => void) {
@@ -81,6 +102,11 @@ export function OrbitView({ state, readout, scale, onPlace }: { state: HydrogenS
   const ey = CENTER - electronRadius * Math.sin(state.orbitAngle);
 
   const photonAngle = -Math.PI / 4;
+  const [svgRef, k] = useSvgScale<SVGSVGElement>(SIZE, SIZE);
+  const font = (units: number) => Math.max(units, MIN_TEXT_PX / k);
+  /* The electron marker carries its own label, so it grows until that label is readable, but never
+     past the innermost orbit it sits on. */
+  const markerRadius = Math.max(7, Math.min(8.5 / k, radiusPx(1) * 0.9));
   const lowerRadius = radiusPx(state.lower);
   let photonX = 0;
   let photonY = 0;
@@ -92,7 +118,7 @@ export function OrbitView({ state, readout, scale, onPlace }: { state: HydrogenS
   }
 
   return (
-    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width="100%" height="100%" role="img" aria-label={`玻耳氫原子軌道圖，電子在 n = ${state.electronLevel} 軌道`}>
+    <svg ref={svgRef} viewBox={`0 0 ${SIZE} ${SIZE}`} width="100%" height="100%" role="img" aria-label={`玻耳氫原子軌道圖，電子在 n = ${state.electronLevel} 軌道`}>
       {readout.levels.map(({ n }) => {
         const r = radiusPx(n);
         const active = n === state.electronLevel;
@@ -110,9 +136,9 @@ export function OrbitView({ state, readout, scale, onPlace }: { state: HydrogenS
               strokeDasharray={active ? undefined : "3 4"}
             />
             {/* Wide invisible stroke so a thin orbit is easy to click. */}
-            <circle cx={CENTER} cy={CENTER} r={r} fill="none" stroke="transparent" strokeWidth={14} style={{ cursor: onPlace ? "pointer" : "default" }} onClick={onPlace ? () => onPlace(n) : undefined} />
+            <circle cx={CENTER} cy={CENTER} r={r} fill="none" stroke="transparent" strokeWidth={Math.max(14, Math.min(TARGET_PX / k, r - (n > 1 ? radiusPx(n - 1) : 0)))} style={{ cursor: onPlace ? "pointer" : "default" }} onClick={onPlace ? () => onPlace(n) : undefined} />
             {label ? (
-              <text x={CENTER + r * 0.7071 + 4} y={CENTER + r * 0.7071 + 12} fill={active ? "#5ed8c3" : "#9fc2d3"} fontSize={15} fontWeight={700}>
+              <text x={CENTER + r * 0.7071 + 4} y={CENTER + r * 0.7071 + 12} fill={active ? "#5ed8c3" : "#9fc2d3"} fontSize={font(15)} fontWeight={700}>
                 n={n}
               </text>
             ) : null}
@@ -120,7 +146,7 @@ export function OrbitView({ state, readout, scale, onPlace }: { state: HydrogenS
         );
       })}
       <circle cx={CENTER} cy={CENTER} r={nucleusRadius} fill="#e0795f" />
-      <text x={CENTER + 9} y={CENTER - 8} fill="#e0a08f" fontSize={13}>p⁺</text>
+      <text x={CENTER + 9} y={CENTER - 8} fill="#e0a08f" fontSize={font(13)}>p⁺</text>
 
       {state.photonProgress !== null ? (
         <g aria-label="光子">
@@ -133,25 +159,29 @@ export function OrbitView({ state, readout, scale, onPlace }: { state: HydrogenS
             stroke={readout.selected.region === "visible" ? "none" : "#f4f1e8"}
             strokeDasharray={readout.selected.region === "visible" ? undefined : "2 2"}
           />
-          <text x={photonX - 8} y={photonY - 14} textAnchor="end" fill="#d4e0e5" fontSize={14}>
+          <text x={photonX - 8} y={photonY - 14} textAnchor="end" fill="#d4e0e5" fontSize={font(14)}>
             {formatWavelength(readout.selected.wavelength)}
           </text>
         </g>
       ) : null}
 
       {scale === "schematic" ? (
-        <text x={10} y={SIZE - 10} fill="#f2c66d" fontSize={14}>示意比例：半徑 ∝ n（非 n²）</text>
+        <text x={10} y={SIZE - 10} fill="#f2c66d" fontSize={font(14)}>示意比例：半徑 ∝ n（非 n²）</text>
       ) : null}
 
-      <circle cx={ex} cy={ey} r={7} fill="#f2c66d" stroke="#fff3cf" strokeWidth={1.5} />
-      <text x={ex} y={ey + 3.5} textAnchor="middle" fill="#3a2a05" fontSize={11} fontWeight={700}>e⁻</text>
+      <circle cx={ex} cy={ey} r={markerRadius} fill="#f2c66d" stroke="#fff3cf" strokeWidth={1.5} />
+      <text x={ex} y={ey + markerRadius * 0.5} textAnchor="middle" fill="#3a2a05" fontSize={markerRadius * 1.5} fontWeight={700}>e⁻</text>
     </svg>
   );
 }
 
 const ENERGY_TOP = 60;
 const ENERGY_SPAN = 360;
-const LABEL_GAP = 14;
+/** The diagram's own frame: the right-hand margin of the 480 square is empty, so it is cropped away and
+ *  the drawing, and its text, can be larger on a narrow card. */
+const ENERGY_VIEW = { x: 0, y: -18, w: 424, h: 478 };
+/** Longest level label ("n=1 -13.60", about 4.8 em) must still fit left of the level lines. */
+const LEVEL_LABEL_ROOM = 104;
 
 export function EnergyView({
   state,
@@ -168,27 +198,33 @@ export function EnergyView({
   /** Transitions to call out with a bold arrow and a label, e.g. the two lines of the Hα/Hβ comparison. */
   marks?: { upper: number; lower: number; label: string }[];
 }) {
+  const [svgRef, k] = useSvgScale<SVGSVGElement>(ENERGY_VIEW.w, ENERGY_VIEW.h);
+  const font = (units: number, ceiling = Infinity) => Math.min(ceiling, Math.max(units, MIN_TEXT_PX / k));
+  const levelFont = font(16, LEVEL_LABEL_ROOM / 4.8);
+  const labelGap = levelFont * 1.1;
   const yOf = (energy: number) => ENERGY_TOP + (-energy / Math.abs(readout.levels[0].energy)) * ENERGY_SPAN;
   const levelY = readout.levels.map((level) => yOf(level.energy));
 
   // Crowded levels near the ionisation limit: spread their labels downward from the top, joined by leader lines.
   const labelY: number[] = [];
   for (let i = levelY.length - 1; i >= 0; i -= 1) {
-    const below = i === levelY.length - 1 ? -Infinity : labelY[i + 1] + LABEL_GAP;
+    const below = i === levelY.length - 1 ? -Infinity : labelY[i + 1] + labelGap;
     labelY[i] = Math.max(levelY[i], below);
   }
 
   const x0 = 150;
   const x1 = 392;
   const lines = readout.series;
+  const arrowSpacing = lines.length <= 1 ? Infinity : (x1 - x0 - 60) / (lines.length - 1);
+  const arrowHit = Math.max(16, Math.min(TARGET_PX / k, arrowSpacing - 4));
   const arrowX = (index: number) => (lines.length <= 1 ? (x0 + x1) / 2 : x0 + 30 + (index * (x1 - x0 - 60)) / (lines.length - 1));
 
   return (
-    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width="100%" height="100%" role="group" aria-label="氫原子能階圖">
+    <svg ref={svgRef} viewBox={`${ENERGY_VIEW.x} ${ENERGY_VIEW.y} ${ENERGY_VIEW.w} ${ENERGY_VIEW.h}`} width="100%" height="100%" role="group" aria-label="氫原子能階圖">
       <line x1={x0 - 20} y1={ENERGY_TOP} x2={x1 + 20} y2={ENERGY_TOP} stroke="#f2c66d" strokeWidth={1.4} strokeDasharray="6 4" />
-      <text x={x1 + 20} y={ENERGY_TOP - 8} textAnchor="end" fill="#f2c66d" fontSize={14}>E = 0（游離）</text>
+      <text x={x1 + 20} y={ENERGY_TOP - 8} textAnchor="end" fill="#f2c66d" fontSize={font(14)}>E = 0（游離）</text>
       <line x1={64} y1={ENERGY_TOP - 20} x2={64} y2={ENERGY_TOP + ENERGY_SPAN + 20} stroke="#4a7692" strokeWidth={1} />
-      <text x={64} y={ENERGY_TOP - 28} textAnchor="middle" fill="#9fc2d3" fontSize={14}>E（eV）</text>
+      <text x={64} y={ENERGY_TOP - 28} textAnchor="middle" fill="#9fc2d3" fontSize={font(14)}>E（eV）</text>
 
       {lines.map((line, index) => {
         const x = arrowX(index);
@@ -204,11 +240,11 @@ export function EnergyView({
             key={`${line.upper}-${line.lower}`}
             {...(onPick ? pressable(() => onPick(line.upper, line.lower), `選擇躍遷 ${line.upper} 到 ${line.lower}，${formatWavelength(line.wavelength)}`, selected) : {})}
           >
-            <line x1={x} y1={fromY} x2={x} y2={toY + head * 0.2} stroke="transparent" strokeWidth={16} />
+            <line x1={x} y1={fromY} x2={x} y2={toY + head * 0.2} stroke="transparent" strokeWidth={arrowHit} />
             <line x1={x} y1={fromY} x2={x} y2={toY + head * 0.2} stroke={color} strokeWidth={selected ? 3.2 : 1.6} opacity={selected ? 1 : 0.55} />
             <path d={`M ${x - 5} ${toY + head} L ${x} ${toY} L ${x + 5} ${toY + head}`} fill="none" stroke={color} strokeWidth={selected ? 3.2 : 1.6} opacity={selected ? 1 : 0.55} />
             {mark ? (
-              <text x={x + 8} y={(fromY + toY) / 2} fill="#f2f6f8" fontSize={14} fontWeight={700} stroke="#10202b" strokeWidth={3} paintOrder="stroke">{mark.label}</text>
+              <text x={x + 8} y={(fromY + toY) / 2} fill="#f2f6f8" fontSize={font(14)} fontWeight={700} stroke="#10202b" strokeWidth={3} paintOrder="stroke">{mark.label}</text>
             ) : null}
           </g>
         );
@@ -217,16 +253,18 @@ export function EnergyView({
       {readout.levels.map(({ n, energy }, i) => {
         const active = n === state.electronLevel;
         const y = levelY[i];
+        const nearest = Math.min(i > 0 ? y - levelY[i - 1] : Infinity, i < levelY.length - 1 ? levelY[i + 1] - y : Infinity);
+        const levelHit = Math.max(10, Math.min(TARGET_PX / k, nearest));
         return (
           <g
             key={n}
             {...(onPlace ? pressable(() => onPlace(n), `把電子放到 n = ${n}，能量 ${energy.toFixed(2)} eV`, active) : {})}
           >
-            <line x1={x0 - 20} y1={y} x2={x1 + 20} y2={y} stroke="transparent" strokeWidth={10} />
+            <line x1={x0 - 20} y1={y} x2={x1 + 20} y2={y} stroke="transparent" strokeWidth={levelHit} />
             <line x1={x0 - 20} y1={y} x2={x1 + 20} y2={y} stroke={active ? "#5ed8c3" : "#7fa7be"} strokeWidth={active ? 3 : 1.8} />
             {Math.abs(labelY[i] - y) > 1 ? <polyline points={`${x0 - 20},${y} ${x0 - 30},${y} ${x0 - 36},${labelY[i]} ${x0 - 42},${labelY[i]}`} fill="none" stroke="#4a7692" strokeWidth={0.8} /> : null}
-            <text x={x0 - 46} y={labelY[i] + 4} textAnchor="end" fill={active ? "#5ed8c3" : "#c9dae2"} fontSize={16} fontWeight={active ? 700 : 400}>
-              n={n}　{energy.toFixed(2)}
+            <text x={x0 - 46} y={labelY[i] + 4} textAnchor="end" fill={active ? "#5ed8c3" : "#c9dae2"} fontSize={levelFont} fontWeight={active ? 700 : 400}>
+              n={n} {energy.toFixed(2)}
             </text>
             {active ? <circle cx={x1 + 4} cy={y - 9} r={6} fill="#f2c66d" stroke="#fff3cf" /> : null}
           </g>
@@ -328,9 +366,11 @@ export function SpectrumStrip({
           const lineColor = absorption ? "#050d14" : photonColor(line);
           const wavelengthText = line.wavelength.toFixed(line.wavelength < 200 ? 1 : 0);
           const clampX = Math.min(width - 22, Math.max(22, lx));
+          const gapToNeighbour = Math.min(i > 0 ? Math.abs(lx - x(shown[i - 1].wavelength)) : Infinity, i < shown.length - 1 ? Math.abs(x(shown[i + 1].wavelength) - lx) : Infinity);
+          const hit = Math.max(22, Math.min(TARGET_PX, gapToNeighbour));
           const body = (
             <>
-              <rect x={lx - 11} y={STRIP_TOP - 4} width={22} height={STRIP_H + 8} fill="transparent" />
+              <rect x={lx - hit / 2} y={STRIP_TOP - 4} width={hit} height={STRIP_H + 8} fill="transparent" />
               {emphasised ? <rect x={lx - 6} y={STRIP_TOP} width={12} height={STRIP_H} fill="none" stroke="#f2c66d" strokeWidth={1.4} /> : null}
               <rect x={lx - (emphasised ? 2.5 : 1.5)} y={STRIP_TOP} width={emphasised ? 5 : 3} height={STRIP_H} fill={lineColor} />
               {keepLabel[i] ? (
