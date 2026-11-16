@@ -49,6 +49,9 @@ for (const width of [360, 472, 820, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/projectile");
     const chart = page.locator('svg[role="img"]').first();
+    // Pause first: the readout follows the pointer, and a loop restarting under it made this timing-dependent.
+    const pause = page.getByRole("button", { name: "暫停", exact: true });
+    if (await pause.count()) await pause.click();
     const box = (await chart.boundingBox())!;
     const tip = page.locator(".projectile-tip");
     // Move repeatedly: a pointer that arrives before hydration would otherwise never raise the readout.
