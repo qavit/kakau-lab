@@ -154,7 +154,25 @@ export function isRaisedHeightReady(height: number, targetHeight = 25): boolean 
 
 /** The comparison stays masked until Activity 2's prediction has been committed. */
 export function comparisonVisible(session: GuidedSession): boolean {
-  return session.activityId !== "complementary" || session.phase !== "predict";
+  return session.phase !== "predict";
+}
+
+/** Disclosure follows the learning phase, independently of where a control is rendered. */
+export function projectileEvidencePolicy(session: GuidedSession | null) {
+  const predicting = session?.phase === "predict";
+  return {
+    theory: !predicting,
+    modelInfo: !predicting,
+    numericResults: !predicting,
+    comparison: !session || comparisonVisible(session),
+    share: !session,
+    export: !session,
+  };
+}
+
+/** A committed prediction that has not reached the summary is progress the student would lose by leaving. */
+export function hasGuidedProgress(session: GuidedSession): boolean {
+  return session.prediction !== null && session.phase !== "complete";
 }
 
 /** Scenario and preset controls belong to free exploration; guided activities own a known state. */
