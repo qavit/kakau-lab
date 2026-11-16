@@ -43,3 +43,30 @@ test("projectile: enlarged view keeps focus inside, and Escape returns it to the
   await expect(page.locator(".projectile-stage")).toHaveAttribute("data-expanded", "false");
   await expect(trigger).toBeFocused();
 });
+
+for (const width of [360, 472, 820, 1280]) {
+  test(`projectile: hover readout stays a compact card and time controls do not wrap or clip at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/projectile");
+    const chart = page.locator('svg[role="img"]').first();
+    const box = (await chart.boundingBox())!;
+    const tip = page.locator(".projectile-tip");
+    // Move repeatedly: a pointer that arrives before hydration would otherwise never raise the readout.
+    await expect(async () => {
+      await page.mouse.move(box.x + box.width * 0.45, box.y + box.height * 0.5);
+      await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+      await expect(tip).toBeVisible({ timeout: 500 });
+    }).toPass();
+    // MathJax symbols inside the readout must not inherit the chart's fixed height.
+    expect((await tip.boundingBox())!.height).toBeLessThan(400);
+
+    const transport = (await page.locator(".projectile-transport").boundingBox())!;
+    const play = (await page.locator('.projectile-transport-buttons button[aria-label="播放"], .projectile-transport-buttons button[aria-label="暫停"]').boundingBox())!;
+    expect(play.height).toBeLessThan(50); // label on one line
+    const speeds = (await page.locator(".projectile-transport-speeds").boundingBox())!;
+    expect(speeds.x + speeds.width).toBeLessThanOrEqual(transport.x + transport.width + 1);
+    const scrub = (await page.locator(".projectile-scrub").boundingBox())!;
+    expect(scrub.width).toBeGreaterThan(Math.min(240, width * 0.6));
+    await expect(page.locator(".projectile-path-card .card-label > span").first()).toHaveCSS("white-space", "nowrap");
+  });
+}
