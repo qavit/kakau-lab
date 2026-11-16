@@ -86,3 +86,63 @@
   .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-card[data-view]:not(.hydrogen-spectrum-card):not([data-expanded="true"]) { height: clamp(364px, 50vh, 440px); }
   .hydrogen-lab.hydrogen-c2 .hydrogen-free-stage .hydrogen-card[data-view]:not(.hydrogen-spectrum-card):not([data-expanded="true"]) .hydrogen-canvas { padding-top: 80px; }
 }
+
+/* ---- UX reset: a transition is the primary object, not three separate cards. ---- */
+.hydrogen-lab.hydrogen-c2 .hydrogen-transition-flow { margin: 0 0 14px; padding: clamp(14px, 2vw, 22px); border: 1px solid #9bd7dd66; border-radius: 18px; background: linear-gradient(120deg, #082238 0%, #103a50 100%); color: #eef8fa; box-shadow: 0 12px 28px #04131f26; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-intro { max-width: 680px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-intro .eyebrow { margin: 0 0 4px; color: #9bd7dd; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-intro h2 { margin: 0; color: #fff; font-size: clamp(21px, 3vw, 29px); }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-intro p:last-child { margin: 7px 0 0; color: #c7e1e6; line-height: 1.55; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-steps { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 10px; margin-top: 16px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-step { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 9px; padding: 12px; border: 1px solid #9bd7dd55; border-radius: 12px; background: #061a2acc; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-step > span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #9bd7dd; color: #082238; font-size: 14px; font-weight: 800; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-step strong { display: block; color: #fff; font-size: 15px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-step p { margin: 5px 0 9px; color: #d0e7eb; font-size: 14px; line-height: 1.45; font-variant-numeric: tabular-nums; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-row button, .hydrogen-lab.hydrogen-c2 .hydrogen-flow-step .primary-action { min-height: 42px; padding: 7px 10px; border: 1px solid #9bd7dd88; border-radius: 8px; background: #113c52; color: #f2fbfc; font-size: 14px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-row button.active { border-color: #e4f1f3; background: #e4f1f3; color: #0a293a; font-weight: 750; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-step .primary-action:not(:disabled) { border-color: #f2c66d; background: #f2c66d; color: #182731; font-weight: 750; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-step .primary-action:disabled { opacity: .55; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-flow-result p { margin-bottom: 0; }
+
+.hydrogen-lab.hydrogen-c2 .hydrogen-causal-workspace { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr); gap: 14px; align-items: stretch; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-causal-workspace .viewport-card { min-height: 410px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-causal-workspace .hydrogen-primary-energy { order: 0; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-causal-workspace .hydrogen-primary-spectrum { order: 1; display: flex; flex-direction: column; justify-content: center; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-primary-spectrum .hydrogen-strip { margin-top: 26px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-primary-spectrum .hydrogen-strip-note { margin: 16px 0 0; color: var(--lc-muted); line-height: 1.5; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-free-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 14px; align-items: start; margin-top: 14px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-free-side { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 0; position: static; max-height: none; overflow: visible; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-free-side .hydrogen-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.hydrogen-lab.hydrogen-c2 .hydrogen-free-side .hydrogen-metrics > div:last-child { grid-column: 1 / -1; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-controls { margin: 0; padding: 0; overflow: hidden; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-controls > summary, .hydrogen-lab.hydrogen-c2 .hydrogen-orbit-drawer > summary { min-height: 52px; display: flex; align-items: center; cursor: pointer; padding: 0 14px; color: var(--lc-text); font-weight: 700; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-controls > summary::marker, .hydrogen-lab.hydrogen-c2 .hydrogen-orbit-drawer > summary::marker { color: var(--lc-accent); }
+.hydrogen-lab.hydrogen-c2 .hydrogen-controls > :not(summary) { margin-left: 14px; margin-right: 14px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-controls .control-panel-heading { padding-top: 10px; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-orbit-drawer { border: 1px solid var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); overflow: hidden; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-orbit-drawer > p { margin: 0; padding: 0 14px 12px; color: var(--lc-muted); line-height: 1.5; }
+.hydrogen-lab.hydrogen-c2 .hydrogen-orbit-drawer .viewport-card { margin: 0 12px 12px; min-height: 340px; }
+
+@media (max-width: 900px) {
+  .hydrogen-lab.hydrogen-c2 .hydrogen-transition-flow { margin-left: -2px; margin-right: -2px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-flow-steps { grid-template-columns: 1fr; gap: 7px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-flow-step { padding: 9px 10px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-flow-step p { margin: 3px 0 6px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-flow-result { display: none; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-causal-workspace { grid-template-columns: 1fr; gap: 8px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-causal-workspace .viewport-card:not([data-expanded="true"]) { min-height: 0; height: clamp(260px, 36vh, 320px); }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-causal-workspace .hydrogen-primary-energy .hydrogen-canvas { padding-top: 70px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-primary-spectrum { padding-top: 12px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-primary-spectrum .card-label { position: static; margin: 0 0 4px; padding-right: 0; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-primary-spectrum .hydrogen-range { position: static; margin: 0 0 4px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-primary-spectrum .hydrogen-strip { margin-top: 0; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-primary-spectrum .hydrogen-strip-note { display: none; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-layout { grid-template-columns: 1fr; margin-top: 8px; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-side .hydrogen-metrics { grid-template-columns: 1fr 1fr; }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-orbit-drawer .viewport-card { height: clamp(320px, 48vh, 440px); }
+}
+@media (min-width: 1100px) {
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-layout { grid-template-columns: minmax(390px, .75fr) minmax(0, 1.25fr); }
+  .hydrogen-lab.hydrogen-c2 .hydrogen-free-side .hydrogen-control-grid { grid-template-columns: 1fr 1fr; }
+}

@@ -34,23 +34,22 @@ test("the entry offers both modes and either one starts clean", async ({ page })
     await page.getByTestId("choose-free").click({ timeout: 1000 });
     await expect(lab(page)).toHaveAttribute("data-mode", "free", { timeout: 1000 });
   }).toPass();
-  await expect(page.locator(".viewport-card").getByText("玻耳軌道")).toBeVisible();
+  await expect(page.getByText("查看玻耳軌道輔助表徵", { exact: true })).toBeVisible();
   await expect(page.getByRole("group", { name: "氫原子能階圖" })).toBeVisible();
   await expect(page.getByRole("button", { name: /放出光子|吸收光子/ })).toBeVisible();
 });
 
-test("free exploration keeps selecting, placing and firing", async ({ page }) => {
+test("free exploration prepares and fires a selected transition in two actions", async ({ page }) => {
   await page.goto("/hydrogen");
   await expect(async () => {
     await page.getByTestId("choose-free").click({ timeout: 1000 });
     await expect(lab(page)).toHaveAttribute("data-mode", "free", { timeout: 1000 });
   }).toPass();
-  await page.getByRole("button", { name: "Balmer Hβ（4→2）" }).click();
+  await page.getByTestId("event-4-2").click();
   await expect(page.getByRole("button", { name: /選擇躍遷 4 到 2/ }).first()).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("#hydrogen-fire-status")).toContainText("需要電子先在 n=4");
-  await page.getByRole("button", { name: "設定電子在 n=4" }).click();
-  await page.getByRole("button", { name: "放出光子" }).click();
-  await expect(page.locator("#hydrogen-fire-status")).toContainText(/光子飛行中|電子在 n=2/);
+  await expect(page.getByTestId("transition-flow")).toContainText("電子已在 n=4");
+  await page.getByTestId("execute-transition").click();
+  await expect(page.getByTestId("execute-transition")).toBeDisabled();
 });
 
 test("guided mode starts on the spectrum without the answer anywhere", async ({ page }) => {

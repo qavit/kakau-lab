@@ -27,52 +27,41 @@ const viewports = [
 for (const viewport of viewports) {
   const phone = viewport.width < 900;
 
-  test(`free workspace: main view, linked selection and enlargement ${viewport.width}x${viewport.height}`, async ({ page }) => {
+  test(`causal workspace: choose, execute and read one transition ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await open(page, "free");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 
-    if (phone) {
-      // One main diagram at a time, with the spectrum and the fire action on the first screen.
-      await expect(card(page, "energy")).toBeVisible();
-      await expect(card(page, "orbit")).toBeHidden();
-      await expect(page.getByRole("group", { name: /發射光譜|吸收光譜/ })).toBeInViewport({ ratio: 0.5 });
-      await expect(page.getByTestId("quick-fire")).toBeInViewport({ ratio: 1 });
-    } else {
-      await expect(card(page, "energy")).toBeVisible();
-      await expect(card(page, "orbit")).toBeVisible();
-      await expect(page.getByTestId("quickbar")).toBeHidden();
-    }
-    await shot(page, `gate-b-hydrogen-${viewport.width}x${viewport.height}.png`);
+    await expect(page.getByTestId("transition-flow")).toBeVisible();
+    await expect(card(page, "energy")).toBeVisible();
+    await expect(card(page, "spectrum")).toBeVisible();
+    await expect(page.getByTestId("execute-transition")).toBeEnabled();
+    const spectrumBox = await card(page, "spectrum").boundingBox();
+    // Phones may need a short scroll, but never a round trip to a detached control panel.
+    if (phone) expect(spectrumBox && spectrumBox.y < viewport.height + 280).toBeTruthy();
+    await shot(page, `ux-reset-hydrogen-${viewport.width}x${viewport.height}.png`);
 
-    // Select Hβ in the energy diagram from the keyboard; every view follows.
+    // Hβ is one direct choice. It also prepares the stated initial level, so firing is the second
+    // and final operation rather than requiring a separate slider adjustment.
+    await page.getByTestId("event-4-2").click();
     const arrow = card(page, "energy").getByRole("button", { name: /選擇躍遷 4 到 2/ });
-    await arrow.focus();
-    await page.keyboard.press("Enter");
     await expect(arrow).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".hydrogen-metrics")).toContainText("486.0 nm");
     await expect(card(page, "spectrum").getByRole("button", { name: /選擇躍遷 4 到 2/ })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("transition-flow")).toContainText("電子已在 n=4");
+    await expect(page.getByTestId("execute-transition")).toBeEnabled();
     // The wavelength is written in ink; its colour is a chip beside it.
     const wavelength = page.locator(".hydrogen-metrics strong", { hasText: "486.0 nm" });
     expect(await wavelength.evaluate((el) => getComputedStyle(el).color)).not.toMatch(/rgb\(0, 2\d\d, 255\)/);
     await expect(wavelength.locator(".hydrogen-swatch")).toHaveAttribute("data-visible", "true");
 
-    // The blocked transition says why, and the same action is offered where the thumb is.
-    await expect(page.locator("#hydrogen-fire-status")).toContainText("需要電子先在 n=4");
-    if (phone) await expect(page.getByTestId("quick-fire")).toBeDisabled();
+    await page.getByTestId("execute-transition").click();
+    await expect(page.getByTestId("execute-transition")).toBeDisabled();
 
-    // A per-view setting, to prove it survives switching and enlarging.
+    // A per-view setting, to prove it survives enlargement.
     await page.getByRole("button", { name: "可見光 380–750" }).click();
-
-    if (phone) {
-      await page.getByTestId("main-orbit").click();
-      await expect(card(page, "orbit")).toBeVisible();
-      await expect(card(page, "energy")).toBeHidden();
-      await expect(page.locator(".hydrogen-metrics")).toContainText("4 → 2");
-    }
-
-    for (const view of ["orbit", "spectrum"] as const) {
+    for (const view of ["energy", "spectrum"] as const) {
       const trigger = page.getByTestId(`expand-${view}`);
       await trigger.click();
       const target = card(page, view);
@@ -90,7 +79,7 @@ for (const viewport of viewports) {
       await target.getByRole("button", { name: "全螢幕" }).click();
       await expect(target.locator(".hydrogen-expand-notice")).toContainText("視窗內放大仍可使用");
       await expect(target).toHaveAttribute("data-expanded", "true");
-      if (viewport.width === 360) await shot(page, `gate-b-hydrogen-expanded-${view}-360x800.png`);
+      if (viewport.width === 360) await shot(page, `ux-reset-hydrogen-expanded-${view}-360x800.png`);
       await page.keyboard.press("Escape");
       await expect(target).toHaveAttribute("data-expanded", "false");
       await expect(trigger).toBeFocused();
@@ -100,11 +89,15 @@ for (const viewport of viewports) {
     await expect(page.locator(".hydrogen-metrics")).toContainText("486.0 nm");
     await expect(page.getByRole("button", { name: "可見光 380–750" })).toHaveAttribute("aria-pressed", "true");
 
-    // Outside the visible band there is no hue to show: neutral chip, said in words.
-    if (phone) await page.getByTestId("quick-controls").click();
-    await page.getByRole("button", { name: /Lyman/ }).click();
-    await expect(page.locator(".hydrogen-metrics .hydrogen-swatch")).toHaveAttribute("data-visible", "false");
-    await expect(page.locator(".hydrogen-metrics")).toContainText("紫外線");
+    // Absorption reverses the direction but keeps the same selected energy gap and direct action.
+    await page.getByRole("button", { name: "吸收 低→高" }).click();
+    await page.getByTestId("event-3-2").click();
+    await expect(page.getByTestId("transition-flow")).toContainText("3 ← 2");
+    await expect(page.getByTestId("execute-transition")).toHaveText("吸收光子");
+    await expect(page.getByTestId("execute-transition")).toBeEnabled();
+    // Orbit remains available, but cannot compete with the causal workspace as a primary task.
+    await page.getByText("查看玻耳軌道輔助表徵", { exact: true }).click();
+    await expect(card(page, "orbit")).toBeVisible();
   });
 }
 
