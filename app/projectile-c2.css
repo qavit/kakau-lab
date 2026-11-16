@@ -195,7 +195,7 @@
   .projectile-c2 .projectile-panel-actions button { flex:1; min-width:0; padding:6px; font-size:13px; }
   .projectile-c2 .projectile-stage { gap:4px; }
   .projectile-c2 .projectile-path-card { aspect-ratio:auto; min-height:0; padding-top:50px; }
-  .projectile-c2 .projectile-path-card .canvas-host svg[role="img"] { height:clamp(235px,39vh,350px); }
+  .projectile-c2 .projectile-path-card .canvas-host > svg[role="img"] { height:clamp(235px,39vh,350px); }
   .projectile-c2 .projectile-dock { margin:0; }
   .projectile-c2 .projectile-readout { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; padding:6px; }
   .projectile-c2 .projectile-readout span { display:flex; flex-direction:column; gap:0; min-width:0; font-size:13px; }
@@ -205,7 +205,7 @@
   .projectile-c2 .projectile-transport { gap:4px; padding:5px; }
   .projectile-c2 .projectile-transport-buttons { grid-template-columns:44px repeat(3,minmax(0,1fr)) 44px 44px; }
   .projectile-c2 .projectile-transport button { min-height:44px; }
-  .projectile-c2 .projectile-stage[data-expanded="true"] .projectile-path-card .canvas-host svg[role="img"] { height:calc(100vh - 280px); min-height:220px; }
+  .projectile-c2 .projectile-stage[data-expanded="true"] .projectile-path-card .canvas-host > svg[role="img"] { height:calc(100vh - 280px); min-height:220px; }
   .projectile-c2 .projectile-stage[data-expanded="true"] .card-label>div { display:none; }
 }
 .projectile-c2 .projectile-extra-readouts { flex-basis:100%; color:var(--lc-body); }
@@ -223,7 +223,7 @@
   .projectile-c2 .projectile-topbar { padding-bottom:0; min-height:44px; }
   .projectile-c2 .projectile-stage { order:1; }
   .projectile-c2 .projectile-panel-actions { order:2; position:sticky; bottom:0; z-index:20; margin:6px 0 0; padding:4px 0; background:var(--lc-raised); }
-  .projectile-c2 .projectile-path-card .canvas-host svg[role="img"] { height:235px; }
+  .projectile-c2 .projectile-path-card .canvas-host > svg[role="img"] { height:235px; }
 }
 
 /* ---- Review fixes on the pilot workspace ---- */
@@ -264,7 +264,30 @@
   .projectile-c2 .projectile-stage[data-expanded="false"] .projectile-path-card { position:relative; top:auto; padding-top:0; }
   .projectile-c2 .projectile-stage[data-expanded="false"] .card-label { position:static; margin:0 0 6px; padding:8px 8px 0; }
   .projectile-c2 .projectile-stage[data-expanded="false"] .card-label small { display:none; }
-  .projectile-c2 .projectile-path-card .canvas-host svg[role="img"] { height:clamp(150px, calc(100dvh - 96px), 235px); }
-  .projectile-c2 .projectile-stage[data-expanded="true"] .projectile-path-card .canvas-host svg[role="img"] { height:clamp(150px, calc(100dvh - 24px), 360px); min-height:150px; }
+  .projectile-c2 .projectile-path-card .canvas-host > svg[role="img"] { height:clamp(150px, calc(100dvh - 96px), 235px); }
+  .projectile-c2 .projectile-stage[data-expanded="true"] .projectile-path-card .canvas-host > svg[role="img"] { height:clamp(150px, calc(100dvh - 24px), 360px); min-height:150px; }
   .projectile-c2 .projectile-side { scroll-margin-top:8px; }
 }
+
+/* ---- Time controls: one layout that follows the width of the dock, not of the window ----
+   Narrow:  [ transport buttons          ]   Wide:  [ transport buttons ]  [ speeds ]
+            [ scrubber                   ]          [ scrubber          ]  [ clock  ]
+            [ clock             speeds   ]
+   Labels never wrap, and the scrubber always has a full row to itself. */
+.projectile-c2 .projectile-dock { container: projectile-dock / inline-size; }
+.projectile-c2 .projectile-transport { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "buttons buttons" "scrub scrub" "clock speeds"; align-items: center; gap: 8px 12px; }
+.projectile-c2 .projectile-transport button { white-space: nowrap; }
+.projectile-c2 .projectile-transport-buttons { grid-area: buttons; order: 0; }
+.projectile-c2 .projectile-scrub { grid-area: scrub; order: 0; width: 100%; min-width: 0; margin: 0; }
+.projectile-c2 .projectile-clock { grid-area: clock; order: 0; flex: none; text-align: left; font-size: 13px; white-space: nowrap; }
+.projectile-c2 .projectile-transport-speeds { grid-area: speeds; order: 0; margin: 0; display: flex; gap: 4px; }
+.projectile-c2 .projectile-transport-speeds button { min-width: 44px; padding: 6px 8px; font-size: 13px; }
+@container projectile-dock (min-width: 520px) {
+  .projectile-c2 .projectile-transport { grid-template-areas: "buttons speeds" "scrub clock"; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 20px; }
+  .projectile-c2 .projectile-transport-buttons { display: flex; flex-wrap: nowrap; width: auto; gap: 6px; }
+  .projectile-c2 .projectile-transport-buttons button[aria-label="暫停"], .projectile-c2 .projectile-transport-buttons button[aria-label="播放"] { min-width: 104px; }
+  .projectile-c2 .projectile-clock { text-align: right; min-width: 9ch; }
+}
+
+/* The chart's number badge is a pill, so a two-character label such as 「軌跡」 stays on one line. */
+.projectile-c2 .card-label > span { width: auto; min-width: 30px; padding: 0 9px; border-radius: 15px; white-space: nowrap; }
