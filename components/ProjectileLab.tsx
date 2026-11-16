@@ -28,6 +28,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import LabInfoDialog from "./overlays/LabInfoDialog";
 import { LabLayerDrawer, LayerGroup, LayerToggle } from "./layers/LabLayerDrawer";
 import { INITIAL_PROJECTILE_LAYERS, PROJECTILE_LAYER_LABELS, type ProjectileLayers } from "./projectile/layers";
+import { projectileResult, projectileResultSvg } from "../models/projectile-export.ts";
 import { decodeProjectileShare, encodeProjectileShare, type ProjectileShareInput } from "../models/projectile-serialization.ts";
 import { MathProvider, Tex } from "@/components/projectile/mathjax";
 import type { PathAcceleration, TrajectorySample, Vec2 } from "@/lib/science/projectile";
@@ -1300,6 +1301,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
   const [layers, setLayers] = useState<ProjectileLayers>(() => initial.layers);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(() => initial.preset);
   const [shareStatus, setShareStatus] = useState<string | null>(initial.error);
+  const [exportStatus, setExportStatus] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [modelInfoOpen, setModelInfoOpen] = useState(false);
   const [layersOpen, setLayersOpen] = useState(false);
@@ -1480,6 +1482,22 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
    * information rather than merely deferred it. */
   const gravityLabel = Object.values(GRAVITY_PRESETS).find((preset) => Math.abs(preset.value - state.gravity) < 1e-6)?.label ?? "自訂";
   const dragLabel = Object.values(DRAG_PRESETS).find((preset) => Math.abs(preset.value - state.dragFactor) < 1e-9)?.label ?? `b = ${state.dragFactor.toFixed(3)} m⁻¹`;
+  const exportTrajectory = (format: "svg" | "json") => {
+    try {
+      const result = projectileResult(state, layers, cursorFraction, guidedSession);
+      const contents = format === "svg" ? projectileResultSvg(result) : JSON.stringify(result, null, 2);
+      const blob = new Blob([contents], { type: format === "svg" ? "image/svg+xml;charset=utf-8" : "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url; link.download = `kakau-projectile.${format}`;
+      document.body.appendChild(link); link.click(); link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setExportStatus("已匯出完整軌跡與當下游標；含單位及假設。 Exported trajectories and current cursor, with units and assumptions.");
+    } catch {
+      setExportStatus("匯出失敗，請離開探索任務並確認設定後重試。 Export failed; leave the guided activity and check the setup before retrying.");
+    }
+  };
+
   const maskOptimalAngle = guidedSession?.activityId === "elevated" && guidedSession.phase === "predict";
   const comparisonIsRevealed = !guidedSession || comparisonVisible(guidedSession);
 
@@ -1542,6 +1560,10 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
               } catch { setShareStatus("目前設定無法分享。"); }
             }}><Share2 size={14} /> 分享設定</button>
           </>}
+          {!guidedSession && <Menu label="匯出 / Export">
+            <button onClick={() => exportTrajectory("svg")}>軌跡圖 SVG / Trajectory figure</button>
+            <button onClick={() => exportTrajectory("json")}>軌跡資料 JSON / Trajectory data</button>
+          </Menu>}
           <button aria-haspopup="dialog" onClick={() => setModelInfoOpen(true)}><Info size={14} /> 模型資訊</button>
           <button className={theoryOpen ? "active" : ""} onClick={() => setTheoryOpen(true)} aria-haspopup="dialog" aria-expanded={theoryOpen}>
             <BookOpen size={14} /> 理論與計算
@@ -1561,6 +1583,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
         </div>
       </div>
 
+      {exportStatus && !guidedSession && <div className="projectile-share-notice" role="status">{exportStatus}</div>}
       {shareStatus && <div className="projectile-share-notice" role="status">{shareStatus}{shareUrl && <label>分享連結<input readOnly value={shareUrl} onFocus={(event) => event.target.select()} /></label>}</div>}
       <LabLayerDrawer open={layersOpen} id="projectile-layer-drawer" title="視圖圖層" className="projectile-layer-drawer" onClose={() => setLayersOpen(false)} returnFocusRef={layersTriggerRef}>
         <LayerGroup title="軌跡與測量"><div className="layer-list">{Object.entries(PROJECTILE_LAYER_LABELS).map(([name, label]) => { const key = name as keyof ProjectileLayers; return <LayerToggle key={key} checked={layers[key]} label={label} onChange={() => setLayers((current) => ({ ...current, [key]: !current[key] }))} />; })}</div></LayerGroup>
