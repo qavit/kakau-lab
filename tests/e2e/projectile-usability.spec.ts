@@ -54,11 +54,14 @@ for (const width of [360, 472, 820, 1280]) {
     if (await pause.count()) await pause.click();
     const box = (await chart.boundingBox())!;
     const tip = page.locator(".projectile-tip");
-    // Move repeatedly: a pointer that arrives before hydration would otherwise never raise the readout.
+    // The readout follows the pointer only near the trajectory, whose height on screen depends on the
+    // chart's shape, so sweep down a column of the chart until it appears.
     await expect(async () => {
-      await page.mouse.move(box.x + box.width * 0.45, box.y + box.height * 0.5);
-      await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
-      await expect(tip).toBeVisible({ timeout: 500 });
+      for (const fy of [0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75]) {
+        await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * fy);
+        if (await tip.isVisible()) return;
+      }
+      throw new Error("readout not shown");
     }).toPass();
     // MathJax symbols inside the readout must not inherit the chart's fixed height.
     expect((await tip.boundingBox())!.height).toBeLessThan(400);
