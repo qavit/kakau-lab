@@ -18,6 +18,8 @@ import {
   SlidersHorizontal,
   Undo2,
   X,
+  Lock,
+  Maximize2,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
@@ -47,11 +49,12 @@ import {
 import {
   canManipulateTime,
   canUseFreeStateControls,
-  comparisonVisible,
   isNearApex,
   isRaisedHeightReady,
   newGuidedSession,
   projectileLearningActivities,
+  hasGuidedProgress,
+  projectileEvidencePolicy,
   recordManipulation,
   revealObservation,
   submitPrediction,
@@ -1330,6 +1333,37 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
   const [mergedCharts, setMergedCharts] = useState(true);
   const [guidedSession, setGuidedSession] = useState<GuidedSession | null>(null);
   const [guidedChartVisible, setGuidedChartVisible] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [expandNotice, setExpandNotice] = useState<string | null>(null);
+  const expandTriggerRef = useRef<HTMLButtonElement>(null);
+  const exitExpandRef = useRef<HTMLButtonElement>(null);
+  const [leaveConfirm, setLeaveConfirm] = useState(false);
+  const sideRef = useRef<HTMLElement>(null);
+  const evidence = projectileEvidencePolicy(guidedSession);
+  /* Collapsing un-inerts the page first, so focus can only return to the trigger on the next frame. */
+  const collapseExpanded = useCallback(() => {
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+    setExpanded(false);
+    setExpandNotice(null);
+    requestAnimationFrame(() => expandTriggerRef.current?.focus());
+  }, []);
+  useEffect(() => {
+    if (!expanded) return;
+    exitExpandRef.current?.focus();
+    const root = document.documentElement;
+    const previousOverflow = root.style.overflow;
+    root.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") collapseExpanded(); };
+    document.addEventListener("keydown", onKeyDown);
+    return () => { root.style.overflow = previousOverflow; document.removeEventListener("keydown", onKeyDown); };
+  }, [expanded, collapseExpanded]);
+  /* On a narrow screen the panel opens below the instruments; bring it under the pinned chart so
+     the first slider and the trajectory are on screen together. */
+  useEffect(() => {
+    if (!panelOpen || !window.matchMedia("(max-width: 900px)").matches) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    sideRef.current?.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" });
+  }, [panelOpen]);
   const freeStateControlsAvailable = canUseFreeStateControls(guidedSession);
   const timeManipulationAllowed = canManipulateTime(guidedSession);
   /* The panel's width is the reader's to set, but opening it is a fresh start: the button always
@@ -1359,6 +1393,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
   const geometry = useMemo(() => chartGeometry(chartSize.width, chartSize.height), [chartSize.width, chartSize.height]);
 
   const model = useMemo(() => deriveProjectileModel(state), [state]);
+  const displayModel = useMemo(() => evidence.comparison ? model : deriveProjectileModel({ ...state, showComplementary: false }), [evidence.comparison, model, state]);
   const cursor = useMemo(() => deriveCursor(model, state.gravity, cursorFraction), [model, state.gravity, cursorFraction]);
   const charts = useMemo(() => componentSeries(model, state), [model, state]);
 
@@ -1378,6 +1413,8 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
     setManualView(null);
     setPanelOpen(false);
     setGuidedChartVisible(false);
+    setShareStatus(null);
+    setShareUrl(null);
   }, [state, layers, cursorFraction, manualView, selectedPreset]);
 
   const closeGuided = useCallback(() => {
@@ -1388,7 +1425,14 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
     }
     setGuidedSession(null);
     setGuidedChartVisible(false);
+    setLeaveConfirm(false);
   }, []);
+
+  /* Leaving discards the prediction and phase, so a task with progress asks first. */
+  const requestLeaveGuided = useCallback(() => {
+    if (guidedSession && hasGuidedProgress(guidedSession)) setLeaveConfirm(true);
+    else closeGuided();
+  }, [closeGuided, guidedSession]);
 
   const submitGuidedPrediction = useCallback((choiceId: string) => {
     setGuidedSession((current) => current ? submitPrediction(current, choiceId) : current);
@@ -1498,8 +1542,8 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
     }
   };
 
-  const maskOptimalAngle = guidedSession?.activityId === "elevated" && guidedSession.phase === "predict";
-  const comparisonIsRevealed = !guidedSession || comparisonVisible(guidedSession);
+  const maskOptimalAngle = !evidence.numericResults;
+  const comparisonIsRevealed = evidence.comparison;
 
   const readouts: readonly (readonly [string, string])[] = [
     ["飛行時間", model.duration > 0 ? `${model.duration.toFixed(2)} s` : "—"],
@@ -1519,37 +1563,14 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
   return (
     <MathProvider>
     <main ref={shellRef} className="lab-shell projectile-lab projectile-c2 lab-c2" style={{ "--projectile-appbar-bottom": `${appBarBottom}px` } as React.CSSProperties}>
-      <div ref={appBarRef} className="topbar projectile-topbar">
-        <div>
+      <div ref={appBarRef} className="topbar projectile-topbar" inert={expanded}>
+        <div className="projectile-identity">
           <Link href="/" className="lab-brand" aria-label="Kakau Lab 模型目錄"><KakauLabMark /></Link>
-          <div className="eyebrow">Model 07</div>
-          <h1><span className="live-dot" />拋體運動</h1>
+          <div><div className="eyebrow">Model 07</div><h1><span className="live-dot" />拋體運動</h1></div>
         </div>
         <div className="header-actions">
-          {freeStateControlsAvailable && (
-            <>
-              <Menu label="情境">
-                <button className={!isStairs ? "active" : ""} aria-pressed={!isStairs} onClick={() => { patchState({ scenario: "field", ...SCENARIO_DEFAULTS.field }); setManualView(null); }}>平地拋射</button>
-                <button className={isStairs ? "active" : ""} aria-pressed={isStairs} onClick={() => { patchState({ scenario: "staircase", ...SCENARIO_DEFAULTS.staircase }); setManualView(null); }}>階梯落點</button>
-              </Menu>
-              <Menu label="教學預設">
-                {Object.entries(PROJECTILE_PRESETS).map(([key, preset]) => {
-                  const { label, ...patch } = preset;
-                  return <button key={key} aria-pressed={selectedPreset === key} onClick={() => { setState({ ...initialProjectileState(), ...patch, playing: false }); setLayers({ ...INITIAL_PROJECTILE_LAYERS }); setSelectedPreset(key); setCursorFraction(0); setManualView(null); }}>{label}</button>;
-                })}
-              </Menu>
-            </>
-          )}
-          <button
-            className={guidedSession ? "active" : ""}
-            onClick={() => guidedSession ? closeGuided() : selectGuidedActivity("apex")}
-            aria-expanded={Boolean(guidedSession)}
-          >
-            {guidedSession ? "離開探索任務" : "探索任務"}
-          </button>
-          {freeStateControlsAvailable && <>
-            <button ref={layersTriggerRef} aria-expanded={layersOpen} aria-controls="projectile-layer-drawer" onClick={() => setLayersOpen((open) => !open)}><Layers3 size={14} /> 圖層</button>
-            <button onClick={async () => {
+          <Menu label="工具">
+            {evidence.share && <button onClick={async () => {
               try {
                 const url = new URL("/projectile", window.location.origin);
                 url.searchParams.set("s", encodeProjectileShare(state, layers, selectedPreset));
@@ -1558,30 +1579,39 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
                 try { await navigator.clipboard.writeText(url.href); setShareStatus("分享連結已複製；開啟後從起點暫停。"); }
                 catch { setShareStatus("請選取下方連結複製。"); }
               } catch { setShareStatus("目前設定無法分享。"); }
-            }}><Share2 size={14} /> 分享設定</button>
-          </>}
-          {!guidedSession && <Menu label="匯出 / Export">
-            <button onClick={() => exportTrajectory("svg")}>軌跡圖 SVG / Trajectory figure</button>
-            <button onClick={() => exportTrajectory("json")}>軌跡資料 JSON / Trajectory data</button>
-          </Menu>}
-          <button aria-haspopup="dialog" onClick={() => setModelInfoOpen(true)}><Info size={14} /> 模型資訊</button>
-          <button className={theoryOpen ? "active" : ""} onClick={() => setTheoryOpen(true)} aria-haspopup="dialog" aria-expanded={theoryOpen}>
-            <BookOpen size={14} /> 理論與計算
-          </button>
-          <button
-            className={panelOpen ? "active" : ""}
-            onClick={() => { closeGuided(); setPanelOpen((open) => !open); setPanelWidth(PANEL_DEFAULT_WIDTH); }}
-            aria-expanded={panelOpen}
-          >
-            {panelOpen ? <X size={14} /> : <SlidersHorizontal size={14} />} {panelOpen ? "收合面板" : "調整參數"}
-          </button>
-          <button onClick={() => {
-            if (guidedSession) selectGuidedActivity(guidedSession.activityId);
-            else { setState(initialProjectileState()); setLayers({ ...INITIAL_PROJECTILE_LAYERS }); setSelectedPreset(null); setCursorFraction(0); setManualView(null); }
-          }}><RotateCcw size={14} /> 重設</button>
+            }}><Share2 size={14} /> 分享設定</button>}
+            {evidence.export && <>
+              <button onClick={() => exportTrajectory("svg")}>匯出軌跡圖 SVG / Export figure</button>
+              <button onClick={() => exportTrajectory("json")}>匯出軌跡資料 JSON / Export data</button>
+            </>}
+            {!evidence.share && !evidence.export && <p className="projectile-menu-note">探索任務期間不提供分享與匯出；回到自由探索後可用。</p>}
+          </Menu>
+          <button className="projectile-model-info" disabled={!evidence.modelInfo} onClick={() => setModelInfoOpen(true)} aria-haspopup="dialog" aria-label="模型資訊" title="模型資訊"><Info size={16} /></button>
           <ThemeToggle />
         </div>
       </div>
+      <div className="projectile-subbar" inert={expanded}>
+      <nav className="projectile-modebar" aria-label="學習模式">
+        <button className={!guidedSession ? "active" : ""} aria-pressed={!guidedSession} onClick={() => { if (guidedSession) requestLeaveGuided(); }}>自由探索</button>
+        <button className={guidedSession ? "active" : ""} aria-pressed={Boolean(guidedSession)} onClick={() => { if (!guidedSession) selectGuidedActivity("apex"); }}>探索任務</button>
+        <button className="projectile-theory-entry" disabled={!evidence.theory} aria-haspopup="dialog" aria-describedby={!evidence.theory ? "projectile-disclosure-note" : undefined} onClick={() => setTheoryOpen(true)} title={!evidence.theory ? "送出預測後開放" : undefined}>
+          {evidence.theory ? <BookOpen size={14} /> : <Lock size={14} />} 理論與計算
+        </button>
+        {!evidence.theory && <span id="projectile-disclosure-note" className="projectile-sr-only">送出預測後開放理論與模型資訊。</span>}
+      </nav>
+      <div className="projectile-panel-actions">
+        {freeStateControlsAvailable && <button className={panelOpen ? "active" : ""} aria-expanded={panelOpen} onClick={() => { setPanelOpen((open) => !open); setPanelWidth(PANEL_DEFAULT_WIDTH); }}><SlidersHorizontal size={16} /> 參數</button>}
+        {freeStateControlsAvailable && <button ref={layersTriggerRef} aria-expanded={layersOpen} aria-controls="projectile-layer-drawer" onClick={() => setLayersOpen((open) => !open)}><Layers3 size={16} /> 圖層</button>}
+        <button ref={expandTriggerRef} onClick={() => { patchState({ playing: false }); setExpanded(true); }} aria-expanded={expanded}><Maximize2 size={16} /> 放大視圖</button>
+      </div>
+      </div>
+      {leaveConfirm && guidedSession && (
+        <div className="projectile-leave-confirm" role="alertdialog" aria-label="離開探索任務" aria-describedby="projectile-leave-text" onKeyDown={(event) => { if (event.key === "Escape") setLeaveConfirm(false); }}>
+          <p id="projectile-leave-text">離開後，這個任務的預測與進度不會保留；自由探索會回到你先前的設定。</p>
+          <button autoFocus onClick={() => setLeaveConfirm(false)}>繼續任務</button>
+          <button className="danger" onClick={closeGuided}>離開任務</button>
+        </div>
+      )}
 
       {exportStatus && !guidedSession && <div className="projectile-share-notice" role="status">{exportStatus}</div>}
       {shareStatus && <div className="projectile-share-notice" role="status">{shareStatus}{shareUrl && <label>分享連結<input readOnly value={shareUrl} onFocus={(event) => event.target.select()} /></label>}</div>}
@@ -1593,7 +1623,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       </LabLayerDrawer>
       {/* The panel takes width from the chart rather than covering it, and the chart is drawn at
           whatever size it is left with, so opening the panel never hides the trajectory. */}
-      <div className="projectile-stage" data-panel={panelOpen || Boolean(guidedSession)}>
+      <div className="projectile-stage" data-panel={panelOpen || Boolean(guidedSession)} data-expanded={expanded}>
         <section className="viewport-card projectile-path-card">
           <div className="card-label">
             <span>軌跡</span>
@@ -1602,11 +1632,19 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
               <small>兩軸同尺度：畫面上的形狀就是真實軌跡</small>
             </div>
           </div>
+          {expanded && <div className="projectile-expand-actions">
+            <button onClick={async () => {
+              try { await document.documentElement.requestFullscreen(); setExpandNotice(null); }
+              catch { setExpandNotice("全螢幕不可用；視窗內放大仍可使用。"); }
+            }}>全螢幕</button>
+            <button ref={exitExpandRef} className="projectile-expand-exit" onClick={collapseExpanded}><X size={16} /> 退出放大</button>
+          </div>}
+          {expanded && expandNotice && <p className="projectile-expand-notice" role="status">{expandNotice}</p>}
           <div className="canvas-host" ref={chartHostRef}>
             <TrajectoryView
               state={state}
-              layers={layers}
-              model={model}
+              layers={evidence.numericResults ? layers : { ...layers, labels: false, guides: false }}
+              model={displayModel}
               cursor={cursor}
               geometry={geometry}
               manualView={manualView}
@@ -1623,8 +1661,56 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
             {state.showAcceleration && <span><i style={{ background: ACCEL }} />加速度 <Tex>{"g"}</Tex>（分量為虛線）</span>}
           </div>
         </section>
+      <div className="projectile-dock">
+        <div className="projectile-transport">
+          <div className="projectile-transport-buttons">
+            <button disabled={!timeManipulationAllowed} onClick={() => { patchState({ playing: false }); setCursorFraction(0); }} aria-label="回到起點" title="回到起點"><SkipBack size={14} /></button>
+            <button disabled={!timeManipulationAllowed} onClick={() => stepBy(-STEP_SECONDS)} aria-label={`退 ${STEP_SECONDS} 秒`}>−{STEP_SECONDS}s</button>
+            <button disabled={!timeManipulationAllowed} className={state.playing ? "active" : ""} onClick={() => patchState({ playing: !state.playing })} aria-label={state.playing ? "暫停" : "播放"}>
+              {state.playing ? <Pause size={14} /> : <Play size={14} />}{state.playing ? "暫停" : "播放"}
+            </button>
+            <button disabled={!timeManipulationAllowed} onClick={() => stepBy(STEP_SECONDS)} aria-label={`進 ${STEP_SECONDS} 秒`}>+{STEP_SECONDS}s</button>
+            <button disabled={!timeManipulationAllowed} className={state.direction < 0 ? "active" : ""} aria-pressed={state.direction < 0} onClick={() => patchState({ direction: state.direction < 0 ? 1 : -1 })} aria-label="反向播放" title="反向播放"><Undo2 size={14} /></button>
+            <button disabled={!timeManipulationAllowed} onClick={() => { patchState({ playing: false }); setCursorFraction(1); }} aria-label="跳到結束" title="跳到結束"><SkipForward size={14} /></button>
+          </div>
+          <input
+            className="projectile-scrub"
+            type="range"
+            min="0"
+            max="1"
+            step="0.001"
+            value={cursorFraction}
+            aria-label="時間游標"
+            disabled={!timeManipulationAllowed}
+            onChange={(event) => {
+              if (!timeManipulationAllowed) return;
+              const next = Number(event.target.value);
+              setCursorFraction(next);
+              patchState({ playing: false });
+              recordGuidedCursor(next);
+            }}
+          />
+          <output className="projectile-clock">{evidence.numericResults ? `${cursor.clockTime.toFixed(2)} / ${model.clockDuration.toFixed(2)} s` : "預測後顯示時間"}</output>
+          <div className="projectile-transport-speeds">
+            {[0.25, 0.5, 1, 2].map((speed) => (
+              <button disabled={!timeManipulationAllowed} key={speed} className={Math.abs(state.animationSpeed - speed) < 0.01 ? "active" : ""} aria-pressed={Math.abs(state.animationSpeed - speed) < 0.01} onClick={() => patchState({ animationSpeed: speed })}>{speed}×</button>
+            ))}
+          </div>
+        </div>
+        <div className="projectile-readout" aria-label="真空主軌跡的時間游標讀值">
+          {evidence.numericResults ? <>
+            {[...liveReadouts.slice(0, 3), liveReadouts[7]].map(([name, value]) => <span key={name} className="live"><i>{name}</i>{value}</span>)}
+            <details className="projectile-extra-readouts"><summary>完整讀值</summary><div>
+              {readouts.map(([name, value]) => <span key={name}><i>{name}</i>{value}</span>)}
+              {[...liveReadouts.slice(3, 7), liveReadouts[8]].map(([name, value]) => <span key={name}><i>{name}</i>{value}</span>)}
+            </div></details>
+          </> : <span className="projectile-masked-readout">觀測讀值將在送出預測後顯示</span>}
+        </div>
+      </div>
 
-        <aside className="projectile-side" data-open={panelOpen && !guidedSession} style={{ width: panelOpen && !guidedSession ? panelWidth : undefined }}>
+
+
+        <aside ref={sideRef} className="projectile-side" data-open={panelOpen && !guidedSession} style={{ width: panelOpen && !guidedSession ? panelWidth : undefined }}>
           <div
             className="projectile-side-grip"
             onPointerDown={startPanelResize}
@@ -1639,6 +1725,17 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
             aria-label="調整面板寬度"
           />
           <div className="projectile-side-inner" style={{ width: panelWidth }}>
+            <div className="projectile-group projectile-setup">
+              <p className="projectile-group-label">實驗設定</p>
+              <Menu label="情境">
+                <button className={!isStairs ? "active" : ""} aria-pressed={!isStairs} onClick={() => { patchState({ scenario: "field", ...SCENARIO_DEFAULTS.field }); setManualView(null); }}>平地拋射</button>
+                <button className={isStairs ? "active" : ""} aria-pressed={isStairs} onClick={() => { patchState({ scenario: "staircase", ...SCENARIO_DEFAULTS.staircase }); setManualView(null); }}>階梯落點</button>
+              </Menu>
+              <Menu label="教學預設">
+                {Object.entries(PROJECTILE_PRESETS).map(([key, preset]) => { const { label, ...patch } = preset; return <button key={key} aria-pressed={selectedPreset === key} onClick={() => { setState({ ...initialProjectileState(), ...patch, playing: false }); setLayers({ ...INITIAL_PROJECTILE_LAYERS }); setSelectedPreset(key); setCursorFraction(0); setManualView(null); }}>{label}</button>; })}
+              </Menu>
+              <button onClick={() => { setState(initialProjectileState()); setLayers({ ...INITIAL_PROJECTILE_LAYERS }); setSelectedPreset(null); setCursorFraction(0); setManualView(null); }}><RotateCcw size={14} /> 重設實驗</button>
+            </div>
             {/* Sliders lead: they are the only controls touched continuously. */}
             <div className="projectile-group">
               <p className="projectile-group-label">發射參數</p>
@@ -1760,7 +1857,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
                 />
               </div>
             )}
-            onClose={closeGuided}
+            onClose={requestLeaveGuided}
             onRestart={() => selectGuidedActivity(guidedSession.activityId)}
             onSelectActivity={selectGuidedActivity}
             onPrediction={submitGuidedPrediction}
@@ -1774,48 +1871,6 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
             componentChartVisible={guidedChartVisible}
           />
         )}
-      </div>
-
-      <div className="projectile-dock">
-        <div className="projectile-transport">
-          <div className="projectile-transport-buttons">
-            <button disabled={!timeManipulationAllowed} onClick={() => { patchState({ playing: false }); setCursorFraction(0); }} aria-label="回到起點" title="回到起點"><SkipBack size={14} /></button>
-            <button disabled={!timeManipulationAllowed} onClick={() => stepBy(-STEP_SECONDS)} aria-label={`退 ${STEP_SECONDS} 秒`}>−{STEP_SECONDS}s</button>
-            <button disabled={!timeManipulationAllowed} className={state.playing ? "active" : ""} onClick={() => patchState({ playing: !state.playing })} aria-label={state.playing ? "暫停" : "播放"}>
-              {state.playing ? <Pause size={14} /> : <Play size={14} />}{state.playing ? "暫停" : "播放"}
-            </button>
-            <button disabled={!timeManipulationAllowed} onClick={() => stepBy(STEP_SECONDS)} aria-label={`進 ${STEP_SECONDS} 秒`}>+{STEP_SECONDS}s</button>
-            <button disabled={!timeManipulationAllowed} className={state.direction < 0 ? "active" : ""} aria-pressed={state.direction < 0} onClick={() => patchState({ direction: state.direction < 0 ? 1 : -1 })} aria-label="反向播放" title="反向播放"><Undo2 size={14} /></button>
-            <button disabled={!timeManipulationAllowed} onClick={() => { patchState({ playing: false }); setCursorFraction(1); }} aria-label="跳到結束" title="跳到結束"><SkipForward size={14} /></button>
-          </div>
-          <input
-            className="projectile-scrub"
-            type="range"
-            min="0"
-            max="1"
-            step="0.001"
-            value={cursorFraction}
-            aria-label="時間游標"
-            disabled={!timeManipulationAllowed}
-            onChange={(event) => {
-              if (!timeManipulationAllowed) return;
-              const next = Number(event.target.value);
-              setCursorFraction(next);
-              patchState({ playing: false });
-              recordGuidedCursor(next);
-            }}
-          />
-          <output className="projectile-clock">{cursor.clockTime.toFixed(2)} / {model.clockDuration.toFixed(2)} s</output>
-          <div className="projectile-transport-speeds">
-            {[0.25, 0.5, 1, 2].map((speed) => (
-              <button disabled={!timeManipulationAllowed} key={speed} className={Math.abs(state.animationSpeed - speed) < 0.01 ? "active" : ""} aria-pressed={Math.abs(state.animationSpeed - speed) < 0.01} onClick={() => patchState({ animationSpeed: speed })}>{speed}×</button>
-            ))}
-          </div>
-        </div>
-        <div className="projectile-readout" aria-label="真空主軌跡的時間游標讀值">
-          {readouts.map(([name, value]) => <span key={name}><i>{name}</i>{value}</span>)}
-          {liveReadouts.map(([name, value]) => <span key={name} className="live"><i>{name}</i>{value}</span>)}
-        </div>
       </div>
 
       {modelInfoOpen && <LabInfoDialog title="拋體運動模型資訊" onClose={() => setModelInfoOpen(false)}><article className="theory-body">

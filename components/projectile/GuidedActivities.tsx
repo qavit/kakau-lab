@@ -149,7 +149,7 @@ export default function GuidedActivities(props: GuidedActivitiesProps) {
 
           {activity.id === "apex" && session.phase === "manipulate" && (
             <div className="guided-block">
-              <p className="guided-question">用下方的時間游標，把拋體移到軌跡最高點附近。</p>
+              <p className="guided-question">用時間游標，或直接點軌跡上的位置，把拋體移到最高點附近。</p>
               <p>先看軌跡，也可以打開速度–時間圖找 <code>vᵧ</code> 穿過 0 的位置。判定範圍會保留一些容差，不需要剛好停在單一像素。</p>
               <button onClick={props.onShowComponentChart}>{props.componentChartVisible ? "收合分量圖" : "顯示分量圖"}</button>
               {props.componentChartVisible && <div className="guided-chart">{props.componentChart}</div>}
