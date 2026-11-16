@@ -34,7 +34,7 @@ test("the entry offers both modes and either one starts clean", async ({ page })
     await page.getByTestId("choose-free").click({ timeout: 1000 });
     await expect(lab(page)).toHaveAttribute("data-mode", "free", { timeout: 1000 });
   }).toPass();
-  await expect(page.getByText("玻耳軌道")).toBeVisible();
+  await expect(page.locator(".viewport-card").getByText("玻耳軌道")).toBeVisible();
   await expect(page.getByRole("group", { name: "氫原子能階圖" })).toBeVisible();
   await expect(page.getByRole("button", { name: /放出光子|吸收光子/ })).toBeVisible();
 });
@@ -121,7 +121,13 @@ test("switching modes resets both sides", async ({ page }) => {
   await page.getByTestId("begin-predict").click();
   await page.getByTestId("guess-3").click();
   await page.getByTestId("submit-guess").click();
+  // A task with a submitted guess asks before resetting; declining keeps the comparison on screen.
   await page.getByTestId("mode-toggle").click();
+  await expect(page.getByTestId("leave-confirm")).toBeVisible();
+  await page.getByTestId("leave-stay").click();
+  await expect(page.getByTestId("guided-card")).toHaveAttribute("data-phase", "compared");
+  await page.getByTestId("mode-toggle").click();
+  await page.getByTestId("leave-go").click();
   await expect(lab(page)).toHaveAttribute("data-mode", "free");
   // Free mode starts from its own initial atom (3→2, electron on n=3), not the guided one.
   await expect(page.locator("#hydrogen-fire-status")).toContainText("電子在 n=3，可以放出光子");
@@ -165,4 +171,24 @@ test("@mobile guided activity fits a phone: no sideways scroll and the next step
   await page.getByTestId("show-evidence").click();
   await expect(page.getByTestId("guided-evidence")).toBeInViewport();
   expect(await overflow()).toBeLessThanOrEqual(0);
+});
+
+test("Balmer comparison does not reveal wavelengths until submit and clears them on retry", async ({ page }) => {
+  await openGuided(page);
+  await page.getByTestId("begin-predict").click();
+  await page.getByTestId("guess-4").click();
+  await page.getByTestId("submit-guess").click();
+  await page.getByTestId("show-evidence").click();
+  const card = page.getByTestId("balmer-compare");
+  await expect(card).not.toContainText("nm");
+  await expect(page.getByTestId("compare-results")).toHaveCount(0);
+  await page.getByTestId("compare-3").click();
+  await page.getByTestId("compare-submit").click();
+  await expect(card).toContainText("656.1 nm");
+  await expect(card).toContainText("486.0 nm");
+  await expect(page.getByTestId("compare-4")).toBeDisabled();
+  await expect(page.locator("#hydrogen-guided-fire-status")).toContainText("電子在 n=4");
+  await page.getByTestId("compare-retry").click();
+  await expect(card).not.toContainText("nm");
+  await expect(page.getByTestId("compare-results")).toHaveCount(0);
 });

@@ -639,9 +639,10 @@ html[data-mode="dark"] .layer-drawer,html[data-mode="dark"] .export-modal,html[d
 .hydrogen-intent-choice strong { font-family:Georgia,"Noto Serif TC",serif; font-size:20px; font-weight:500; }
 .hydrogen-intent-choice span { color:var(--body); font-size:15px; line-height:1.6; }
 .hydrogen-intent-choice em { margin-top:auto; color:var(--muted); font-size:13px; font-style:normal; }
-.hydrogen-guided { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(310px,1fr); grid-template-areas:"spec card" "evid card" "note note"; gap:14px; align-items:start; }
+.hydrogen-guided { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(310px,1fr); grid-template-areas:"spec card" "evid card" "cmp card" "note note"; gap:14px; align-items:start; }
 .hydrogen-guided-spectrum { grid-area:spec; margin:0; }
-.hydrogen-guided>.hydrogen-task-card { grid-area:card; position:sticky; top:12px; }
+.hydrogen-guided>.hydrogen-task-card:not(.hydrogen-compare-card) { grid-area:card; position:sticky; top:12px; }
+.hydrogen-guided>.hydrogen-compare-card { grid-area:cmp; }
 .hydrogen-guided-evidence { grid-area:evid; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .hydrogen-guided-evidence .hydrogen-card { min-height:0; aspect-ratio:1/1; }
 .hydrogen-guided>.hydrogen-note { grid-area:note; margin:0 2px; }
@@ -664,6 +665,9 @@ html[data-mode="dark"] .layer-drawer,html[data-mode="dark"] .export-modal,html[d
 .hydrogen-task-actions button:disabled { cursor:not-allowed; opacity:.5; transform:none; }
 .hydrogen-guess-row { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:12px; }
 .hydrogen-guess-row button { min-height:52px; font-size:19px; font-weight:600; }
+.hydrogen-guess-row--pair { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.hydrogen-guess-row--pair button { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:18px; }
+.hydrogen-guess-row--pair small { color:var(--muted); font-size:14px; font-weight:400; }
 .hydrogen-hint { padding:8px 12px; border-left:3px solid var(--accent); background:var(--formula-bg); font-size:15px !important; }
 .hydrogen-hints { margin-top:6px; }
 .hydrogen-link-button { margin-top:8px; padding:6px 0; border:0; background:none; color:var(--link); font-size:15px; text-decoration:underline; text-underline-offset:3px; }
@@ -682,8 +686,8 @@ html[data-mode="dark"] .layer-drawer,html[data-mode="dark"] .export-modal,html[d
 @media(max-width:900px){
   .hydrogen-intent-grid { grid-template-columns:1fr; }
   .hydrogen-intent-choice { min-height:0; }
-  .hydrogen-guided { grid-template-columns:minmax(0,1fr); grid-template-areas:"spec" "card" "evid" "note"; }
-  .hydrogen-guided>.hydrogen-task-card { position:static; }
+  .hydrogen-guided { grid-template-columns:minmax(0,1fr); grid-template-areas:"spec" "card" "evid" "cmp" "note"; }
+  .hydrogen-guided>.hydrogen-task-card:not(.hydrogen-compare-card) { position:static; }
   .hydrogen-guided-spectrum { padding:60px 12px 10px; }
 }
 @media(max-width:660px){ .hydrogen-lab .header-actions button { font-size:13px; padding:7px 10px; } .hydrogen-lab .header-actions button svg { width:14px; height:14px; } }
