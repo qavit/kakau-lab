@@ -1,0 +1,63 @@
+{
+  "build": "production (vinext start)",
+  "note": "desktop Chromium headless on dev laptop, CDP CPU throttle; NOT representative devices",
+  "url": "http://localhost:3100/projectile",
+  "results": {
+    "desktop-1366-cpu1x": {
+      "ttiMs_median": 54,
+      "ttiMs_all": [
+        56,
+        53,
+        53,
+        56,
+        54,
+        53,
+        54
+      ],
+      "cursorUpdateMs_median": 33,
+      "paramsPanelOpenMs_median": 44
+    },
+    "desktop-1366-cpu4x": {
+      "ttiMs_median": 194,
+      "ttiMs_all": [
+        210,
+        200,
+        194,
+        191,
+        195,
+        191,
+        190
+      ],
+      "cursorUpdateMs_median": 33,
+      "paramsPanelOpenMs_median": 60
+    },
+    "phone-360-cpu4x": {
+      "ttiMs_median": 198,
+      "ttiMs_all": [
+        189,
+        201,
+        199,
+        219,
+        195,
+        198,
+        197
+      ],
+      "cursorUpdateMs_median": 33,
+      "paramsPanelOpenMs_median": 58
+    },
+    "phone-360-cpu6x": {
+      "ttiMs_median": 303,
+      "ttiMs_all": [
+        317,
+        287,
+        291,
+        309,
+        290,
+        305,
+        303
+      ],
+      "cursorUpdateMs_median": 33,
+      "paramsPanelOpenMs_median": 71
+    }
+  }
+}

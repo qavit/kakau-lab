@@ -143,6 +143,13 @@ const STEP_SECONDS = 0.05;
  */
 const PATH = "#5ed8c3";
 const COMPARE = "#f2c66d";
+/* Series are told apart by line pattern as well as hue (R10): main solid, complementary long dash, drag dotted.
+   Same convention as the exported SVG. */
+const COMPLEMENTARY_DASH = "9 4";
+const DRAG_DASH = "3 4";
+function LegendLine({ dash }: { dash: string }) {
+  return <svg className="legend-key" width="26" height="6" viewBox="0 0 26 6" aria-hidden="true" focusable="false" style={{ display: "inline-block", marginRight: 5, verticalAlign: 1 }}><line x1="0" x2="26" y1="3" y2="3" stroke={COMPARE} strokeWidth="2.2" strokeDasharray={dash} /></svg>;
+}
 const BOUND = "#7d90b4";
 const VELOCITY = "#eaf4f8";
 const ACCEL = "#ef8f6a";
@@ -812,14 +819,14 @@ function TrajectoryView({ state, layers, model, cursor, geometry, manualView, on
 
         {model.complementary && (
           <>
-            <path d={samplePath(model.complementary.samples, frame)} fill="none" stroke={COMPARE} strokeWidth={2.2} />
+            <path d={samplePath(model.complementary.samples, frame)} fill="none" stroke={COMPARE} strokeWidth={2.2} strokeDasharray={COMPLEMENTARY_DASH} />
             {layers.markers && <circle cx={frame.px(model.complementary.range)} cy={frame.py(0)} r={5} fill="none" stroke={COMPARE} strokeWidth={2} />}
           </>
         )}
 
         {model.dragSamples.length > 0 && (
           <>
-            <path d={samplePath(model.dragSamples, frame)} fill="none" stroke={COMPARE} strokeWidth={2.2} strokeDasharray="3 4" />
+            <path d={samplePath(model.dragSamples, frame)} fill="none" stroke={COMPARE} strokeWidth={2.2} strokeDasharray={DRAG_DASH} />
             {layers.markers && <circle cx={frame.px(model.dragLanding?.point.x ?? 0)} cy={frame.py(0)} r={4.5} fill="none" stroke={COMPARE} strokeWidth={2} />}
           </>
         )}
@@ -1324,6 +1331,15 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
     window.addEventListener("resize", update);
     return () => { observer.disconnect(); window.removeEventListener("resize", update); };
   }, []);
+  /* prefers-reduced-motion: never start the animation on its own (and stop it if the preference turns on);
+     播放 stays available (WCAG 2.2.2 / R10). Applied from a media-query callback, not synchronously in the effect. */
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => { if (query.matches) setState((current) => (current.playing ? { ...current, playing: false } : current)); };
+    const first = window.setTimeout(apply, 0);
+    query.addEventListener("change", apply);
+    return () => { window.clearTimeout(first); query.removeEventListener("change", apply); };
+  }, []);
   const [cursorFraction, setCursorFraction] = useState(0.45);
   const [showComponents, setShowComponents] = useState(false);
   const [showEnvironment, setShowEnvironment] = useState(false);
@@ -1538,7 +1554,9 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       setExportStatus("已匯出完整軌跡與當下游標；含單位及假設。 Exported trajectories and current cursor, with units and assumptions.");
     } catch {
-      setExportStatus("匯出失敗，請離開探索任務並確認設定後重試。 Export failed; leave the guided activity and check the setup before retrying.");
+      setExportStatus(guidedSession
+        ? "匯出失敗，請離開探索任務並確認設定後重試。 Export failed; leave the guided activity and check the setup before retrying."
+        : "匯出失敗：瀏覽器無法建立檔案。請再試一次，或改用另一種格式。 Export failed: the browser could not create the file. Try again, or use the other format.");
     }
   };
 
@@ -1655,7 +1673,8 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
           </div>
           <div className="legend">
             {layers.trajectory && <span><i style={{ background: PATH }} />本次軌跡</span>}
-            {comparisonIsRevealed && (model.complementary || dragActive) && <span><i style={{ background: COMPARE }} />對照軌跡</span>}
+            {comparisonIsRevealed && model.complementary && <span><LegendLine dash={COMPLEMENTARY_DASH} />互補角對照</span>}
+            {comparisonIsRevealed && dragActive && <span><LegendLine dash={DRAG_DASH} />阻力對照</span>}
             {model.envelope.length > 0 && <span><i style={{ background: BOUND }} />可及邊界</span>}
             {(layers.velocity || layers.components) && <span><i style={{ background: VELOCITY }} />速度 <Tex>{"\\vec v"}</Tex>（分量為虛線）</span>}
             {state.showAcceleration && <span><i style={{ background: ACCEL }} />加速度 <Tex>{"g"}</Tex>（分量為虛線）</span>}

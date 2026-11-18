@@ -31,6 +31,8 @@ test("projectile: at 400% zoom the page scrolls and reflows instead of pinning b
 test("projectile: enlarged view keeps focus inside, and Escape returns it to the trigger", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 180 });
   await page.goto("/projectile");
+  // Wait for hydration: clicking before React attaches handlers is a silent no-op under parallel load.
+  await expect(page.locator("main")).toHaveAttribute("data-interactive", "true");
   const trigger = page.getByRole("button", { name: /放大視圖/ });
   await trigger.scrollIntoViewIfNeeded();
   await trigger.click();

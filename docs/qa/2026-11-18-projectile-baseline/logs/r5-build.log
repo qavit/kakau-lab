@@ -1,0 +1,72 @@
+
+> kakau-lab@0.1.0 prebuild
+> node scripts/copy-mathjax.mjs
+
+copied mathjax tex-svg.js, LICENSE and NOTICE.txt into public/mathjax/
+
+> kakau-lab@0.1.0 build
+> WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build
+
+
+  vinext build  (Vite 8.0.13)
+
+(node:9107) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[1/5] analyze client references...
+[2Ktransforming...✓ 206 modules transformed.
+rendering chunks...
+✓ built in 305ms
+[2/5] analyze server references...
+[2Ktransforming...✓ 313 modules transformed.
+rendering chunks...
+✓ built in 309ms
+[3/5] build rsc environment...
+[2Ktransforming...✓ 212 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 282ms
+[4/5] build client environment...
+[2Ktransforming...✓ 2029 modules transformed.
+rendering chunks...
+computing gzip size...
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 617ms
+[5/5] build ssr environment...
+[2Ktransforming...✓ 319 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 494ms
+[0m
+  Route (app)
+  ┌ ? /                      
+  ├ ? /about                 
+  ├ ? /atmosphere            
+  ├ ? /atmosphere-profile    
+  ├ ? /chemistry/lewis       
+  ├ ? /coriolis              
+  ├ ? /electrostatic-field   
+  ├ ? /electrostatics        
+  ├ ? /electrostatics/notes  
+  ├ ? /en/atmosphere-profile 
+  ├ ? /fbd                   
+  ├ ? /geology               
+  ├ ? /hydrogen              
+  ├ ? /interference          
+  ├ ? /interference-lifecycle
+  ├ ? /magnetism             
+  ├ ? /projectile            
+  ├ ? /projectile/notes      
+  └ ? /solar                 
+
+  ? Unknown
+
+  ? Some routes could not be classified. vinext currently uses static analysis
+    and cannot detect dynamic API usage (headers(), cookies(), etc.) at build time.
+    Automatic classification will be improved in a future release.
+
+  Build complete. Run `vinext start` to start the production server.
+
