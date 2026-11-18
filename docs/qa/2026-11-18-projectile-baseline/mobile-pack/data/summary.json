@@ -1,0 +1,762 @@
+{
+ "base": {
+  "360x800": {
+   "initial": {
+    "canvasPx": "342x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 642,
+     "bottom": 680,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 477,
+     "bottom": 635,
+     "fullyInViewport": true
+    },
+    "scrollH": 857,
+    "vh": 800
+   },
+   "paramsOpen": {
+    "canvasPx": "342x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "speedSliderInViewport": true,
+    "speedSliderY": 470,
+    "readoutKeyRow": {
+     "top": 195,
+     "bottom": 233,
+     "fullyInViewport": true
+    },
+    "scrollY": 362
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "342x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "readoutKeyRow": {
+     "top": -7,
+     "bottom": 31,
+     "fullyInViewport": false
+    }
+   },
+   "rotationKept": true
+  },
+  "390x844": {
+   "initial": {
+    "canvasPx": "372x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 642,
+     "bottom": 680,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 477,
+     "bottom": 635,
+     "fullyInViewport": true
+    },
+    "scrollH": 857,
+    "vh": 844
+   },
+   "paramsOpen": {
+    "canvasPx": "372x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "speedSliderInViewport": true,
+    "speedSliderY": 470,
+    "readoutKeyRow": {
+     "top": 195,
+     "bottom": 233,
+     "fullyInViewport": true
+    },
+    "scrollY": 362
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "372x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "readoutKeyRow": {
+     "top": 178,
+     "bottom": 216,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  },
+  "320x640": {
+   "initial": {
+    "canvasPx": "302x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 642,
+     "bottom": 680,
+     "fullyInViewport": false
+    },
+    "transport": {
+     "top": 477,
+     "bottom": 635,
+     "fullyInViewport": true
+    },
+    "scrollH": 857,
+    "vh": 640
+   },
+   "paramsOpen": {
+    "canvasPx": "302x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "speedSliderInViewport": true,
+    "speedSliderY": 522,
+    "readoutKeyRow": {
+     "top": 195,
+     "bottom": 233,
+     "fullyInViewport": true
+    },
+    "scrollY": 362
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "302x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "readoutKeyRow": {
+     "top": 158,
+     "bottom": 196,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  },
+  "844x390": {
+   "initial": {
+    "canvasPx": "791x416",
+    "canvasVisiblePct": 62,
+    "canvasVisiblePx": 257,
+    "canvasTop": 133,
+    "readoutKeyRow": {
+     "top": 694,
+     "bottom": 718,
+     "fullyInViewport": false
+    },
+    "transport": {
+     "top": 559,
+     "bottom": 681,
+     "fullyInViewport": false
+    },
+    "scrollH": 799,
+    "vh": 390
+   },
+   "paramsOpen": {
+    "canvasPx": "791x416",
+    "canvasVisiblePct": 0,
+    "canvasVisiblePx": 0,
+    "canvasTop": -646,
+    "speedSliderInViewport": true,
+    "speedSliderY": 190,
+    "readoutKeyRow": {
+     "top": -85,
+     "bottom": -61,
+     "fullyInViewport": false
+    },
+    "scrollY": 779
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "791x416",
+    "canvasVisiblePct": 0,
+    "canvasVisiblePx": 0,
+    "canvasTop": -528,
+    "readoutKeyRow": {
+     "top": 33,
+     "bottom": 57,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  }
+ },
+ "A": {
+  "360x800": {
+   "initial": {
+    "canvasPx": "342x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 642,
+     "bottom": 680,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 477,
+     "bottom": 635,
+     "fullyInViewport": true
+    },
+    "scrollH": 857,
+    "vh": 800
+   },
+   "paramsOpen": {
+    "canvasPx": "342x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "speedSliderInViewport": true,
+    "speedSliderY": 470,
+    "readoutKeyRow": {
+     "top": 195,
+     "bottom": 233,
+     "fullyInViewport": true
+    },
+    "scrollY": 362
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "342x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "readoutKeyRow": {
+     "top": -7,
+     "bottom": 31,
+     "fullyInViewport": false
+    }
+   },
+   "rotationKept": true
+  },
+  "390x844": {
+   "initial": {
+    "canvasPx": "372x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 642,
+     "bottom": 680,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 477,
+     "bottom": 635,
+     "fullyInViewport": true
+    },
+    "scrollH": 857,
+    "vh": 844
+   },
+   "paramsOpen": {
+    "canvasPx": "372x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "speedSliderInViewport": true,
+    "speedSliderY": 470,
+    "readoutKeyRow": {
+     "top": 195,
+     "bottom": 233,
+     "fullyInViewport": true
+    },
+    "scrollY": 362
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "372x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "readoutKeyRow": {
+     "top": 178,
+     "bottom": 216,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  },
+  "320x640": {
+   "initial": {
+    "canvasPx": "302x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 642,
+     "bottom": 680,
+     "fullyInViewport": false
+    },
+    "transport": {
+     "top": 477,
+     "bottom": 635,
+     "fullyInViewport": true
+    },
+    "scrollH": 857,
+    "vh": 640
+   },
+   "paramsOpen": {
+    "canvasPx": "302x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "speedSliderInViewport": true,
+    "speedSliderY": 522,
+    "readoutKeyRow": {
+     "top": 195,
+     "bottom": 233,
+     "fullyInViewport": true
+    },
+    "scrollY": 362
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "302x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "readoutKeyRow": {
+     "top": 158,
+     "bottom": 196,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  },
+  "844x390": {
+   "initial": {
+    "canvasPx": "453x261",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 261,
+    "canvasTop": 120,
+    "readoutKeyRow": {
+     "top": 279,
+     "bottom": 299,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 120,
+     "bottom": 272,
+     "fullyInViewport": true
+    },
+    "scrollH": 390,
+    "vh": 390
+   },
+   "paramsOpen": {
+    "canvasPx": "453x172",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 172,
+    "canvasTop": 120,
+    "speedSliderInViewport": true,
+    "speedSliderY": 293,
+    "readoutKeyRow": {
+     "top": 360,
+     "bottom": 378,
+     "fullyInViewport": true
+    },
+    "scrollY": 0
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "453x172",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 172,
+    "canvasTop": 120,
+    "readoutKeyRow": {
+     "top": 360,
+     "bottom": 378,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  }
+ },
+ "B": {
+  "360x800": {
+   "initial": {
+    "canvasPx": "342x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 642,
+     "bottom": 680,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 477,
+     "bottom": 635,
+     "fullyInViewport": true
+    },
+    "scrollH": 857,
+    "vh": 800
+   },
+   "paramsOpen": {
+    "canvasPx": "342x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "speedSliderInViewport": true,
+    "speedSliderY": 470,
+    "readoutKeyRow": {
+     "top": 195,
+     "bottom": 233,
+     "fullyInViewport": true
+    },
+    "scrollY": 362
+   },
+   "preset": {
+    "clicksFromFreshLoad": 2,
+    "canvasPx": "342x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "readoutKeyRow": {
+     "top": -7,
+     "bottom": 31,
+     "fullyInViewport": false
+    }
+   },
+   "rotationKept": true
+  },
+  "390x844": {
+   "initial": {
+    "canvasPx": "372x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 642,
+     "bottom": 680,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 477,
+     "bottom": 635,
+     "fullyInViewport": true
+    },
+    "scrollH": 857,
+    "vh": 844
+   },
+   "paramsOpen": {
+    "canvasPx": "372x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "speedSliderInViewport": true,
+    "speedSliderY": 470,
+    "readoutKeyRow": {
+     "top": 195,
+     "bottom": 233,
+     "fullyInViewport": true
+    },
+    "scrollY": 362
+   },
+   "preset": {
+    "clicksFromFreshLoad": 2,
+    "canvasPx": "372x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "readoutKeyRow": {
+     "top": 37,
+     "bottom": 75,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  },
+  "320x640": {
+   "initial": {
+    "canvasPx": "302x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 642,
+     "bottom": 680,
+     "fullyInViewport": false
+    },
+    "transport": {
+     "top": 477,
+     "bottom": 635,
+     "fullyInViewport": true
+    },
+    "scrollH": 857,
+    "vh": 640
+   },
+   "paramsOpen": {
+    "canvasPx": "302x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "speedSliderInViewport": true,
+    "speedSliderY": 522,
+    "readoutKeyRow": {
+     "top": 195,
+     "bottom": 233,
+     "fullyInViewport": true
+    },
+    "scrollY": 362
+   },
+   "preset": {
+    "clicksFromFreshLoad": 2,
+    "canvasPx": "302x235",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 235,
+    "canvasTop": 51,
+    "readoutKeyRow": {
+     "top": 158,
+     "bottom": 196,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  },
+  "844x390": {
+   "initial": {
+    "canvasPx": "453x261",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 261,
+    "canvasTop": 120,
+    "readoutKeyRow": {
+     "top": 279,
+     "bottom": 299,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 120,
+     "bottom": 272,
+     "fullyInViewport": true
+    },
+    "scrollH": 390,
+    "vh": 390
+   },
+   "paramsOpen": {
+    "canvasPx": "453x172",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 172,
+    "canvasTop": 120,
+    "speedSliderInViewport": true,
+    "speedSliderY": 293,
+    "readoutKeyRow": {
+     "top": 360,
+     "bottom": 378,
+     "fullyInViewport": true
+    },
+    "scrollY": 0
+   },
+   "preset": {
+    "clicksFromFreshLoad": 2,
+    "canvasPx": "453x172",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 172,
+    "canvasTop": 120,
+    "readoutKeyRow": {
+     "top": 360,
+     "bottom": 378,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  }
+ },
+ "C": {
+  "360x800": {
+   "initial": {
+    "canvasPx": "342x315",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 315,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 644,
+     "bottom": 681,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 479,
+     "bottom": 637,
+     "fullyInViewport": true
+    },
+    "scrollH": 800,
+    "vh": 800
+   },
+   "paramsOpen": {
+    "canvasPx": "342x208",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 208,
+    "canvasTop": 158,
+    "speedSliderInViewport": true,
+    "speedSliderY": 630,
+    "readoutKeyRow": {
+     "top": 426,
+     "bottom": 444,
+     "fullyInViewport": true
+    },
+    "scrollY": 0
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "342x208",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 208,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 426,
+     "bottom": 444,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  },
+  "390x844": {
+   "initial": {
+    "canvasPx": "372x359",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 359,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 688,
+     "bottom": 725,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 523,
+     "bottom": 681,
+     "fullyInViewport": true
+    },
+    "scrollH": 844,
+    "vh": 844
+   },
+   "paramsOpen": {
+    "canvasPx": "372x236",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 236,
+    "canvasTop": 158,
+    "speedSliderInViewport": true,
+    "speedSliderY": 658,
+    "readoutKeyRow": {
+     "top": 454,
+     "bottom": 472,
+     "fullyInViewport": true
+    },
+    "scrollY": 0
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "372x236",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 236,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 454,
+     "bottom": 472,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  },
+  "320x640": {
+   "initial": {
+    "canvasPx": "302x155",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 155,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 484,
+     "bottom": 521,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 319,
+     "bottom": 477,
+     "fullyInViewport": true
+    },
+    "scrollH": 640,
+    "vh": 640
+   },
+   "paramsOpen": {
+    "canvasPx": "302x106",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 106,
+    "canvasTop": 158,
+    "speedSliderInViewport": true,
+    "speedSliderY": 580,
+    "readoutKeyRow": {
+     "top": 324,
+     "bottom": 342,
+     "fullyInViewport": true
+    },
+    "scrollY": 0
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "302x106",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 106,
+    "canvasTop": 158,
+    "readoutKeyRow": {
+     "top": 324,
+     "bottom": 342,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  },
+  "844x390": {
+   "initial": {
+    "canvasPx": "453x261",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 261,
+    "canvasTop": 120,
+    "readoutKeyRow": {
+     "top": 279,
+     "bottom": 299,
+     "fullyInViewport": true
+    },
+    "transport": {
+     "top": 120,
+     "bottom": 272,
+     "fullyInViewport": true
+    },
+    "scrollH": 390,
+    "vh": 390
+   },
+   "paramsOpen": {
+    "canvasPx": "453x172",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 172,
+    "canvasTop": 120,
+    "speedSliderInViewport": true,
+    "speedSliderY": 293,
+    "readoutKeyRow": {
+     "top": 360,
+     "bottom": 378,
+     "fullyInViewport": true
+    },
+    "scrollY": 0
+   },
+   "preset": {
+    "clicksFromFreshLoad": 3,
+    "canvasPx": "453x172",
+    "canvasVisiblePct": 100,
+    "canvasVisiblePx": 172,
+    "canvasTop": 120,
+    "readoutKeyRow": {
+     "top": 360,
+     "bottom": 378,
+     "fullyInViewport": true
+    }
+   },
+   "rotationKept": true
+  }
+ }
+}

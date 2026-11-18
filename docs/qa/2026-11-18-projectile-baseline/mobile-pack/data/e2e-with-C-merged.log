@@ -1,0 +1,92 @@
+
+Running 88 tests using 3 workers
+
+[1/88] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 1366x768
+[2/88] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 1366x768
+[3/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 1 @1366
+[4/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 2 @1366
+[5/88] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 1280x720
+[6/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 3 @1366
+[7/88] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 390x844
+[8/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 1 @390
+[9/88] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 1280x720
+[10/88] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 360x800
+[11/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 2 @390
+[12/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 3 @390
+[13/88] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:13:3 › reduced motion › does not autoplay; 播放 still works
+[14/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:58:1 › activity 1: predict → gated manipulate → observe → explain → complete; reveals only after the gate
+[15/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:78:1 › activity 2: observe is masked until prediction; playback + table then explain
+[16/88] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 390x844
+[17/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:91:1 › activity 3: result withheld until h≈25 m; then reveals; completes
+[18/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:106:1 › restart clears prediction; leaving mid-task asks first; cancel keeps progress; leave restores free state
+[19/88] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:24:1 › no reduced-motion preference: the animation still starts on its own (regression guard)
+[20/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:127:1 › keyboard only: choose a prediction with Tab/Enter
+[21/88] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 360x800
+[22/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:137:1 › answers never reach share URL or exports after a completed task
+[23/88] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:31:1 › share failure modes fall back to defaults, paused, with an explanation
+[24/88] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:162:1 › session progress is not persisted: reload returns to free mode with no task state
+[25/88] [desktop-chromium] › tests/e2e/projectile-qa-roundtrip.spec.ts:21:1 › share → clean browser reopen is paused at start; setup identical; export JSON/SVG share one snapshot
+[26/88] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 1366x768: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[27/88] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:50:1 › export failure is reported and a retry succeeds (no stuck state)
+[28/88] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:74:3 › fullscreen rejects: in-window enlarge remains usable, notice shown, exit returns focus
+[29/88] [desktop-chromium] › tests/e2e/projectile-qa-roundtrip.spec.ts:60:1 › legacy golden v1 link opens in a clean browser, paused, with its preset state
+[30/88] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:74:3 › fullscreen missing: in-window enlarge remains usable, notice shown, exit returns focus
+[31/88] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:12:1 › Projectile layers, probe/readout, presets and validated deep link
+[32/88] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:92:1 › non-colour encoding: simultaneously shown series differ in dash pattern, not hue alone
+[33/88] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 1280x720: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[34/88] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:50:1 › Projectile guided prediction and free state restore; modal focus; standalone notes
+[35/88] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:114:3 › reflow at zoom200-equiv-640x360 (browser-zoom equivalent): no horizontal scroll, controls reachable by scrolling
+[36/88] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:114:3 › reflow at zoom400-equiv-320x180 (browser-zoom equivalent): no horizontal scroll, controls reachable by scrolling
+[37/88] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:128:1 › axe: free / params / layers / guided / theory — blocking (serious|critical) violations recorded
+[38/88] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 390x844: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[39/88] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:100:1 › Projectile bad/repeated share falls back and explains the error
+[40/88] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:5:1 › projectile: at 400% zoom the page scrolls and reflows instead of pinning bars over the chart
+[41/88] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:31:1 › projectile: enlarged view keeps focus inside, and Escape returns it to the trigger
+[42/88] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:50:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 360px
+[43/88] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:50:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 472px
+[44/88] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 360x800: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[45/88] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:50:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 820px
+[46/88] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:50:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 1280px
+[47/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Catalog: one 44px control at the end of the header, closed list is not focusable
+[48/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Catalog: keyboard, Escape, outside click, focus return and aria-pressed
+[49/88] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 320x640: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[50/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Catalog: open list stays inside the 1440px viewport without horizontal overflow
+[51/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Catalog: open list stays inside the 390px viewport without horizontal overflow
+[52/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Catalog: open list stays inside the 360px viewport without horizontal overflow
+[53/88] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 844x390-landscape: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[54/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Projectile: one 44px control at the end of the header, closed list is not focusable
+[55/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Projectile: keyboard, Escape, outside click, focus return and aria-pressed
+[56/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Projectile: open list stays inside the 1440px viewport without horizontal overflow
+[57/88] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:73:3 › keyboard: every Tab stop shows a visible focus indicator @1366x768
+[58/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Projectile: open list stays inside the 390px viewport without horizontal overflow
+[59/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Projectile: open list stays inside the 360px viewport without horizontal overflow
+[60/88] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:73:3 › keyboard: every Tab stop shows a visible focus indicator @360x800
+[61/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Solar: one 44px control at the end of the header, closed list is not focusable
+[62/88] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:99:1 › measured operation counts at 360x800 (clicks from a fresh load)
+[63/88] [mobile-chromium] › tests/e2e/projectile-uplift.spec.ts:79:1 › Projectile mobile controls, layers, theme and keyboard @mobile
+[64/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Solar: keyboard, Escape, outside click, focus return and aria-pressed
+[65/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Solar: open list stays inside the 1440px viewport without horizontal overflow
+[66/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Solar: open list stays inside the 390px viewport without horizontal overflow
+[67/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Solar: open list stays inside the 360px viewport without horizontal overflow
+[68/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Atmosphere zh: one 44px control at the end of the header, closed list is not focusable
+[69/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Atmosphere zh: keyboard, Escape, outside click, focus return and aria-pressed
+[70/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere zh: open list stays inside the 1440px viewport without horizontal overflow
+[71/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere zh: open list stays inside the 390px viewport without horizontal overflow
+[72/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere zh: open list stays inside the 360px viewport without horizontal overflow
+[73/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Atmosphere en: one 44px control at the end of the header, closed list is not focusable
+[74/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Atmosphere en: keyboard, Escape, outside click, focus return and aria-pressed
+[75/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere en: open list stays inside the 1440px viewport without horizontal overflow
+[76/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere en: open list stays inside the 390px viewport without horizontal overflow
+[77/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere en: open list stays inside the 360px viewport without horizontal overflow
+[78/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Electrostatics: one 44px control at the end of the header, closed list is not focusable
+[79/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Electrostatics: keyboard, Escape, outside click, focus return and aria-pressed
+[80/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Electrostatics: open list stays inside the 1440px viewport without horizontal overflow
+[81/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Electrostatics: open list stays inside the 390px viewport without horizontal overflow
+[82/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Electrostatics: open list stays inside the 360px viewport without horizontal overflow
+[83/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Interference: one 44px control at the end of the header, closed list is not focusable
+[84/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Interference: keyboard, Escape, outside click, focus return and aria-pressed
+[85/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Interference: open list stays inside the 1440px viewport without horizontal overflow
+[86/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Interference: open list stays inside the 390px viewport without horizontal overflow
+[87/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Interference: open list stays inside the 360px viewport without horizontal overflow
+[88/88] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:121:1 › ThemeMenu choice persists across pages and System follows the OS preference
+  88 passed (1.1m)
