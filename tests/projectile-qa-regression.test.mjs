@@ -142,3 +142,31 @@ test("SVG legend: each trajectory has a key line with the same stroke+dash as it
     }
   }
 });
+
+import { projectileEvidencePolicy, newGuidedSession, submitPrediction, canManipulateTime, canUseFreeStateControls, projectileLearningActivities } from "../models/projectile-learning.ts";
+test("evidence policy table: predict withholds theory/model/numbers; share+export only outside any task", () => {
+  for (const id of ["apex", "complementary", "elevated"]) {
+    const s = newGuidedSession(id);
+    for (const phase of ["predict", "manipulate", "observe", "explain", "complete"]) {
+      const pol = projectileEvidencePolicy({ ...s, phase });
+      assert.equal(pol.share, false, `${id}/${phase} share`);
+      assert.equal(pol.export, false, `${id}/${phase} export`);
+      assert.equal(pol.theory, phase !== "predict", `${id}/${phase} theory`);
+      assert.equal(pol.numericResults, phase !== "predict", `${id}/${phase} numbers`);
+      assert.equal(pol.comparison, phase !== "predict", `${id}/${phase} comparison`);
+    }
+    assert.equal(canManipulateTime({ ...s, phase: "predict" }), false);
+    assert.equal(canUseFreeStateControls(s), false);
+    assert.notEqual(submitPrediction(s, "x").phase, "predict");
+  }
+  const free = projectileEvidencePolicy(null);
+  assert.deepEqual([free.share, free.export, free.theory, free.numericResults, free.comparison], [true, true, true, true, true]);
+});
+
+test("guided session object carries no student identity and activities expose no answer keys", () => {
+  const s = submitPrediction(newGuidedSession("apex"), "vertical-only");
+  assert.deepEqual(Object.keys(s).sort(), ["activityId", "explanation", "hasManipulated", "hintLevel", "phase", "prediction"]);
+  for (const a of projectileLearningActivities(9.80665)) {
+    assert.ok(!("answer" in a) && !("correct" in a) && !a.choices.some(c => "correct" in c || "answer" in c), a.id);
+  }
+});

@@ -1,0 +1,17 @@
+
+Running 13 tests using 1 worker
+
+[1/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 1 @1366
+[2/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 2 @1366
+[3/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 3 @1366
+[4/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 1 @390
+[5/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 2 @390
+[6/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 3 @390
+[7/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:58:1 › activity 1: predict → gated manipulate → observe → explain → complete; reveals only after the gate
+[8/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:78:1 › activity 2: observe is masked until prediction; playback + table then explain
+[9/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:91:1 › activity 3: result withheld until h≈25 m; then reveals; completes
+[10/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:106:1 › restart clears prediction; leaving mid-task asks first; cancel keeps progress; leave restores free state
+[11/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:127:1 › keyboard only: choose a prediction with Tab/Enter
+[12/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:137:1 › answers never reach share URL or exports after a completed task
+[13/13] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:162:1 › session progress is not persisted: reload returns to free mode with no task state
+  13 passed (8.4s)
