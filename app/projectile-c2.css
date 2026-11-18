@@ -50,6 +50,18 @@
   outline-color: var(--lc-focus-on-dark);
   outline-offset: -2px;
 }
+/* MathJax makes each formula a tab stop (tabindex=0, for its context menu / explorer). Give those the same
+   focus ring as every other control instead of the UA default 1px blue, which is hard to see on the dark chart. */
+.projectile-lab.projectile-c2 mjx-container:focus-visible {
+  outline: 2px solid var(--lc-focus);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+.projectile-lab.projectile-c2 .projectile-path-card mjx-container:focus-visible,
+.projectile-lab.projectile-c2 .projectile-mini mjx-container:focus-visible {
+  outline-color: var(--lc-focus-on-dark);
+  outline-offset: 1px;
+}
 /* ---- Chart card: the dark data surface stays; only its frame follows C2 ---- */
 .projectile-c2 .projectile-zoom-group button,
 .projectile-c2 .projectile-map-reset { width: 44px; height: 44px; min-height: 44px; }
