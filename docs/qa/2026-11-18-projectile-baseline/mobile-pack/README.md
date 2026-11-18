@@ -2,6 +2,8 @@
 
 2026-11-18 · Repo `qavit/kakau-lab` · [Draft PR #52](https://github.com/qavit/kakau-lab/pull/52) · 現況基準 = `main@58f244d` + PR #52 修補（程式碼 SHA `77a30c6`）
 對應：11/20「Lab 基準｜工作區版型、命名與 Science 選型 Gate」決議項 ①（Projectile 手機畫布／工具可達性的修正方向）；契約 R02、R03。
+> **歷史紀錄（Owner 決策前的證據包）。** Owner 已於 11/18 核定 A＋手機限定 B；實作與最新數據見 `../round-8-mobile-workspace.md`。下文 CI／SHA 為當時狀態。
+
 **這是證據包，不是決定。** 未選型、未 merge、未部署；Science 配色與其他模組完全未動；原型都不是產品程式碼。
 
 ## 1. 先看結論（現況其實分兩半）

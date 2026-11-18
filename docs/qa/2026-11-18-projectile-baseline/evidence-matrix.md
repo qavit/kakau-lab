@@ -1,6 +1,6 @@
 # Projectile — R01–R12 Evidence Matrix (final, engineering candidate)
 
-- **Verified commit SHA:** `77a30c6633cc6fd24d624a740caee1ff6e222aea` (branch `qa/projectile-baseline-20261118`, base `main@58f244d`)
+- **Verified commit SHA:** R02 row at `e101bf6` (round 8); all other rows at `77a30c6633cc6fd24d624a740caee1ff6e222aea` (their code unchanged since; tests re-run in the e101bf6 full suite) (branch `qa/projectile-baseline-20261118`, base `main@58f244d`)
 - Environment: local macOS, Node v26.11.1, Playwright Chromium; production build served locally (`vinext start`) for final runs. **Not Production.**
 - **PASS** = the whole current acceptance is met. Nothing below is PASS: partial code/test support is PARTIAL. This is an engineering/QA
   candidate — **not** a Product Gate PASS, Owner UX approval, Student validation or Release approval.
