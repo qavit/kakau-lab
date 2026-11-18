@@ -52,7 +52,12 @@ export function projectileResultSvg(result: ProjectileResult): string {
   const y = (v: number) => 440 - (v - ymin) * scale;
   const colors = ["#125b82", "#8a4600", "#6e3696"];
   const text = (value: string, px: number, py: number, size = 14) => `<text x="${px}" y="${py}" font-size="${size}">${escapeXml(value)}</text>`;
-  const paths = result.trajectories.map((t, i) => `<polyline fill="none" stroke="${colors[i]}" stroke-width="2.5" stroke-dasharray="${i === 0 ? "none" : i === 1 ? "8 4" : "2 4"}" points="${t.samples.map(s => `${x(s.point.x)},${y(s.point.y)}`).join(" ")}"/>${text(t.label + (t.termination === "time-cap" ? " (120 s 截止 / capped)" : ""), 80 + i * 280, 502)}`).join("");
+  const dash = (i: number) => (i === 0 ? "none" : i === 1 ? "8 4" : "2 4");
+  // Legend key = a sample of the same stroke, colour and dash as the plotted line, so the figure
+  // is decodable in black-and-white print as well as colour.
+  const legendEntry = (t: ProjectileResult["trajectories"][number], i: number) =>
+    `<line data-legend="${t.id}" x1="${80 + i * 290}" x2="${80 + i * 290 + 32}" y1="498" y2="498" stroke="${colors[i]}" stroke-width="2.5" stroke-dasharray="${dash(i)}"/>${text(t.label + (t.termination === "time-cap" ? " (截止 / capped)" : ""), 80 + i * 290 + 40, 502)}`;
+  const paths = result.trajectories.map((t, i) => `<polyline fill="none" stroke="${colors[i]}" stroke-width="2.5" stroke-dasharray="${dash(i)}" points="${t.samples.map(s => `${x(s.point.x)},${y(s.point.y)}`).join(" ")}"/>${legendEntry(t, i)}`).join("");
   const launch = result.setup.launch;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="790" viewBox="0 0 1000 790" role="img" aria-labelledby="title desc">
 <title id="title">拋體軌跡 / Projectile trajectories</title><desc id="desc">Equal axis scales; conditions, units and model assumptions below. 等比例座標；條件、單位及假設如下。</desc>

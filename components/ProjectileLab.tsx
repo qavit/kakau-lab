@@ -1576,8 +1576,8 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
                 url.searchParams.set("s", encodeProjectileShare(state, layers, selectedPreset));
                 if (url.href.length > 2000) throw new Error("分享網址過長。");
                 setShareUrl(url.href);
-                try { await navigator.clipboard.writeText(url.href); setShareStatus("分享連結已複製；開啟後從起點暫停。"); }
-                catch { setShareStatus("請選取下方連結複製。"); }
+                try { await navigator.clipboard.writeText(url.href); setShareStatus("分享連結已複製；開啟後還原起始設定並暫停，不含目前時間游標。"); }
+                catch { setShareStatus("請選取下方連結複製；開啟後還原起始設定並暫停，不含目前時間游標。"); }
               } catch { setShareStatus("目前設定無法分享。"); }
             }}><Share2 size={14} /> 分享設定</button>}
             {evidence.export && <>
