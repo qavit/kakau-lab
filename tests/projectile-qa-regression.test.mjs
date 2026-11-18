@@ -83,7 +83,7 @@ test("export: JSON and SVG are one snapshot; SVG numbers/points trace to JSON an
       assert.doesNotMatch(svg, /NaN|Infinity|undefined/, key);
       assert.ok(svg.includes(`t=${result.cursor.t.toFixed(3)} s`), "cursor time in text equals JSON");
       assert.ok(svg.includes(`x=${result.cursor.point.x.toFixed(3)} m`));
-      const polylines = [...svg.matchAll(/<polyline[^>]*points="([^"]+)"/g)];
+      const polylines = [...svg.matchAll(/<polyline(?![^>]*data-stairs)[^>]*points="([^"]+)"/g)];
       assert.equal(polylines.length, result.trajectories.length, `${key}: one polyline per trajectory`);
       polylines.forEach((m, i) => {
         const pts = m[1].trim().split(/\s+/).map(p => p.split(",").map(Number));
@@ -168,5 +168,28 @@ test("guided session object carries no student identity and activities expose no
   assert.deepEqual(Object.keys(s).sort(), ["activityId", "explanation", "hasManipulated", "hintLevel", "phase", "prediction"]);
   for (const a of projectileLearningActivities(9.80665)) {
     assert.ok(!("answer" in a) && !("correct" in a) && !a.choices.some(c => "correct" in c || "answer" in c), a.id);
+  }
+});
+
+test("staircase export draws the steps (clipped to the plot) and states the stair parameters; other scenarios do not", () => {
+  const stairsState = { ...initialProjectileState(), ...PROJECTILE_PRESETS.staircase };
+  const svg = projectileResultSvg(projectileResult(stairsState, LAYERS, 0.5, null));
+  const m = svg.match(/<polyline data-stairs="true" clip-path="url\(#plot-clip\)"[^>]*points="([^"]+)"/);
+  assert.ok(m, "stairs polyline present");
+  const pts = m[1].trim().split(/\s+/).map(p => p.split(",").map(Number));
+  assert.equal(pts.length, 2 * (stairsState.stairs.count + 1));
+  assert.ok(pts.every(([a, b]) => Number.isFinite(a) && Number.isFinite(b)));
+  const clip = svg.match(/<clipPath id="plot-clip"><rect x="([\d.]+)" y="([\d.-]+)" width="([\d.]+)" height="([\d.]+)"/);
+  assert.ok(clip, "clip rect present");
+  const [cx, cy, cw, ch] = clip.slice(1).map(Number);
+  assert.ok(cx >= 0 && cy >= 0 && cx + cw <= 1000 && cy + ch <= 790, "clip rect inside canvas");
+  assert.match(svg, new RegExp(`w=${stairsState.stairs.width} m`));
+  assert.match(svg, new RegExp(`r=${stairsState.stairs.rise} m`));
+  assert.match(svg, new RegExp(`${stairsState.stairs.count} 級`));
+  // first vertex is the top nose of step 0 → (x(0), y(0)); successive vertices alternate vertical/horizontal
+  assert.equal(pts[0][0], pts[1][0], "first riser is vertical");
+  for (const key of ["horizontal", "oblique", "elevated", "drag", "moon"]) {
+    const other = projectileResultSvg(projectileResult({ ...initialProjectileState(), ...PROJECTILE_PRESETS[key] }, LAYERS, 0.5, null));
+    assert.doesNotMatch(other, /data-stairs|plot-clip|階梯 \/ Stairs/, key);
   }
 });

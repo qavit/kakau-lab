@@ -59,6 +59,12 @@ export function projectileResultSvg(result: ProjectileResult): string {
     `<line data-legend="${t.id}" x1="${80 + i * 290}" x2="${80 + i * 290 + 32}" y1="498" y2="498" stroke="${colors[i]}" stroke-width="2.5" stroke-dasharray="${dash(i)}"/>${text(t.label + (t.termination === "time-cap" ? " (截止 / capped)" : ""), 80 + i * 290 + 40, 502)}`;
   const paths = result.trajectories.map((t, i) => `<polyline fill="none" stroke="${colors[i]}" stroke-width="2.5" stroke-dasharray="${dash(i)}" points="${t.samples.map(s => `${x(s.point.x)},${y(s.point.y)}`).join(" ")}"/>${legendEntry(t, i)}`).join("");
   const launch = result.setup.launch;
+  // Staircase scenario: draw the steps themselves (same vertices as the canvas: (n·w, −n·r) → (n·w, −(n+1)·r)),
+  // clipped to the plot so a long flight of stairs never rescales the trajectory. Uses setup.stairs only — no schema change.
+  const stairs = launch.scenario === "staircase" ? result.setup.stairs : null;
+  const stairPoints = stairs ? Array.from({ length: stairs.count + 1 }, (_, n) => [[n * stairs.width, -n * stairs.rise], [n * stairs.width, -(n + 1) * stairs.rise]]).flat().map(([a, b]) => `${x(a)},${y(b)}`).join(" ") : "";
+  const stairLayer = stairs ? `<clipPath id="plot-clip"><rect x="${x(xmin)}" y="${y(ymax)}" width="${x(xmax) - x(xmin)}" height="${y(ymin) - y(ymax)}"/></clipPath><polyline data-stairs="true" clip-path="url(#plot-clip)" fill="none" stroke="#66717b" stroke-width="2" points="${stairPoints}"/>` : "";
+  const stairNote = stairs ? `<line x1="40" x2="72" y1="540" y2="540" stroke="#66717b" stroke-width="2"/>${text(`階梯 / Stairs: 踏深 w=${stairs.width} m、級高 r=${stairs.rise} m、${stairs.count} 級；原點在頂端 / tread ${stairs.width} m, rise ${stairs.rise} m, ${stairs.count} steps; origin at top`, 80, 544, 12)}` : "";
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="790" viewBox="0 0 1000 790" role="img" aria-labelledby="title desc">
 <title id="title">拋體軌跡 / Projectile trajectories</title><desc id="desc">Equal axis scales; conditions, units and model assumptions below. 等比例座標；條件、單位及假設如下。</desc>
 <metadata>${escapeXml(JSON.stringify(result))}</metadata><rect width="1000" height="790" fill="white"/>
@@ -68,9 +74,10 @@ ${text(`v₀=${launch.speed} m/s  θ=${launch.angle}°  h=${result.effectiveHeig
 ${text(ymin.toFixed(2), 40, y(ymin) + 4, 12)}${text(ymax.toFixed(2), 40, y(ymax) + 4, 12)}
 ${text(xmin.toFixed(2), x(xmin), 455, 12)}${text(xmax.toFixed(2), x(xmax), 455, 12)}
 ${text(`y (m): ${ymin.toFixed(2)} … ${ymax.toFixed(2)}`, 80, 78)}${text(`x (m): ${xmin.toFixed(2)} … ${xmax.toFixed(2)} | 等比例 / equal scale`, 80, 478)}
-${paths}<circle cx="${x(result.cursor.point.x)}" cy="${y(result.cursor.point.y)}" r="5" fill="#17232e"/>
+${stairLayer}${paths}<circle cx="${x(result.cursor.point.x)}" cy="${y(result.cursor.point.y)}" r="5" fill="#17232e"/>
 ${text(`● 主軌跡游標 / Vacuum cursor: t=${result.cursor.t.toFixed(3)} s, x=${result.cursor.point.x.toFixed(3)} m, y=${result.cursor.point.y.toFixed(3)} m`, 40, 525)}
-${text(`模型 / Model: ${result.modelVersion}; result-1; share v1`, 40, 555)}
+${stairNote}
+${text(`模型 / Model: ${result.modelVersion}; result-1; share v1`, 40, 565)}
 ${result.assumptions.map((a, i) => text(a, 40, 585 + i * 27, 12)).join("")}
 ${text("重現設定與精確數值內嵌於 SVG metadata；亦可另存 JSON。 Setup and exact values embedded in metadata; JSON available.", 40, 765, 12)}</g></svg>`;
 }
