@@ -71,7 +71,7 @@ Running 52 tests using 5 workers
       38 |   for (let i = 0; i < 16; i += 1) {
       39 |     await page.keyboard.press("Tab");
       40 |     expect(await page.evaluate(() => document.querySelector(".projectile-stage")!.contains(document.activeElement))).toBe(true);
-        at /Users/jacques/Documents/Kakau/lab-projectile-qa/tests/e2e/projectile-usability.spec.ts:37:51
+        at <worktree>/tests/e2e/projectile-usability.spec.ts:37:51
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
     ../../../../../tmp/pw-qa/projectile-usability-proje-8802f-e-returns-it-to-the-trigger-desktop-chromium/test-failed-1.png
