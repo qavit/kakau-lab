@@ -1,0 +1,248 @@
+{
+  "844x390 initial canvas": {
+    "pct": 100,
+    "w": 453,
+    "h": 261
+  },
+  "844x390 params canvas": {
+    "pct": 100,
+    "w": 453,
+    "h": 172
+  },
+  "844x390 share-notice canvas": {
+    "pct": 78,
+    "w": 453,
+    "h": 261
+  },
+  "844x390 expanded (panel was open) canvas": {
+    "pct": 100,
+    "w": 488,
+    "h": 372
+  },
+  "axe 844x390 initial": {
+    "violations": [],
+    "serious_critical": []
+  },
+  "axe 844x390 params": {
+    "violations": [],
+    "serious_critical": []
+  },
+  "axe 844x390 preset sheet": {
+    "violations": [],
+    "serious_critical": []
+  },
+  "360x800 toolbar": [
+    {
+      "t": "參數",
+      "w": 82,
+      "h": 44,
+      "clipped": false,
+      "right": 89.5
+    },
+    {
+      "t": "預設",
+      "w": 82,
+      "h": 44,
+      "clipped": false,
+      "right": 177
+    },
+    {
+      "t": "圖層",
+      "w": 82,
+      "h": 44,
+      "clipped": false,
+      "right": 264.5
+    },
+    {
+      "t": "放大視圖",
+      "w": 82,
+      "h": 44,
+      "clipped": false,
+      "right": 352
+    }
+  ],
+  "360x800 sheet geometry": {
+    "sheetTop": 262.5,
+    "sheetBottom": 734.5,
+    "barTop": 740.5,
+    "vh": 800,
+    "vw": 360,
+    "sheetRight": 352,
+    "sheetLeft": 8
+  },
+  "360x800 last item": {
+    "reachable": true,
+    "within": true,
+    "h": 44
+  },
+  "360x800 preset operations": 2,
+  "axe 360x800 preset sheet": {
+    "violations": [],
+    "serious_critical": []
+  },
+  "390x844 toolbar": [
+    {
+      "t": "參數",
+      "w": 89,
+      "h": 44,
+      "clipped": false,
+      "right": 97
+    },
+    {
+      "t": "預設",
+      "w": 89,
+      "h": 44,
+      "clipped": false,
+      "right": 192
+    },
+    {
+      "t": "圖層",
+      "w": 89,
+      "h": 44,
+      "clipped": false,
+      "right": 287
+    },
+    {
+      "t": "放大視圖",
+      "w": 89,
+      "h": 44,
+      "clipped": false,
+      "right": 382
+    }
+  ],
+  "390x844 sheet geometry": {
+    "sheetTop": 262.5,
+    "sheetBottom": 734.5,
+    "barTop": 740.5,
+    "vh": 844,
+    "vw": 390,
+    "sheetRight": 382,
+    "sheetLeft": 8
+  },
+  "390x844 last item": {
+    "reachable": true,
+    "within": true,
+    "h": 44
+  },
+  "390x844 preset operations": 2,
+  "axe 390x844 preset sheet": {
+    "violations": [],
+    "serious_critical": []
+  },
+  "320x640 toolbar": [
+    {
+      "t": "參數",
+      "w": 72,
+      "h": 44,
+      "clipped": false,
+      "right": 79.5
+    },
+    {
+      "t": "預設",
+      "w": 72,
+      "h": 44,
+      "clipped": false,
+      "right": 157
+    },
+    {
+      "t": "圖層",
+      "w": 72,
+      "h": 44,
+      "clipped": false,
+      "right": 234.5
+    },
+    {
+      "t": "放大視圖",
+      "w": 72,
+      "h": 44,
+      "clipped": false,
+      "right": 312
+    }
+  ],
+  "320x640 sheet geometry": {
+    "sheetTop": 198,
+    "sheetBottom": 582,
+    "barTop": 588,
+    "vh": 640,
+    "vw": 320,
+    "sheetRight": 312,
+    "sheetLeft": 8
+  },
+  "320x640 last item": {
+    "reachable": true,
+    "within": true,
+    "h": 44
+  },
+  "320x640 preset operations": 2,
+  "axe 320x640 preset sheet": {
+    "violations": [],
+    "serious_critical": []
+  },
+  "844x390 toolbar": [
+    {
+      "t": "參數",
+      "w": 78,
+      "h": 44,
+      "clipped": false,
+      "right": 534.6875
+    },
+    {
+      "t": "預設",
+      "w": 78,
+      "h": 44,
+      "clipped": false,
+      "right": 618.6875
+    },
+    {
+      "t": "圖層",
+      "w": 78,
+      "h": 44,
+      "clipped": false,
+      "right": 702.6875
+    },
+    {
+      "t": "放大視圖",
+      "w": 110,
+      "h": 44,
+      "clipped": false,
+      "right": 818.6875
+    }
+  ],
+  "844x390 sheet geometry": {
+    "sheetTop": 8,
+    "sheetBottom": 382,
+    "barTop": 71,
+    "vh": 390,
+    "vw": 844,
+    "sheetRight": 836,
+    "sheetLeft": 536
+  },
+  "844x390 last item": {
+    "reachable": true,
+    "within": true,
+    "h": 44
+  },
+  "844x390 preset operations": 2,
+  "360x800 in-panel menu last item": {
+    "reachable": true,
+    "within": true
+  },
+  "390x844 in-panel menu last item": {
+    "reachable": true,
+    "within": true
+  },
+  "320x640 in-panel menu last item": {
+    "reachable": true,
+    "within": true
+  },
+  "1366x768 desktop canvas (params open)": {
+    "pct": 100,
+    "w": 910,
+    "h": 338
+  },
+  "1280x720 desktop canvas (params open)": {
+    "pct": 100,
+    "w": 829,
+    "h": 338
+  }
+}

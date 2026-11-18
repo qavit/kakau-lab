@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Info,
   Layers3,
+  ListChecks,
   Share2,
   Home,
   Pause,
@@ -1271,9 +1272,12 @@ function Menu({ label, children }: { label: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
+    // On phones the list can open under the fixed tool bar; scroll-margin (CSS) keeps its last item clear of the bar.
+    listRef.current?.scrollIntoView({ block: "nearest" });
     const onPointerDown = (event: MouseEvent) => {
       if (!ref.current?.contains(event.target as Node)) setOpen(false);
     };
@@ -1291,7 +1295,48 @@ function Menu({ label, children }: { label: string; children: ReactNode }) {
       <button ref={triggerRef} className={open ? "active" : ""} onClick={() => setOpen((value) => !value)} aria-expanded={open}>
         {label} <ChevronDown size={13} />
       </button>
-      {open && <div className="projectile-menu-list" role="group" aria-label={`${label}選項`} onClick={() => { setOpen(false); triggerRef.current?.focus(); }}>{children}</div>}
+      {open && <div ref={listRef} className="projectile-menu-list" role="group" aria-label={`${label}選項`} onClick={() => { setOpen(false); triggerRef.current?.focus(); }}>{children}</div>}
+    </div>
+  );
+}
+
+/** Phone shortcut to the same teaching presets as the 教學預設 menu in the parameter panel (preset = 2 taps: 預設 → item).
+ * A modal sheet (background stage inert, Tab wraps inside) anchored above the tool bar (CSS), scrollable, so the last item is never under the fixed bar. Hidden by CSS
+ * outside phone layouts. Escape / outside press / choosing closes it and returns focus to the trigger. */
+function PresetSheet({ open, selected, onPick, onClose, triggerRef }: { open: boolean; selected: string | null; onPick: (key: string) => void; onClose: () => void; triggerRef: RefObject<HTMLButtonElement | null> }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  useEffect(() => { closeRef.current = onClose; });
+  // Focus moves in once per opening (not on every re-render: playback re-renders the page each frame).
+  useEffect(() => {
+    if (!open) return;
+    const first = ref.current?.querySelector<HTMLButtonElement>("button[aria-pressed='true']") ?? ref.current?.querySelector<HTMLButtonElement>("button");
+    first?.focus({ preventScroll: true });
+  }, [open]);
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (!ref.current?.contains(target) && !triggerRef.current?.contains(target)) closeRef.current();
+    };
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") { closeRef.current(); triggerRef.current?.focus(); } };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => { document.removeEventListener("mousedown", onPointerDown); document.removeEventListener("keydown", onKeyDown); };
+  }, [open, triggerRef]);
+  if (!open) return null;
+  return (
+    <div ref={ref} id="projectile-preset-sheet" className="projectile-preset-sheet" role="dialog" aria-modal="true" aria-label="教學預設選項" onKeyDown={(event) => {
+      if (event.key !== "Tab") return;
+      const items = ref.current?.querySelectorAll<HTMLButtonElement>("button");
+      if (!items?.length) return;
+      const first = items[0], last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }}>
+      {Object.entries(PROJECTILE_PRESETS).map(([key, preset]) => (
+        <button key={key} aria-pressed={selected === key} onClick={() => { onPick(key); onClose(); triggerRef.current?.focus(); }}>{preset.label}</button>
+      ))}
     </div>
   );
 }
@@ -1344,6 +1389,8 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
   const [showComponents, setShowComponents] = useState(false);
   const [showEnvironment, setShowEnvironment] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [presetSheetOpen, setPresetSheetOpen] = useState(false);
+  const presetTriggerRef = useRef<HTMLButtonElement>(null);
   const [theoryOpen, setTheoryOpen] = useState(false);
   const [manualView, setManualView] = useState<ManualView | null>(null);
   const [mergedCharts, setMergedCharts] = useState(true);
@@ -1413,6 +1460,15 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
   const cursor = useMemo(() => deriveCursor(model, state.gravity, cursorFraction), [model, state.gravity, cursorFraction]);
   const charts = useMemo(() => componentSeries(model, state), [model, state]);
 
+  const applyPreset = useCallback((key: string) => {
+    const patch: Partial<ProjectileState> & { label?: string } = { ...PROJECTILE_PRESETS[key] };
+    delete patch.label;
+    setState({ ...initialProjectileState(), ...patch, playing: false });
+    setLayers({ ...INITIAL_PROJECTILE_LAYERS });
+    setSelectedPreset(key);
+    setCursorFraction(0);
+    setManualView(null);
+  }, []);
   const patchState = useCallback((patch: Partial<ProjectileState>) => {
     setState((current) => ({ ...current, ...patch }));
     if (["speed", "angle", "height", "gravity", "dragFactor", "scenario", "stairs"].some((key) => key in patch)) setSelectedPreset(null);
@@ -1611,7 +1667,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       <div className="projectile-subbar" inert={expanded}>
       <nav className="projectile-modebar" aria-label="學習模式">
         <button className={!guidedSession ? "active" : ""} aria-pressed={!guidedSession} onClick={() => { if (guidedSession) requestLeaveGuided(); }}>自由探索</button>
-        <button className={guidedSession ? "active" : ""} aria-pressed={Boolean(guidedSession)} onClick={() => { if (!guidedSession) selectGuidedActivity("apex"); }}>探索任務</button>
+        <button className={guidedSession ? "active" : ""} aria-pressed={Boolean(guidedSession)} onClick={() => { if (!guidedSession) { setPresetSheetOpen(false); selectGuidedActivity("apex"); } }}>探索任務</button>
         <button className="projectile-theory-entry" disabled={!evidence.theory} aria-haspopup="dialog" aria-describedby={!evidence.theory ? "projectile-disclosure-note" : undefined} onClick={() => setTheoryOpen(true)} title={!evidence.theory ? "送出預測後開放" : undefined}>
           {evidence.theory ? <BookOpen size={14} /> : <Lock size={14} />} 理論與計算
         </button>
@@ -1619,8 +1675,10 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       </nav>
       <div className="projectile-panel-actions">
         {freeStateControlsAvailable && <button className={panelOpen ? "active" : ""} aria-expanded={panelOpen} onClick={() => { setPanelOpen((open) => !open); setPanelWidth(PANEL_DEFAULT_WIDTH); }}><SlidersHorizontal size={16} /> 參數</button>}
-        {freeStateControlsAvailable && <button ref={layersTriggerRef} aria-expanded={layersOpen} aria-controls="projectile-layer-drawer" onClick={() => setLayersOpen((open) => !open)}><Layers3 size={16} /> 圖層</button>}
+        {freeStateControlsAvailable && <button ref={presetTriggerRef} className="projectile-preset-entry" aria-expanded={presetSheetOpen} aria-controls="projectile-preset-sheet" onClick={() => { setLayersOpen(false); setPresetSheetOpen((open) => !open); }}><ListChecks size={16} /> 預設</button>}
+        {freeStateControlsAvailable && <button ref={layersTriggerRef} aria-expanded={layersOpen} aria-controls="projectile-layer-drawer" onClick={() => { setPresetSheetOpen(false); setLayersOpen((open) => !open); }}><Layers3 size={16} /> 圖層</button>}
         <button ref={expandTriggerRef} onClick={() => { patchState({ playing: false }); setExpanded(true); }} aria-expanded={expanded}><Maximize2 size={16} /> 放大視圖</button>
+        {freeStateControlsAvailable && <PresetSheet open={presetSheetOpen} selected={selectedPreset} onPick={applyPreset} onClose={() => setPresetSheetOpen(false)} triggerRef={presetTriggerRef} />}
       </div>
       </div>
       {leaveConfirm && guidedSession && (
@@ -1641,7 +1699,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       </LabLayerDrawer>
       {/* The panel takes width from the chart rather than covering it, and the chart is drawn at
           whatever size it is left with, so opening the panel never hides the trajectory. */}
-      <div className="projectile-stage" data-panel={panelOpen || Boolean(guidedSession)} data-expanded={expanded}>
+      <div className="projectile-stage" data-panel={panelOpen || Boolean(guidedSession)} data-expanded={expanded} inert={presetSheetOpen && freeStateControlsAvailable}>
         <section className="viewport-card projectile-path-card">
           <div className="card-label">
             <span>軌跡</span>
@@ -1751,7 +1809,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
                 <button className={isStairs ? "active" : ""} aria-pressed={isStairs} onClick={() => { patchState({ scenario: "staircase", ...SCENARIO_DEFAULTS.staircase }); setManualView(null); }}>階梯落點</button>
               </Menu>
               <Menu label="教學預設">
-                {Object.entries(PROJECTILE_PRESETS).map(([key, preset]) => { const { label, ...patch } = preset; return <button key={key} aria-pressed={selectedPreset === key} onClick={() => { setState({ ...initialProjectileState(), ...patch, playing: false }); setLayers({ ...INITIAL_PROJECTILE_LAYERS }); setSelectedPreset(key); setCursorFraction(0); setManualView(null); }}>{label}</button>; })}
+                {Object.entries(PROJECTILE_PRESETS).map(([key, preset]) => <button key={key} aria-pressed={selectedPreset === key} onClick={() => applyPreset(key)}>{preset.label}</button>)}
               </Menu>
               <button onClick={() => { setState(initialProjectileState()); setLayers({ ...INITIAL_PROJECTILE_LAYERS }); setSelectedPreset(null); setCursorFraction(0); setManualView(null); }}><RotateCcw size={14} /> 重設實驗</button>
             </div>
