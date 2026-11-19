@@ -231,6 +231,24 @@ test.describe("Doppler — free exploration", () => {
     await expect(page.getByTestId("notice")).toHaveCount(0);
   });
 
+  test("the share toast has a copy button that really copies; export entries carry icons", async ({ page, context, baseURL }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: new URL(baseURL!).origin });
+    await open(page);
+    await preset(page, "觀察者靠近");
+    await page.getByRole("button", { name: "工具", exact: true }).click();
+    for (const name of [/分享起始設定/, /匯出教學圖/, /匯出事件資料/]) await expect(page.getByRole("button", { name }).locator("svg")).toBeVisible();
+    await page.getByRole("button", { name: /分享起始設定/ }).click();
+    const copyButton = page.getByRole("button", { name: "複製連結" });
+    await expect(copyButton.locator("svg")).toBeVisible();
+    expect((await copyButton.boundingBox())!.width).toBeGreaterThanOrEqual(43.5);
+    await page.evaluate(() => navigator.clipboard.writeText("sentinel"));
+    await copyButton.click();
+    await expect(page.getByRole("button", { name: "已複製" })).toBeVisible();
+    const link = await page.getByLabel("分享連結").inputValue();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(link);
+    await expect(page.getByRole("button", { name: "複製連結" })).toBeVisible({ timeout: 5000 }); // the check mark reverts
+  });
+
   test("playback rate is one menu with 0.25× to 4×, immersion controls are icons, formulas are typeset", async ({ page }) => {
     await open(page);
     await page.getByRole("button", { name: /^播放倍率：1×/ }).click();
@@ -252,6 +270,36 @@ test.describe("Doppler — free exploration", () => {
     await page.getByText("公式核對").click();
     await expect(page.getByTestId("pair-readout").locator("details[open] mjx-container").first()).toBeVisible();
     await expect(page.getByTestId("live-readout").locator("mjx-container")).toHaveCount(1);
+  });
+
+  test("theory lists every symbol with its name and SI unit next to the formulas, in both languages", async ({ page }) => {
+    await open(page);
+    await mode(page, "理論與計算").click();
+    const dialog = page.getByRole("dialog");
+    const table = dialog.locator("table.theory-symbols");
+    await expect(table).toBeVisible();
+    await expect(table.locator("thead th")).toHaveText(["符號", "名稱", "SI 單位", "本模型的正規化單位"]);
+    await expect(table.locator("tbody tr")).toHaveCount(15);
+    for (const text of ["聲速", "波源的發射頻率", "發射週期", "波源 S 的速度", "觀察者 O 的速度", "接收間隔", "O 接收到的頻率"]) await expect(table).toContainText(text);
+    await expect(table).not.toContainText("$"); // every $…$ is typeset, none left raw
+    await expect(table).toContainText("m/s");
+    await expect(table).toContainText("Hz");
+    await expect(table.locator("mjx-container").first()).toBeVisible();
+    // The table sits with the formulas, between "公式" and the paragraph that explains them.
+    const order = await dialog.locator("h2, h3, table.theory-symbols").evaluateAll((els) => els.map((e) => e.textContent?.slice(0, 8)));
+    expect(order.indexOf("公式")).toBeGreaterThanOrEqual(0);
+    expect(order.indexOf("符號、名稱與單位")).toBe(order.indexOf("公式") + 1);
+    await page.keyboard.press("Escape");
+    await open(page, "/en/doppler");
+    await mode(page, "Theory & calculation").click();
+    const en = page.getByRole("dialog").locator("table.theory-symbols");
+    await expect(en.locator("thead th")).toHaveText(["Symbol", "Name", "SI unit", "Unit in this model (normalised)"]);
+    await expect(en.locator("tbody tr")).toHaveCount(15);
+    await expect(en).toContainText("Speed of sound");
+    await expect(en).not.toContainText("$");
+    // Narrow screen: the table scrolls inside its own box, the page does not.
+    await page.setViewportSize({ width: 320, height: 640 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   });
 
   test("reduced motion: playback steps from event to event and stays readable and controllable", async ({ page }) => {

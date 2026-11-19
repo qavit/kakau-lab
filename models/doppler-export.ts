@@ -107,7 +107,9 @@ export function dopplerResultSvg(result: DopplerResult): string {
   const side = observerSide(setup);
   /** A light outline behind a label keeps it legible where it crosses a wavefront or the cursor. */
   const halo = (bg: string) => `paint-order="stroke" stroke="${bg}" stroke-width="4" stroke-linejoin="round"`;
-  const text = (value: string, x: number, y: number, size = 14, extra = "") => `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${size}" ${extra}>${escapeXml(value)}</text>`;
+  /** Labels name the source (S) and observer (O): those subscripts are upright capitals, set as a lowered tspan. */
+  const sub = (value: string) => value.replace(/([uxλ])_([SO])/g, '$1<tspan baseline-shift="sub" font-size="75%">$2</tspan>');
+  const text = (value: string, x: number, y: number, size = 14, extra = "") => `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${size}" ${extra}>${sub(escapeXml(value))}</text>`;
 
   /* ---- Panel A: the wavefronts in the air frame, at the cursor time ---- */
   const A = { x: 40, y: 116, w: 920, h: 232 };
@@ -153,8 +155,8 @@ export function dopplerResultSvg(result: DopplerResult): string {
     `<path d="M${xs} ${axisY - 9}L${xs + 9} ${axisY}L${xs} ${axisY + 9}L${xs - 9} ${axisY}Z" fill="${SOURCE}" stroke="#fff" stroke-width="1.5"/>` +
     `<rect x="${xo - 8}" y="${axisY - 8}" width="16" height="16" fill="${OBSERVER}" stroke="#fff" stroke-width="1.5"/>` +
     arrow(xs, setup.sourceVelocity, SOURCE) + arrow(xo, setup.observerVelocity, OBSERVER) +
-    text(`S  uₛ = ${signed(setup.sourceVelocity)}c ${rest(setup.sourceVelocity)}`, xs + (side > 0 ? 8 : -8), axisY - 44, 13, `text-anchor="${sourceAnchor}" fill="${SOURCE}" font-weight="700" ${halo("#f4f7fa")}`) +
-    text(`O  uₒ = ${signed(setup.observerVelocity)}c ${rest(setup.observerVelocity)}`, xo + (side > 0 ? -8 : 8), axisY - 44, 13, `text-anchor="${observerAnchor}" fill="${OBSERVER}" font-weight="700" ${halo("#f4f7fa")}`);
+    text(`S  u_S = ${signed(setup.sourceVelocity)}c ${rest(setup.sourceVelocity)}`, xs + (side > 0 ? 8 : -8), axisY - 44, 13, `text-anchor="${sourceAnchor}" fill="${SOURCE}" font-weight="700" ${halo("#f4f7fa")}`) +
+    text(`O  u_O = ${signed(setup.observerVelocity)}c ${rest(setup.observerVelocity)}`, xo + (side > 0 ? -8 : 8), axisY - 44, 13, `text-anchor="${observerAnchor}" fill="${OBSERVER}" font-weight="700" ${halo("#f4f7fa")}`);
   const xTicks = Array.from({ length: 7 }, (_, i) => X_DOMAIN.min + i * 4)
     .map((v) => `<path d="M${sx(v)} ${A.y + A.h - 14}v5" stroke="${MUTED}"/>` + text(String(v), sx(v), A.y + A.h - 1, 12, `text-anchor="middle" fill="${MUTED}"`))
     .join("");
@@ -208,13 +210,13 @@ export function dopplerResultSvg(result: DopplerResult): string {
   const rows: [string, string, string, string, string][] = [
     ["量 / Quantity", "目前 / Current", "參考 / Reference", "公式核對 / Formula", ""],
     ["ΔT / T₀ 發射間隔 emission interval", fmt(result.pair?.emissionInterval), "—", "1", ""],
-    ["λ / λ₀ 波前間距 spacing", fmt(result.ratios?.wavelength), fmt(result.reference?.ratios.wavelength), fmt(result.analytic.wavelength), "(c − s·uₛ)/c"],
-    ["Δt / T₀ 接收間隔 reception interval", fmt(result.ratios?.period), fmt(result.reference?.ratios.period), fmt(result.analytic.period), "(c − s·uₛ)/(c − s·uₒ)"],
-    ["f / f₀ 接收頻率 received frequency", fmt(result.ratios?.frequency), fmt(result.reference?.ratios.frequency), fmt(result.analytic.frequency), "(c − s·uₒ)/(c − s·uₛ)"],
+    ["λ / λ₀ 波前間距 spacing", fmt(result.ratios?.wavelength), fmt(result.reference?.ratios.wavelength), fmt(result.analytic.wavelength), "(c − s·u_S)/c"],
+    ["Δt / T₀ 接收間隔 reception interval", fmt(result.ratios?.period), fmt(result.reference?.ratios.period), fmt(result.analytic.period), "(c − s·u_S)/(c − s·u_O)"],
+    ["f / f₀ 接收頻率 received frequency", fmt(result.ratios?.frequency), fmt(result.reference?.ratios.frequency), fmt(result.analytic.frequency), "(c − s·u_O)/(c − s·u_S)"],
   ];
   const table = rows.map((row, i) => row.map((cell, j) => (cell ? text(cell, cols[j], C.y + 22 + i * 26, i === 0 ? 12 : j === 4 ? 12 : 14, `${i === 0 ? `fill="${MUTED}" ` : j === 4 ? `fill="${MUTED}" ` : ""}${i === 4 && j === 1 ? 'font-weight="700"' : ""}`) : "")).join("")).join("");
   const referenceNote = result.reference
-    ? `參考：uₛ = ${signed(result.reference.sourceVelocity)}c, uₒ = ${signed(result.reference.observerVelocity)}c, 波前對 #${result.reference.pair}  / Reference setup`
+    ? `參考：u_S = ${signed(result.reference.sourceVelocity)}c, u_O = ${signed(result.reference.observerVelocity)}c, 波前對 #${result.reference.pair}  / Reference setup`
     : "尚未保留參考結果 / No reference kept";
   const footY = C.y + 22 + 5 * 26 + 18;
   // Each assumption is "中文。 English." — set the two languages on their own lines so nothing is clipped.
@@ -229,7 +231,7 @@ export function dopplerResultSvg(result: DopplerResult): string {
 <metadata>${escapeXml(JSON.stringify(result))}</metadata><rect width="1000" height="${height}" fill="white"/>
 <g fill="${INK}" font-family="Arial, 'Noto Sans TC', sans-serif">
 ${text("聲音的都普勒效應 / Doppler effect of sound", 40, 38, 24, 'font-weight="700"')}
-${text(`uₛ = ${signed(setup.sourceVelocity)}c · uₒ = ${signed(setup.observerVelocity)}c · c = 1, f₀ = 1（λ₀ = cT₀ = 1）· S 起點 x = ${fmt(setup.sourceStart, 1)} λ₀, O 起點 x = ${fmt(setup.observerStart, 1)} λ₀`, 40, 64, 14)}
+${text(`u_S = ${signed(setup.sourceVelocity)}c · u_O = ${signed(setup.observerVelocity)}c · c = 1, f₀ = 1（λ₀ = cT₀ = 1）· S 起點 x = ${fmt(setup.sourceStart, 1)} λ₀, O 起點 x = ${fmt(setup.observerStart, 1)} λ₀`, 40, 64, 14)}
 ${text("速度以空氣為參考系、向右為正 / Velocities in the air frame, positive to the right.", 40, 84, 12, `fill="${MUTED}"`)}
 <clipPath id="clipA"><rect x="${A.x}" y="${A.y}" width="${A.w}" height="${A.h}"/></clipPath>
 <rect x="${A.x}" y="${A.y}" width="${A.w}" height="${A.h}" fill="#f4f7fa" stroke="#c4ced8"/>

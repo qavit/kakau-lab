@@ -9,7 +9,7 @@
  *
  * Everything here is *event based*, not frame based. Wavefront n is emitted at t_n = n·T₀ from wherever
  * the source is at that instant, and from then on is a circle about that fixed centre with radius
- * c·(t − t_n). The instant O meets it is the root of |x_o(t) − x_n| = c·(t − t_n), solved in closed
+ * c·(t − t_n). The instant O meets it is the root of |x_O(t) − x_n| = c·(t − t_n), solved in closed
  * form. No animation step, collision test or time stepping is involved, so scrubbing, stepping back and
  * comparing all rebuild their state from the same list of events.
  *
@@ -41,9 +41,9 @@ export interface DopplerSetup {
   sourceStart: number;
   /** x of the observer at t = 0, in λ₀. */
   observerStart: number;
-  /** Signed u_s / c. */
+  /** Signed u_S / c. */
   sourceVelocity: number;
-  /** Signed u_o / c. */
+  /** Signed u_O / c. */
   observerVelocity: number;
 }
 
@@ -102,13 +102,13 @@ export function observerSide(setup: DopplerSetup): Direction {
   return setup.observerStart >= setup.sourceStart ? 1 : -1;
 }
 
-/** Earliest legal meeting of O with the front born at `emission`: the unique root of |x_o(t) − x_n| = c(t − t_n). */
+/** Earliest legal meeting of O with the front born at `emission`: the unique root of |x_O(t) − x_n| = c(t − t_n). */
 function solveReception(setup: DopplerSetup, emission: Emission): Reception {
   const c = SOUND_SPEED;
   const { observerStart: xo, observerVelocity: uo } = setup;
-  // Front travelling right:  x_o(t) − x_n = +c (t − t_n)   →   t (c − u_o) = x_o0 − x_n + c t_n
+  // Front travelling right:  x_O(t) − x_n = +c (t − t_n)   →   t (c − u_O) = x_O0 − x_n + c t_n
   const tRight = (xo - emission.x + c * emission.t) / (c - uo);
-  // Front travelling left:   x_n − x_o(t) = +c (t − t_n)   →   t (c + u_o) = x_n − x_o0 + c t_n
+  // Front travelling left:   x_n − x_O(t) = +c (t − t_n)   →   t (c + u_O) = x_n − x_O0 + c t_n
   const tLeft = (emission.x - xo + c * emission.t) / (c + uo);
   const rightLegal = tRight >= emission.t - EPS && xo + uo * tRight - emission.x >= -EPS;
   const leftLegal = tLeft >= emission.t - EPS && emission.x - (xo + uo * tLeft) >= -EPS;
@@ -206,7 +206,7 @@ export interface LiveFrequency {
   frequency: number;
 }
 
-/** 1/(t_{r,n+1} − t_{r,n}) from the two latest receptions so far; null until two valid receptions exist. */
+/** 1/(t_{R,n+1} − t_{R,n}) from the two latest receptions so far; null until two valid receptions exist. */
 export function latestReceptionFrequency(experiment: DopplerExperiment, t: number): LiveFrequency | null {
   const received = receptionsUpTo(experiment, t);
   if (received.length < 2) return null;
@@ -288,7 +288,7 @@ export function pairRatios(pair: PairMeasurement): Ratios | null {
 
 /**
  * Closed-form answer for the collinear single-branch case, kept deliberately separate from the event
- * model so one can check the other:  λ_s = (c − s·u_s)·T₀,  f_obs = f₀ (c − s·u_o)/(c − s·u_s).
+ * model so one can check the other:  λ_S = (c − s·u_S)·T₀,  f_obs = f₀ (c − s·u_O)/(c − s·u_S).
  */
 export function dopplerAnalytic(sourceVelocity: number, observerVelocity: number, direction: Direction): Ratios {
   const c = SOUND_SPEED;

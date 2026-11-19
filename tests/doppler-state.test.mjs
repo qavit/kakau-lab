@@ -230,8 +230,8 @@ test("the SVG is a standalone bilingual figure with conditions, units, version, 
   assert.match(svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
   for (const needle of [
     "聲音的都普勒效應 / Doppler effect of sound",
-    "uₛ = +0.20c",
-    "uₒ = 0.00c",
+    'u<tspan baseline-shift="sub" font-size="75%">S</tspan> = +0.20c',
+    'u<tspan baseline-shift="sub" font-size="75%">O</tspan> = 0.00c',
     "doppler-wavefront-1",
     "doppler-result-1",
     "λ₀ = cT₀ = 1",
@@ -273,4 +273,16 @@ test("layering: lib/science/doppler.ts depends on nothing; models import lib/sci
   }
   const render = await Promise.all(["export", "interaction", "primitives", "viewport"].map((name) => read(`../lib/render/${name}.ts`)));
   for (const source of render) assert.doesNotMatch(source, /doppler/i, "lib/render stays model-agnostic");
+});
+
+test("subscripts that name the source or observer are upright capitals, never lowercase italic s / o", async () => {
+  const { readFile, readdir } = await import("node:fs/promises");
+  const files = ["../components/doppler/copy.ts", "../components/doppler/TheoryNotes.tsx", "../components/DopplerLab.tsx", "../models/doppler-export.ts"];
+  for (const file of files) {
+    const source = await readFile(new URL(file, import.meta.url), "utf8");
+    assert.doesNotMatch(source, /\b[uxλ]_[so]\b|\\lambda_[so]\b|t_\{r,|\\Delta t_r\b|[uλ]?[ₛₒ]/, file);
+  }
+  const theory = await readFile(new URL(files[1], import.meta.url), "utf8");
+  assert.match(theory, /u_\\\\mathrm\{S\}/);
+  assert.match(theory, /u_\\\\mathrm\{O\}/);
 });

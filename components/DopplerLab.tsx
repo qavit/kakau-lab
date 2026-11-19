@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { BookOpen, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Expand, Info, Lock, Maximize2, Minimize2, Pause, Play, RotateCcw, Share2, SkipBack, SkipForward, StepBack, StepForward, TriangleAlert, X } from "lucide-react";
+import { BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Copy, Expand, FileBraces, FileImage, Info, Lock, Maximize2, Minimize2, Pause, Play, RotateCcw, Share2, SkipBack, SkipForward, StepBack, StepForward, TriangleAlert, X } from "lucide-react";
 import KakauLabMark from "@/components/KakauLabMark";
 import ThemeToggle from "@/components/ThemeToggle";
 import LabInfoDialog from "@/components/overlays/LabInfoDialog";
@@ -137,6 +137,8 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
   const notice = noticeState?.text ?? null;
   const setNotice = useCallback((text: string | null, tone: "ok" | "warn" = "ok") => setNoticeState(text === null ? null : { text, tone }), []);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const shareInput = useRef<HTMLInputElement>(null);
   const snapshot = useRef<Snapshot | null>(null);
   const shellRef = useRef<HTMLElement>(null);
   const waveHost = useRef<HTMLDivElement>(null);
@@ -281,7 +283,20 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
     catch { return localizedPath(target, "/doppler"); }
   };
 
+  const copyShareUrl = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      shareInput.current?.focus();
+      shareInput.current?.select();
+    }
+  };
+
   const shareSetup = async () => {
+    setCopied(false);
     try {
       const url = new URL(localizedPath(locale, "/doppler"), window.location.origin);
       url.searchParams.set("s", encodeDopplerShare(setup, { ...view, pair }, preset));
@@ -415,8 +430,10 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
           <Menu label={copy.actions.tools}>
             {evidence.share && <button onClick={shareSetup}><Share2 size={14} /> {copy.actions.share}</button>}
             {evidence.export && <>
-              <button onClick={() => exportResult("svg")}>{copy.actions.exportSvg}</button>
-              <button onClick={() => exportResult("json")}>{copy.actions.exportJson}</button>
+              <button onClick={() => exportResult("svg")}><FileImage size={14} /> {copy.actions.exportSvg}</button>
+              <button onClick={() => exportResult("json")}>
+                <FileBraces size={14} /> {copy.actions.exportJson}
+              </button>
             </>}
             {!evidence.share && !evidence.export && <p className="doppler-menu-note">{copy.actions.guidedNoTools}</p>}
           </Menu>
@@ -438,7 +455,14 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
           {noticeState?.tone === "warn" ? <TriangleAlert size={20} className="doppler-toast-icon" aria-hidden="true" /> : <CircleCheck size={20} className="doppler-toast-icon" aria-hidden="true" />}
           <div className="doppler-toast-body">
             <p>{notice}</p>
-            {shareUrl && <label>{copy.status.shareLink}<input readOnly value={shareUrl} onFocus={(event) => event.target.select()} /></label>}
+            {shareUrl && (
+              <div className="doppler-toast-link">
+                <label>{copy.status.shareLink}<input ref={shareInput} readOnly value={shareUrl} onFocus={(event) => event.target.select()} /></label>
+                <button onClick={copyShareUrl} aria-label={copied ? copy.status.copied : copy.status.copyLink} title={copied ? copy.status.copied : copy.status.copyLink} data-copied={copied}>
+                  {copied ? <Check size={18} /> : <Copy size={18} />}
+                </button>
+              </div>
+            )}
           </div>
           <button className="doppler-toast-close" aria-label={copy.status.dismiss} title={copy.status.dismiss} onClick={() => { setNoticeState(null); setShareUrl(null); }}><X size={18} /></button>
         </div>

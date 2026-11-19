@@ -31,7 +31,7 @@ const zh = {
     ended: (reason: "time-limit" | "before-coincidence"): string =>
       reason === "before-coincidence" ? "實驗在此結束：再走下去 S 與 O 就要重合，所以停在相距 1 λ₀ 之前。" : "實驗在 t = 16 T₀ 結束。",
     modelHint: "每次改變速度都會重新生成實驗，並回到 $t=0$。",
-    dismiss: "關閉通知",
+    dismiss: "關閉通知", copyLink: "複製連結", copied: "已複製",
   },
   presets: {
     label: "教學預設",
@@ -39,7 +39,7 @@ const zh = {
   },
   controls: {
     group: "實驗設定", sourceSpeed: "波源速度", observerSpeed: "觀察者速度", flip: "反向", flipSource: "波源反向", flipObserver: "觀察者反向",
-    unit: "uₛ / c", unitObserver: "uₒ / c", at: "靜止", right: "向右", left: "向左",
+    at: "靜止", right: "向右", left: "向左",
     speedValue: (u: number) => (u === 0 ? "靜止" : `${u > 0 ? "向右" : "向左"} ${Math.abs(u).toFixed(2)}c`),
     sourceLabel: "波源 S", observerLabel: "觀察者 O", fixed: "聲速 $c$ 與發射頻率 $f_0$ 固定（$c=1$，$f_0=1$）。速度以空氣為參考系，向右為正，範圍 $|u|\\le 0.5c$。",
     range: "", more: "更多設定與說明",
@@ -68,10 +68,10 @@ const zh = {
     emissionInterval: "發射間隔 $\\Delta T/T_0$", spacing: "波前間距 $\\lambda/\\lambda_0$", period: "接收間隔 $\\Delta t/T_0$", frequency: "接收頻率 $f/f_0$",
     waitingReal: "等待相鄰兩次接收", notBorn: "—", live: "最近兩次接收 $f_\\mathrm{obs}/f_0$", liveWaiting: "等待相鄰兩次接收",
     masked: "送出預測後顯示讀值", noPair: "這個實驗結束前沒有一對波前被接收完，請改小速度。", keep: "保留為參考", kept: "已保留參考", clearReference: "清除參考",
-    reference: "參考", current: "目前", referenceSetup: (us: string, uo: string) => `$u_s=${us}$，$u_o=${uo}$`,
+    reference: "參考", current: "目前", referenceSetup: (us: string, uo: string) => `$u_\\mathrm{S}=${us}$，$u_\\mathrm{O}=${uo}$`,
     keepNeed: "兩個波前都被接收後才能保留。", compareTitle: "與參考比較", noReference: "尚未保留參考結果。",
     check: "公式核對", checkText: (lam: string, f: string, ok: boolean) => `$\\lambda/\\lambda_0=${lam}$，$f/f_0=${f}$（公式${ok ? "與事件量測一致" : "與事件量測不一致"}）`,
-    formulaLine: "$\\lambda_s=(c-s\\,u_s)\\,T_0$，$f_\\mathrm{obs}=f_0\\,\\dfrac{c-s\\,u_o}{c-s\\,u_s}$；$s=+1$：O 在 S 右側",
+    formulaLine: "$\\lambda_\\mathrm{S}=(c-s\\,u_\\mathrm{S})\\,T_0$，$f_\\mathrm{obs}=f_0\\,\\dfrac{c-s\\,u_\\mathrm{O}}{c-s\\,u_\\mathrm{S}}$；$s=+1$：O 在 S 右側",
     liveFrequency: "即時接收頻率",
   },
   layers: { connectors: "發射—接收連線", labels: "波前編號" },
@@ -170,7 +170,7 @@ const en: Copy = {
     ended: (reason) =>
       reason === "before-coincidence" ? "The run ends here: any further and S and O would coincide, so it stops while they are still 1 λ₀ apart." : "The run ends at t = 16 T₀.",
     modelHint: "Changing any speed regenerates the experiment and returns to $t=0$.",
-    dismiss: "Dismiss notice",
+    dismiss: "Dismiss notice", copyLink: "Copy link", copied: "Copied",
   },
   presets: {
     label: "Teaching presets",
@@ -178,7 +178,7 @@ const en: Copy = {
   },
   controls: {
     group: "Experiment setup", sourceSpeed: "Source velocity", observerSpeed: "Observer velocity", flip: "Reverse", flipSource: "Reverse source", flipObserver: "Reverse observer",
-    unit: "uₛ / c", unitObserver: "uₒ / c", at: "at rest", right: "rightwards", left: "leftwards",
+    at: "at rest", right: "rightwards", left: "leftwards",
     speedValue: (u) => (u === 0 ? "at rest" : `${u > 0 ? "right" : "left"} ${Math.abs(u).toFixed(2)}c`),
     sourceLabel: "Source S", observerLabel: "Observer O", fixed: "Speed of sound $c$ and emission frequency $f_0$ are fixed ($c=1$, $f_0=1$). Velocities are measured in the air's frame, positive to the right, within $|u|\\le 0.5c$.",
     range: "", more: "More settings and notes",
@@ -207,10 +207,10 @@ const en: Copy = {
     emissionInterval: "Emission interval $\\Delta T/T_0$", spacing: "Front spacing $\\lambda/\\lambda_0$", period: "Reception interval $\\Delta t/T_0$", frequency: "Received frequency $f/f_0$",
     waitingReal: "Waiting for two adjacent receptions", notBorn: "—", live: "Latest two receptions $f_\\mathrm{obs}/f_0$", liveWaiting: "Waiting for two adjacent receptions",
     masked: "Readings appear after your prediction", noPair: "No pair of fronts is fully received before this run ends; reduce the speeds.", keep: "Keep as reference", kept: "Reference kept", clearReference: "Clear reference",
-    reference: "Reference", current: "Current", referenceSetup: (us, uo) => `$u_s=${us}$, $u_o=${uo}$`,
+    reference: "Reference", current: "Current", referenceSetup: (us, uo) => `$u_\\mathrm{S}=${us}$, $u_\\mathrm{O}=${uo}$`,
     keepNeed: "Available once both fronts have been received.", compareTitle: "Compare with reference", noReference: "No reference kept yet.",
     check: "Formula check", checkText: (lam, f, ok) => `$\\lambda/\\lambda_0=${lam}$, $f/f_0=${f}$ (the formula ${ok ? "agrees with" : "disagrees with"} the event measurement)`,
-    formulaLine: "$\\lambda_s=(c-s\\,u_s)\\,T_0$, $f_\\mathrm{obs}=f_0\\,\\dfrac{c-s\\,u_o}{c-s\\,u_s}$; $s=+1$: O is to the right of S",
+    formulaLine: "$\\lambda_\\mathrm{S}=(c-s\\,u_\\mathrm{S})\\,T_0$, $f_\\mathrm{obs}=f_0\\,\\dfrac{c-s\\,u_\\mathrm{O}}{c-s\\,u_\\mathrm{S}}$; $s=+1$: O is to the right of S",
     liveFrequency: "Live received frequency",
   },
   layers: { connectors: "Emission–reception links", labels: "Front numbers" },

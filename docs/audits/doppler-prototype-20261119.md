@@ -47,7 +47,7 @@
 | Lint | `npm run lint` | 0 error；2 個 `StandardAtmosphereLab.tsx` 既有 warning（與本改動無關） |
 | Unit + build | `npm test`（= `npm run build` + `node --test tests/*.test.mjs`） | build 成功；**485 / 485 pass** |
 | 型別 | `npx tsc --noEmit` | 本改動無錯；`db/index.ts`、`worker/index.ts` 的 cloudflare 型別錯誤在 main 上即存在 |
-| Doppler E2E | `BASE_URL=http://localhost:3100 npx playwright test tests/e2e/doppler.spec.ts --project=desktop-chromium` | **28 / 28 pass**（dev server、Chromium） |
+| Doppler E2E | `BASE_URL=http://localhost:3100 npx playwright test tests/e2e/doppler.spec.ts --project=desktop-chromium` | **30 / 30 pass**（dev server、Chromium） |
 | 既有 Projectile E2E | `projectile-layered`、`projectile-export` | pass（一併跑的 32 個通過；theme-menu 見下） |
 | theme-menu E2E | `tests/e2e/theme-menu.spec.ts` | 本分支 12 / 36 失敗；**同一份 spec 在 main（dev server，同機）10 / 36 失敗**，失敗集合不同、症狀同為「選單 list 未出現」，判為 dev server 水合時序的既有不穩，**未診斷、未修**；Doppler 未影響這些頁面 |
 | 效能（非門檻） | `DOPPLER_PERF=1 npx playwright test tests/e2e/doppler-perf.spec.ts` | dev server／headless Chromium／未降速：首次可操作 322 ms；2× 播放 frame 平均 16.6 ms、p95 18.4 ms；放大視圖切換 22.7 ms。**這不是代表裝置的 baseline** |
@@ -113,6 +113,10 @@
 ## 8. 試用後的修正（Owner 回饋）
 
 分享、匯出的通知改成浮動 toast（圖示、關閉鈕、Esc，不再推動版面）；實驗結束改成時間帶內固定繪製的結束線與標示，不再在 dock 多出一行；播放倍率收成一個選單並加入 4×；全螢幕與退出放大改為圖示鈕；標籤、讀值、公式核對、模型資訊與導學比較卡的公式改用 MathJax。對應 3 個新 E2E（版面不位移、toast、倍率選單／圖示／排版）。導學選項按鈕內的 `λ₀`、`T₀` 仍是純文字（它們是被引用的整句選項，也是測試的選取依據）。
+
+### 第二輪回饋
+
+分享 toast 加複製鈕（實測會寫入剪貼簿、短暫顯示勾號）；匯出選單項目加圖示；代表「波源」「觀察者」的下標一律改為正體大寫（$u_\\mathrm{S}$、$u_\\mathrm{O}$、$x_\\mathrm{S}$、$\\lambda_\\mathrm{S}$、$t_{\\mathrm{R},n}$、$\\Delta t_\\mathrm{R}$；匯出 SVG 以降低的 tspan 呈現），`f_\\mathrm{obs}` 與表示傳播方向的 $s$ 維持原樣，並以原始碼掃描測試防止小寫下標回來；理論對話框在公式旁新增符號表（符號、名稱、SI 單位，另附本模型的正規化單位，共 15 列，中英文各一份，窄螢幕在表內橫向捲動）。
 
 ## 9. 未做與後續
 
