@@ -16,15 +16,15 @@ test("registry numbers are unique", () => {
   assert.equal(new Set(numbers).size, numbers.length);
 });
 
-test("registry numbers 01 through 10 are all present", () => {
+test("registry numbers 01 through 11 are all present", () => {
   const numbers = new Set(labRegistry.map((lab) => lab.number));
-  for (let n = 1; n <= 10; n += 1) {
+  for (let n = 1; n <= 11; n += 1) {
     assert.ok(numbers.has(String(n).padStart(2, "0")), `missing number ${n}`);
   }
 });
 
-test("inventory holds labs 01-10 plus the uncatalogued FBD", () => {
-  assert.equal(labRegistry.length, 11);
+test("inventory holds labs 01-11 plus the uncatalogued FBD", () => {
+  assert.equal(labRegistry.length, 12);
   const fbd = labRegistry.find((lab) => lab.id === "fbd");
   assert.ok(fbd);
   assert.equal(fbd.number, undefined);
@@ -44,6 +44,7 @@ test("maturity and visibility matrix is exact", () => {
     "two-source-interference": "beta/public",
     electrostatics: "stable/public",
     "hydrogen-atom": "prototype/unlisted",
+    "doppler-effect": "prototype/unlisted",
     fbd: "prototype/unlisted",
   });
 });
@@ -53,7 +54,7 @@ test("catalogLabs selects exactly the five public non-prototype labs in product 
     catalogLabs().map((lab) => lab.id),
     ["solar-sphere", "standard-atmosphere-profile", "projectile-motion", "two-source-interference", "electrostatics"],
   );
-  const excluded = ["magnetic-field-superposition", "planetary-wind-systems", "valley-bedding", "coriolis-effect", "hydrogen-atom", "fbd"];
+  const excluded = ["magnetic-field-superposition", "planetary-wind-systems", "valley-bedding", "coriolis-effect", "hydrogen-atom", "doppler-effect", "fbd"];
   assert.deepEqual(unlistedLabs().map((lab) => lab.id).sort(), [...excluded].sort());
 });
 
@@ -132,4 +133,22 @@ test("catalog derives its model count from the registry, not a hard-coded string
   const source = await readFile(new URL("../components/ModelCatalog.tsx", import.meta.url), "utf8");
   assert.match(source, /labs\.length/);
   assert.doesNotMatch(source, /07 interactive models/);
+});
+
+test("model 11 is the unlisted Doppler prototype: reachable by URL, never catalogued or sitemapped", async () => {
+  const model11 = labRegistry.find((lab) => lab.number === "11");
+  assert.ok(model11);
+  assert.equal(model11.id, "doppler-effect");
+  assert.equal(model11.title, "聲音的都普勒效應");
+  assert.deepEqual(model11.implementation, { app: "kakau-lab", route: "/doppler" });
+  assert.equal(model11.maturity, "prototype");
+  assert.equal(model11.visibility, "unlisted");
+  assert.equal(catalogLabs().includes(model11), false);
+  assert.equal(unlistedLabs().includes(model11), true);
+  for (const file of ["../app/doppler/page.tsx", "../app/en/doppler/page.tsx"]) {
+    const source = await readFile(new URL(file, import.meta.url), "utf8");
+    assert.match(source, /robots: \{ index: false/, file);
+  }
+  const sitemap = await readFile(new URL("../app/sitemap.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(sitemap, /doppler/);
 });

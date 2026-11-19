@@ -277,3 +277,41 @@ custom domain has not been verified in this stage — the current deployment tar
 Workers via `vinext`/`wrangler`, see `vite.config.ts` and `worker/index.ts`) has no custom-domain
 configuration checked into the repo, so this should not be assumed to be ready without confirming
 it in the Cloudflare dashboard first.
+
+## The Doppler-effect model
+
+`/doppler` and `/en/doppler` (catalogue number 11, `prototype` and `unlisted`, `noindex`) compare a moving
+source with a moving observer in still air. The point of the lab is that one train of wavefronts is read
+twice — as a *spacing in space* and as an *interval in time* — so that two setups with the same closing
+speed can be told apart: a moving source changes the spacing, a moving observer does not, and both change
+the reception interval.
+
+`lib/science/doppler.ts` is event based, not frame based. Wavefront n is emitted at `t_n = nT₀` from where
+the source is then, keeps that centre, and grows at `c`. The instant the observer meets it is the root of
+`|x_o(t) − x_n| = c(t − t_n)`, solved in closed form on both branches and kept only if it is legal
+(`t ≥ t_n`, observer on the branch's side). Nothing steps through time, so scrubbing, stepping back, the
+comparison card and the exported figure all rebuild from the same list of emissions and receptions. The
+closed form `f_obs = f₀(c − s·u_o)/(c − s·u_s)` lives beside it only as a check value; the tests compare
+the two, and the on-screen readings come from the events.
+
+The experiment is regenerated whenever the starting setup changes. It ends at 16 T₀ or, if S and O are
+closing, before they come within 1 λ₀, so the two never coincide or cross. Speeds are limited to
+`|u| ≤ 0.5c`. Units are normalised (`c = 1`, `f₀ = 1`, lengths in λ₀, times in T₀) and every setup shares
+one x scale and one time axis, so a kept reference result and the next setup can be read against each other.
+
+Layering follows the platform rule and is asserted by `tests/doppler-state.test.mjs`: `lib/science` imports
+nothing; `models/doppler*.ts` import only `lib/science` and each other; the two SVG views, the guided task
+and the lab are in `components/`. Model state (`models/doppler.ts`), the guided state machine and its
+disclosure policy (`doppler-learning.ts`), the share codec (`doppler-serialization.ts`) and the export
+(`doppler-export.ts`) are locale-free except for the bilingual export strings; every on-screen word lives in
+`components/doppler/copy.ts`.
+
+Three version names stay separate: the model version (`doppler-wavefront-1`), the share format (`v1`, a
+*starting setup*, always opened paused at t = 0, never carrying a time, an answer or a learner) and the
+result schema (`doppler-result-1`). A share from a different model version or format is refused with a
+reason and the default experiment is loaded.
+
+Guided tasks hold back what a prediction would give away. While a prediction is open there are no numbers
+anywhere (visible text, accessible names, the clock, the brackets), the theory and model-information
+dialogs are locked, and sharing and export are closed; in the "who is moving?" task the frequency row also
+waits until the two kept results are compared.
