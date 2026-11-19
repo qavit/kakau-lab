@@ -1,0 +1,46 @@
+
+Running 42 tests using 5 workers
+
+[1/42] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 1366x768
+[2/42] [desktop-chromium] › tests/e2e/projectile-qa-roundtrip.spec.ts:21:1 › share → clean browser reopen is paused at start; setup identical; export JSON/SVG share one snapshot
+[3/42] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 1366x768: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[4/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 1 @1366
+[5/42] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 1366x768
+[6/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 2 @1366
+[7/42] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 1280x720
+[8/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 3 @1366
+[9/42] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 390x844
+[10/42] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 1280x720: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[11/42] [desktop-chromium] › tests/e2e/projectile-qa-roundtrip.spec.ts:60:1 › legacy golden v1 link opens in a clean browser, paused, with its preset state
+[12/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 1 @390
+[13/42] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 1280x720
+[14/42] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 360x800
+[15/42] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:12:1 › Projectile layers, probe/readout, presets and validated deep link
+[16/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 2 @390
+[17/42] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:5:1 › projectile: at 400% zoom the page scrolls and reflows instead of pinning bars over the chart
+[18/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 3 @390
+[19/42] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:31:1 › projectile: enlarged view keeps focus inside, and Escape returns it to the trigger
+[20/42] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 390x844: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[21/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:58:1 › activity 1: predict → gated manipulate → observe → explain → complete; reveals only after the gate
+[22/42] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:50:1 › Projectile guided prediction and free state restore; modal focus; standalone notes
+[23/42] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 390x844
+[24/42] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:48:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 360px
+[25/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:78:1 › activity 2: observe is masked until prediction; playback + table then explain
+[26/42] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:48:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 472px
+[27/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:91:1 › activity 3: result withheld until h≈25 m; then reveals; completes
+[28/42] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:48:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 820px
+[29/42] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:100:1 › Projectile bad/repeated share falls back and explains the error
+[30/42] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 360x800: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[31/42] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:48:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 1280px
+[32/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:106:1 › restart clears prediction; leaving mid-task asks first; cancel keeps progress; leave restores free state
+[33/42] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 360x800
+[34/42] [mobile-chromium] › tests/e2e/projectile-uplift.spec.ts:79:1 › Projectile mobile controls, layers, theme and keyboard @mobile
+[35/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:127:1 › keyboard only: choose a prediction with Tab/Enter
+[36/42] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 320x640: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[37/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:137:1 › answers never reach share URL or exports after a completed task
+[38/42] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:162:1 › session progress is not persisted: reload returns to free mode with no task state
+[39/42] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 844x390-landscape: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[40/42] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:73:3 › keyboard: every Tab stop shows a visible focus indicator @1366x768
+[41/42] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:73:3 › keyboard: every Tab stop shows a visible focus indicator @360x800
+[42/42] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:99:1 › measured operation counts at 360x800 (clicks from a fresh load)
+  42 passed (20.9s)

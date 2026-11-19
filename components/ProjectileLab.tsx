@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Info,
   Layers3,
+  ListChecks,
   Share2,
   Home,
   Pause,
@@ -143,6 +144,13 @@ const STEP_SECONDS = 0.05;
  */
 const PATH = "#5ed8c3";
 const COMPARE = "#f2c66d";
+/* Series are told apart by line pattern as well as hue (R10): main solid, complementary long dash, drag dotted.
+   Same convention as the exported SVG. */
+const COMPLEMENTARY_DASH = "9 4";
+const DRAG_DASH = "3 4";
+function LegendLine({ dash }: { dash: string }) {
+  return <svg className="legend-key" width="26" height="6" viewBox="0 0 26 6" aria-hidden="true" focusable="false" style={{ display: "inline-block", marginRight: 5, verticalAlign: 1 }}><line x1="0" x2="26" y1="3" y2="3" stroke={COMPARE} strokeWidth="2.2" strokeDasharray={dash} /></svg>;
+}
 const BOUND = "#7d90b4";
 const VELOCITY = "#eaf4f8";
 const ACCEL = "#ef8f6a";
@@ -812,14 +820,14 @@ function TrajectoryView({ state, layers, model, cursor, geometry, manualView, on
 
         {model.complementary && (
           <>
-            <path d={samplePath(model.complementary.samples, frame)} fill="none" stroke={COMPARE} strokeWidth={2.2} />
+            <path d={samplePath(model.complementary.samples, frame)} fill="none" stroke={COMPARE} strokeWidth={2.2} strokeDasharray={COMPLEMENTARY_DASH} />
             {layers.markers && <circle cx={frame.px(model.complementary.range)} cy={frame.py(0)} r={5} fill="none" stroke={COMPARE} strokeWidth={2} />}
           </>
         )}
 
         {model.dragSamples.length > 0 && (
           <>
-            <path d={samplePath(model.dragSamples, frame)} fill="none" stroke={COMPARE} strokeWidth={2.2} strokeDasharray="3 4" />
+            <path d={samplePath(model.dragSamples, frame)} fill="none" stroke={COMPARE} strokeWidth={2.2} strokeDasharray={DRAG_DASH} />
             {layers.markers && <circle cx={frame.px(model.dragLanding?.point.x ?? 0)} cy={frame.py(0)} r={4.5} fill="none" stroke={COMPARE} strokeWidth={2} />}
           </>
         )}
@@ -1264,9 +1272,12 @@ function Menu({ label, children }: { label: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
+    // On phones the list can open under the fixed tool bar; scroll-margin (CSS) keeps its last item clear of the bar.
+    listRef.current?.scrollIntoView({ block: "nearest" });
     const onPointerDown = (event: MouseEvent) => {
       if (!ref.current?.contains(event.target as Node)) setOpen(false);
     };
@@ -1284,7 +1295,48 @@ function Menu({ label, children }: { label: string; children: ReactNode }) {
       <button ref={triggerRef} className={open ? "active" : ""} onClick={() => setOpen((value) => !value)} aria-expanded={open}>
         {label} <ChevronDown size={13} />
       </button>
-      {open && <div className="projectile-menu-list" role="group" aria-label={`${label}選項`} onClick={() => { setOpen(false); triggerRef.current?.focus(); }}>{children}</div>}
+      {open && <div ref={listRef} className="projectile-menu-list" role="group" aria-label={`${label}選項`} onClick={() => { setOpen(false); triggerRef.current?.focus(); }}>{children}</div>}
+    </div>
+  );
+}
+
+/** Phone shortcut to the same teaching presets as the 教學預設 menu in the parameter panel (preset = 2 taps: 預設 → item).
+ * A modal sheet (background stage inert, Tab wraps inside) anchored above the tool bar (CSS), scrollable, so the last item is never under the fixed bar. Hidden by CSS
+ * outside phone layouts. Escape / outside press / choosing closes it and returns focus to the trigger. */
+function PresetSheet({ open, selected, onPick, onClose, triggerRef }: { open: boolean; selected: string | null; onPick: (key: string) => void; onClose: () => void; triggerRef: RefObject<HTMLButtonElement | null> }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  useEffect(() => { closeRef.current = onClose; });
+  // Focus moves in once per opening (not on every re-render: playback re-renders the page each frame).
+  useEffect(() => {
+    if (!open) return;
+    const first = ref.current?.querySelector<HTMLButtonElement>("button[aria-pressed='true']") ?? ref.current?.querySelector<HTMLButtonElement>("button");
+    first?.focus({ preventScroll: true });
+  }, [open]);
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (!ref.current?.contains(target) && !triggerRef.current?.contains(target)) closeRef.current();
+    };
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") { closeRef.current(); triggerRef.current?.focus(); } };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => { document.removeEventListener("mousedown", onPointerDown); document.removeEventListener("keydown", onKeyDown); };
+  }, [open, triggerRef]);
+  if (!open) return null;
+  return (
+    <div ref={ref} id="projectile-preset-sheet" className="projectile-preset-sheet" role="dialog" aria-modal="true" aria-label="教學預設選項" onKeyDown={(event) => {
+      if (event.key !== "Tab") return;
+      const items = ref.current?.querySelectorAll<HTMLButtonElement>("button");
+      if (!items?.length) return;
+      const first = items[0], last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }}>
+      {Object.entries(PROJECTILE_PRESETS).map(([key, preset]) => (
+        <button key={key} aria-pressed={selected === key} onClick={() => { onPick(key); onClose(); triggerRef.current?.focus(); }}>{preset.label}</button>
+      ))}
     </div>
   );
 }
@@ -1324,10 +1376,21 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
     window.addEventListener("resize", update);
     return () => { observer.disconnect(); window.removeEventListener("resize", update); };
   }, []);
+  /* prefers-reduced-motion: never start the animation on its own (and stop it if the preference turns on);
+     播放 stays available (WCAG 2.2.2 / R10). Applied from a media-query callback, not synchronously in the effect. */
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => { if (query.matches) setState((current) => (current.playing ? { ...current, playing: false } : current)); };
+    const first = window.setTimeout(apply, 0);
+    query.addEventListener("change", apply);
+    return () => { window.clearTimeout(first); query.removeEventListener("change", apply); };
+  }, []);
   const [cursorFraction, setCursorFraction] = useState(0.45);
   const [showComponents, setShowComponents] = useState(false);
   const [showEnvironment, setShowEnvironment] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [presetSheetOpen, setPresetSheetOpen] = useState(false);
+  const presetTriggerRef = useRef<HTMLButtonElement>(null);
   const [theoryOpen, setTheoryOpen] = useState(false);
   const [manualView, setManualView] = useState<ManualView | null>(null);
   const [mergedCharts, setMergedCharts] = useState(true);
@@ -1397,6 +1460,15 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
   const cursor = useMemo(() => deriveCursor(model, state.gravity, cursorFraction), [model, state.gravity, cursorFraction]);
   const charts = useMemo(() => componentSeries(model, state), [model, state]);
 
+  const applyPreset = useCallback((key: string) => {
+    const patch: Partial<ProjectileState> & { label?: string } = { ...PROJECTILE_PRESETS[key] };
+    delete patch.label;
+    setState({ ...initialProjectileState(), ...patch, playing: false });
+    setLayers({ ...INITIAL_PROJECTILE_LAYERS });
+    setSelectedPreset(key);
+    setCursorFraction(0);
+    setManualView(null);
+  }, []);
   const patchState = useCallback((patch: Partial<ProjectileState>) => {
     setState((current) => ({ ...current, ...patch }));
     if (["speed", "angle", "height", "gravity", "dragFactor", "scenario", "stairs"].some((key) => key in patch)) setSelectedPreset(null);
@@ -1538,7 +1610,9 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       setExportStatus("已匯出完整軌跡與當下游標；含單位及假設。 Exported trajectories and current cursor, with units and assumptions.");
     } catch {
-      setExportStatus("匯出失敗，請離開探索任務並確認設定後重試。 Export failed; leave the guided activity and check the setup before retrying.");
+      setExportStatus(guidedSession
+        ? "匯出失敗，請離開探索任務並確認設定後重試。 Export failed; leave the guided activity and check the setup before retrying."
+        : "匯出失敗：瀏覽器無法建立檔案。請再試一次，或改用另一種格式。 Export failed: the browser could not create the file. Try again, or use the other format.");
     }
   };
 
@@ -1576,8 +1650,8 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
                 url.searchParams.set("s", encodeProjectileShare(state, layers, selectedPreset));
                 if (url.href.length > 2000) throw new Error("分享網址過長。");
                 setShareUrl(url.href);
-                try { await navigator.clipboard.writeText(url.href); setShareStatus("分享連結已複製；開啟後從起點暫停。"); }
-                catch { setShareStatus("請選取下方連結複製。"); }
+                try { await navigator.clipboard.writeText(url.href); setShareStatus("分享連結已複製；開啟後還原起始設定並暫停，不含目前時間游標。"); }
+                catch { setShareStatus("請選取下方連結複製；開啟後還原起始設定並暫停，不含目前時間游標。"); }
               } catch { setShareStatus("目前設定無法分享。"); }
             }}><Share2 size={14} /> 分享設定</button>}
             {evidence.export && <>
@@ -1593,7 +1667,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       <div className="projectile-subbar" inert={expanded}>
       <nav className="projectile-modebar" aria-label="學習模式">
         <button className={!guidedSession ? "active" : ""} aria-pressed={!guidedSession} onClick={() => { if (guidedSession) requestLeaveGuided(); }}>自由探索</button>
-        <button className={guidedSession ? "active" : ""} aria-pressed={Boolean(guidedSession)} onClick={() => { if (!guidedSession) selectGuidedActivity("apex"); }}>探索任務</button>
+        <button className={guidedSession ? "active" : ""} aria-pressed={Boolean(guidedSession)} onClick={() => { if (!guidedSession) { setPresetSheetOpen(false); selectGuidedActivity("apex"); } }}>探索任務</button>
         <button className="projectile-theory-entry" disabled={!evidence.theory} aria-haspopup="dialog" aria-describedby={!evidence.theory ? "projectile-disclosure-note" : undefined} onClick={() => setTheoryOpen(true)} title={!evidence.theory ? "送出預測後開放" : undefined}>
           {evidence.theory ? <BookOpen size={14} /> : <Lock size={14} />} 理論與計算
         </button>
@@ -1601,8 +1675,10 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       </nav>
       <div className="projectile-panel-actions">
         {freeStateControlsAvailable && <button className={panelOpen ? "active" : ""} aria-expanded={panelOpen} onClick={() => { setPanelOpen((open) => !open); setPanelWidth(PANEL_DEFAULT_WIDTH); }}><SlidersHorizontal size={16} /> 參數</button>}
-        {freeStateControlsAvailable && <button ref={layersTriggerRef} aria-expanded={layersOpen} aria-controls="projectile-layer-drawer" onClick={() => setLayersOpen((open) => !open)}><Layers3 size={16} /> 圖層</button>}
+        {freeStateControlsAvailable && <button ref={presetTriggerRef} className="projectile-preset-entry" aria-expanded={presetSheetOpen} aria-controls="projectile-preset-sheet" onClick={() => { setLayersOpen(false); setPresetSheetOpen((open) => !open); }}><ListChecks size={16} /> 預設</button>}
+        {freeStateControlsAvailable && <button ref={layersTriggerRef} aria-expanded={layersOpen} aria-controls="projectile-layer-drawer" onClick={() => { setPresetSheetOpen(false); setLayersOpen((open) => !open); }}><Layers3 size={16} /> 圖層</button>}
         <button ref={expandTriggerRef} onClick={() => { patchState({ playing: false }); setExpanded(true); }} aria-expanded={expanded}><Maximize2 size={16} /> 放大視圖</button>
+        {freeStateControlsAvailable && <PresetSheet open={presetSheetOpen} selected={selectedPreset} onPick={applyPreset} onClose={() => setPresetSheetOpen(false)} triggerRef={presetTriggerRef} />}
       </div>
       </div>
       {leaveConfirm && guidedSession && (
@@ -1623,7 +1699,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
       </LabLayerDrawer>
       {/* The panel takes width from the chart rather than covering it, and the chart is drawn at
           whatever size it is left with, so opening the panel never hides the trajectory. */}
-      <div className="projectile-stage" data-panel={panelOpen || Boolean(guidedSession)} data-expanded={expanded}>
+      <div className="projectile-stage" data-panel={panelOpen || Boolean(guidedSession)} data-expanded={expanded} inert={presetSheetOpen && freeStateControlsAvailable}>
         <section className="viewport-card projectile-path-card">
           <div className="card-label">
             <span>軌跡</span>
@@ -1655,7 +1731,8 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
           </div>
           <div className="legend">
             {layers.trajectory && <span><i style={{ background: PATH }} />本次軌跡</span>}
-            {comparisonIsRevealed && (model.complementary || dragActive) && <span><i style={{ background: COMPARE }} />對照軌跡</span>}
+            {comparisonIsRevealed && model.complementary && <span><LegendLine dash={COMPLEMENTARY_DASH} />互補角對照</span>}
+            {comparisonIsRevealed && dragActive && <span><LegendLine dash={DRAG_DASH} />阻力對照</span>}
             {model.envelope.length > 0 && <span><i style={{ background: BOUND }} />可及邊界</span>}
             {(layers.velocity || layers.components) && <span><i style={{ background: VELOCITY }} />速度 <Tex>{"\\vec v"}</Tex>（分量為虛線）</span>}
             {state.showAcceleration && <span><i style={{ background: ACCEL }} />加速度 <Tex>{"g"}</Tex>（分量為虛線）</span>}
@@ -1732,7 +1809,7 @@ export default function ProjectileLab({ share }: { share?: ProjectileShareInput 
                 <button className={isStairs ? "active" : ""} aria-pressed={isStairs} onClick={() => { patchState({ scenario: "staircase", ...SCENARIO_DEFAULTS.staircase }); setManualView(null); }}>階梯落點</button>
               </Menu>
               <Menu label="教學預設">
-                {Object.entries(PROJECTILE_PRESETS).map(([key, preset]) => { const { label, ...patch } = preset; return <button key={key} aria-pressed={selectedPreset === key} onClick={() => { setState({ ...initialProjectileState(), ...patch, playing: false }); setLayers({ ...INITIAL_PROJECTILE_LAYERS }); setSelectedPreset(key); setCursorFraction(0); setManualView(null); }}>{label}</button>; })}
+                {Object.entries(PROJECTILE_PRESETS).map(([key, preset]) => <button key={key} aria-pressed={selectedPreset === key} onClick={() => applyPreset(key)}>{preset.label}</button>)}
               </Menu>
               <button onClick={() => { setState(initialProjectileState()); setLayers({ ...INITIAL_PROJECTILE_LAYERS }); setSelectedPreset(null); setCursorFraction(0); setManualView(null); }}><RotateCcw size={14} /> 重設實驗</button>
             </div>

@@ -1,0 +1,70 @@
+/* PROTOTYPE C — "app shell": portrait phones lock to the viewport (no page scroll); the canvas takes all height left over;
+   the parameter panel becomes a bottom sheet capped at 40dvh. Landscape = prototype A's two-column layout.
+   CSS only, injected over the real page. LIMITS (not adapted, listed in the pack): guided task card, share notice, layer drawer height. */
+@media (max-width: 660px) and (orientation: portrait) {
+  .projectile-lab.projectile-c2 { height: 100dvh; min-height: 0; overflow: hidden; padding-bottom: 0; }
+  .projectile-lab.projectile-c2 .projectile-stage { flex: 1 1 auto; min-height: 0; grid-template-rows: minmax(0, 1fr) auto auto; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-expanded="false"] .projectile-path-card { position: relative; top: auto; min-height: 0; height: 100%; }
+  .projectile-lab.projectile-c2 .projectile-path-card .canvas-host { height: 100%; }
+  .projectile-lab.projectile-c2 .projectile-path-card .canvas-host > svg[role="img"] { height: 100%; min-height: 0; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-path-card { aspect-ratio: auto; min-height: 0; height: 100%; }
+  .projectile-lab.projectile-c2 .projectile-side[data-open="true"] { grid-row: 3; max-height: 40dvh; overflow-y: auto; border-radius: 14px; box-shadow: 0 -6px 18px rgba(0, 0, 0, .18); }
+  .projectile-lab.projectile-c2 .projectile-side-inner { max-height: none; }
+  .projectile-lab.projectile-c2 .projectile-panel-actions { margin: 4px 0; }
+  .projectile-lab.projectile-c2 .projectile-side[data-open="true"] { max-height: 36dvh; }
+  /* Sheet open: the transport collapses to one row so the canvas keeps real height (same idea as prototype A, landscape). */
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-transport { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "buttons scrub clock"; align-items: center; padding: 3px 6px; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-transport-buttons { display: flex; width: auto; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-transport-buttons button:not([aria-label="暫停"]):not([aria-label="播放"]) { display: none; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-transport-speeds { display: none; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-readout { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 3px 6px; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-readout span:nth-child(4) { display: none; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-readout span { flex-direction: row; gap: 4px; font-size: 12px; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-extra-readouts { display: none; }
+}
+@media (orientation: landscape) and (max-height: 520px) and (min-width: 661px) {
+  .projectile-lab.projectile-c2 { padding-top: 6px; padding-bottom: 6px; }
+  .projectile-lab.projectile-c2 .projectile-topbar { margin-bottom: 4px; min-height: 0; }
+  .projectile-lab.projectile-c2 .projectile-identity .eyebrow { display: none; }
+  .projectile-lab.projectile-c2 .projectile-identity h1 { font-size: 18px; }
+  .projectile-lab.projectile-c2 .projectile-subbar { margin-bottom: 4px; }
+  .projectile-lab.projectile-c2 .projectile-stage { grid-template-columns: minmax(0, 1fr) 330px; grid-template-rows: auto minmax(0, 1fr); height: calc(100dvh - 127px); gap: 6px 8px; align-items: stretch; }
+  .projectile-lab.projectile-c2 .projectile-path-card { grid-column: 1; grid-row: 1 / span 2; aspect-ratio: auto; min-height: 0; max-height: none; height: auto; align-self: stretch; padding: 0; }
+  .projectile-lab.projectile-c2 .projectile-path-card .canvas-host { position: absolute; inset: 0; }
+  .projectile-lab.projectile-c2 .projectile-path-card .canvas-host > svg[role="img"] { height: 100%; width: 100%; }
+  .projectile-lab.projectile-c2 .projectile-path-card .card-label small { display: none; }
+  .projectile-lab.projectile-c2 .projectile-dock { grid-column: 2; grid-row: 1; }
+  .projectile-lab.projectile-c2 .projectile-side[data-open="true"], .projectile-lab.projectile-c2 .guided-side { grid-column: 2; grid-row: 2; width: 330px !important; min-height: 0; }
+  .projectile-lab.projectile-c2 .projectile-side-inner { height: 100%; max-height: none; overflow-y: auto; }
+  .projectile-lab.projectile-c2 .projectile-transport { grid-template-areas: "buttons buttons" "scrub scrub" "clock speeds"; padding: 6px; gap: 4px 6px; }
+  .projectile-lab.projectile-c2 .projectile-transport-buttons { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); width: 100%; gap: 4px; }
+  .projectile-lab.projectile-c2 .projectile-transport-buttons button { min-width: 0; padding: 4px; }
+  .projectile-lab.projectile-c2 .projectile-transport-buttons button[aria-label="暫停"], .projectile-lab.projectile-c2 .projectile-transport-buttons button[aria-label="播放"] { min-width: 0; }
+  .projectile-lab.projectile-c2 .projectile-transport-speeds { gap: 2px; }
+  .projectile-lab.projectile-c2 .projectile-transport-speeds button { min-width: 44px; padding: 4px 2px; font-size: 12px; }
+  .projectile-lab.projectile-c2 .projectile-clock { min-width: 0; font-size: 11px; white-space: nowrap; }
+  .projectile-lab.projectile-c2 .projectile-path-card .legend { max-width: calc(100% - 150px); gap: 4px 10px; padding: 4px 8px; font-size: 10px; left: 8px; bottom: 6px; }
+  .projectile-lab.projectile-c2 .projectile-readout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 8px; padding: 6px; }
+  .projectile-lab.projectile-c2 .projectile-readout span { font-size: 13px; }
+  .projectile-lab.projectile-c2 .projectile-extra-readouts { grid-column: 1 / -1; }
+  .projectile-lab.projectile-c2 .projectile-extra-readouts summary { min-height: 36px; }
+  /* Parameter panel open: it takes the whole right column; the transport shrinks to one slim row under the canvas. */
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"]:not([data-expanded="true"]) { grid-template-rows: minmax(0, 1fr) auto; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-path-card { grid-row: 1; height: auto; min-height: 0; aspect-ratio: auto; align-self: stretch; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-dock { grid-column: 1; grid-row: 2; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-side[data-open="true"] { grid-row: 1 / span 2; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-transport { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "buttons scrub clock"; align-items: center; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-transport-buttons { display: flex; width: auto; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-transport-buttons button:not([aria-label="暫停"]):not([aria-label="播放"]) { display: none; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-transport-speeds { display: none; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-readout { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-extra-readouts { display: none; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-path-card .card-label { display: none; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-path-card .legend { flex-wrap: nowrap; white-space: nowrap; font-size: 9px; gap: 8px; padding: 3px 6px; max-width: none; right: auto; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-readout { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 3px 6px; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-readout span:nth-child(4) { display: none; }
+  .projectile-lab.projectile-c2 .projectile-stage[data-panel="true"] .projectile-readout span { flex-direction: row; gap: 4px; font-size: 12px; }
+  .projectile-lab.projectile-c2 .projectile-side-inner .projectile-setup { gap: 4px; }
+  .projectile-lab.projectile-c2 .projectile-side-inner .projectile-setup button { padding: 4px 8px; font-size: 13px; }
+  .projectile-lab.projectile-c2 .projectile-side-inner .projectile-setup > * { min-width: 0; }
+}

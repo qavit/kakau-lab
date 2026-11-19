@@ -1,0 +1,686 @@
+{
+  "1366x768": {
+    "initial": {
+      "vw": 1366,
+      "vh": 768,
+      "scrollW": 1366,
+      "scrollH": 829,
+      "canvas": {
+        "top": 133,
+        "bottom": 579,
+        "w": 1270,
+        "h": 446
+      },
+      "readout": {
+        "top": 711,
+        "bottom": 812,
+        "w": 1270,
+        "h": 101
+      },
+      "timeSlider": {
+        "top": 655,
+        "bottom": 699,
+        "w": 1020,
+        "h": 44
+      },
+      "under44": []
+    },
+    "paramsOpen": {
+      "vw": 1366,
+      "vh": 768,
+      "scrollW": 1366,
+      "scrollH": 768,
+      "canvas": {
+        "top": 133,
+        "bottom": 471,
+        "w": 910,
+        "h": 338
+      },
+      "readout": {
+        "top": 611,
+        "bottom": 712,
+        "w": 910,
+        "h": 101
+      },
+      "timeSlider": {
+        "top": 555,
+        "bottom": 599,
+        "w": 660,
+        "h": 44
+      },
+      "under44": []
+    },
+    "layersOpen": {
+      "vw": 1366,
+      "vh": 768,
+      "scrollW": 1366,
+      "scrollH": 829,
+      "canvas": {
+        "top": 133,
+        "bottom": 579,
+        "w": 1270,
+        "h": 446
+      },
+      "readout": {
+        "top": 711,
+        "bottom": 812,
+        "w": 1270,
+        "h": 101
+      },
+      "timeSlider": {
+        "top": 655,
+        "bottom": 699,
+        "w": 1020,
+        "h": 44
+      },
+      "under44": [
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 17x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 17x18",
+        "INPUT 18x18",
+        "INPUT 17x18",
+        "INPUT 18x18"
+      ]
+    },
+    "guided": {
+      "vw": 1366,
+      "vh": 768,
+      "scrollW": 1366,
+      "scrollH": 768,
+      "canvas": {
+        "top": 133,
+        "bottom": 471,
+        "w": 880,
+        "h": 338
+      },
+      "readout": {
+        "top": 624,
+        "bottom": 670,
+        "w": 880,
+        "h": 46
+      },
+      "timeSlider": {
+        "top": 568,
+        "bottom": 612,
+        "w": 630,
+        "h": 44
+      },
+      "under44": []
+    }
+  },
+  "1280x720": {
+    "initial": {
+      "vw": 1280,
+      "vh": 720,
+      "scrollW": 1280,
+      "scrollH": 781,
+      "canvas": {
+        "top": 133,
+        "bottom": 531,
+        "w": 1189,
+        "h": 398
+      },
+      "readout": {
+        "top": 663,
+        "bottom": 764,
+        "w": 1189,
+        "h": 101
+      },
+      "timeSlider": {
+        "top": 607,
+        "bottom": 651,
+        "w": 939,
+        "h": 44
+      },
+      "under44": []
+    },
+    "paramsOpen": {
+      "vw": 1280,
+      "vh": 720,
+      "scrollW": 1280,
+      "scrollH": 721,
+      "canvas": {
+        "top": 133,
+        "bottom": 471,
+        "w": 829,
+        "h": 338
+      },
+      "readout": {
+        "top": 603,
+        "bottom": 704,
+        "w": 829,
+        "h": 101
+      },
+      "timeSlider": {
+        "top": 547,
+        "bottom": 591,
+        "w": 579,
+        "h": 44
+      },
+      "under44": []
+    },
+    "layersOpen": {
+      "vw": 1280,
+      "vh": 720,
+      "scrollW": 1280,
+      "scrollH": 781,
+      "canvas": {
+        "top": 133,
+        "bottom": 531,
+        "w": 1189,
+        "h": 398
+      },
+      "readout": {
+        "top": 663,
+        "bottom": 764,
+        "w": 1189,
+        "h": 101
+      },
+      "timeSlider": {
+        "top": 607,
+        "bottom": 651,
+        "w": 939,
+        "h": 44
+      },
+      "under44": [
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 17x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 17x18",
+        "INPUT 18x18",
+        "INPUT 17x18",
+        "INPUT 18x18"
+      ]
+    },
+    "guided": {
+      "vw": 1280,
+      "vh": 720,
+      "scrollW": 1280,
+      "scrollH": 720,
+      "canvas": {
+        "top": 133,
+        "bottom": 471,
+        "w": 799,
+        "h": 338
+      },
+      "readout": {
+        "top": 617,
+        "bottom": 663,
+        "w": 799,
+        "h": 46
+      },
+      "timeSlider": {
+        "top": 561,
+        "bottom": 605,
+        "w": 549,
+        "h": 44
+      },
+      "under44": []
+    }
+  },
+  "390x844": {
+    "initial": {
+      "vw": 390,
+      "vh": 844,
+      "scrollW": 390,
+      "scrollH": 857,
+      "canvas": {
+        "top": 158,
+        "bottom": 393,
+        "w": 372,
+        "h": 235
+      },
+      "readout": {
+        "top": 635,
+        "bottom": 734,
+        "w": 372,
+        "h": 99
+      },
+      "timeSlider": {
+        "top": 534,
+        "bottom": 578,
+        "w": 362,
+        "h": 44
+      },
+      "under44": []
+    },
+    "paramsOpen": {
+      "vw": 390,
+      "vh": 844,
+      "scrollW": 390,
+      "scrollH": 1364,
+      "canvas": {
+        "top": 51,
+        "bottom": 286,
+        "w": 372,
+        "h": 235
+      },
+      "readout": {
+        "top": 188,
+        "bottom": 287,
+        "w": 372,
+        "h": 99
+      },
+      "timeSlider": {
+        "top": 87,
+        "bottom": 131,
+        "w": 362,
+        "h": 44
+      },
+      "under44": []
+    },
+    "layersOpen": {
+      "vw": 390,
+      "vh": 844,
+      "scrollW": 390,
+      "scrollH": 857,
+      "canvas": {
+        "top": 145,
+        "bottom": 380,
+        "w": 372,
+        "h": 235
+      },
+      "readout": {
+        "top": 622,
+        "bottom": 721,
+        "w": 372,
+        "h": 99
+      },
+      "timeSlider": {
+        "top": 521,
+        "bottom": 565,
+        "w": 362,
+        "h": 44
+      },
+      "under44": [
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 16x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 16x18",
+        "INPUT 18x18",
+        "INPUT 16x18",
+        "INPUT 18x18"
+      ]
+    },
+    "guided": {
+      "vw": 390,
+      "vh": 844,
+      "scrollW": 390,
+      "scrollH": 1267,
+      "canvas": {
+        "top": 145,
+        "bottom": 380,
+        "w": 372,
+        "h": 235
+      },
+      "readout": {
+        "top": 537,
+        "bottom": 571,
+        "w": 372,
+        "h": 34
+      },
+      "timeSlider": {
+        "top": 436,
+        "bottom": 480,
+        "w": 362,
+        "h": 44
+      },
+      "under44": []
+    }
+  },
+  "360x800": {
+    "initial": {
+      "vw": 360,
+      "vh": 800,
+      "scrollW": 360,
+      "scrollH": 857,
+      "canvas": {
+        "top": 158,
+        "bottom": 393,
+        "w": 342,
+        "h": 235
+      },
+      "readout": {
+        "top": 635,
+        "bottom": 734,
+        "w": 342,
+        "h": 99
+      },
+      "timeSlider": {
+        "top": 534,
+        "bottom": 578,
+        "w": 332,
+        "h": 44
+      },
+      "under44": []
+    },
+    "paramsOpen": {
+      "vw": 360,
+      "vh": 800,
+      "scrollW": 360,
+      "scrollH": 1364,
+      "canvas": {
+        "top": 51,
+        "bottom": 286,
+        "w": 342,
+        "h": 235
+      },
+      "readout": {
+        "top": 188,
+        "bottom": 287,
+        "w": 342,
+        "h": 99
+      },
+      "timeSlider": {
+        "top": 87,
+        "bottom": 131,
+        "w": 332,
+        "h": 44
+      },
+      "under44": []
+    },
+    "layersOpen": {
+      "vw": 360,
+      "vh": 800,
+      "scrollW": 360,
+      "scrollH": 857,
+      "canvas": {
+        "top": 101,
+        "bottom": 336,
+        "w": 342,
+        "h": 235
+      },
+      "readout": {
+        "top": 578,
+        "bottom": 677,
+        "w": 342,
+        "h": 99
+      },
+      "timeSlider": {
+        "top": 477,
+        "bottom": 521,
+        "w": 332,
+        "h": 44
+      },
+      "under44": [
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 16x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 16x18",
+        "INPUT 18x18",
+        "INPUT 16x18",
+        "INPUT 18x18"
+      ]
+    },
+    "guided": {
+      "vw": 360,
+      "vh": 800,
+      "scrollW": 360,
+      "scrollH": 1285,
+      "canvas": {
+        "top": 101,
+        "bottom": 336,
+        "w": 342,
+        "h": 235
+      },
+      "readout": {
+        "top": 493,
+        "bottom": 527,
+        "w": 342,
+        "h": 34
+      },
+      "timeSlider": {
+        "top": 392,
+        "bottom": 436,
+        "w": 332,
+        "h": 44
+      },
+      "under44": []
+    }
+  },
+  "320x640": {
+    "initial": {
+      "vw": 320,
+      "vh": 640,
+      "scrollW": 320,
+      "scrollH": 857,
+      "canvas": {
+        "top": 158,
+        "bottom": 393,
+        "w": 302,
+        "h": 235
+      },
+      "readout": {
+        "top": 635,
+        "bottom": 734,
+        "w": 302,
+        "h": 99
+      },
+      "timeSlider": {
+        "top": 534,
+        "bottom": 578,
+        "w": 292,
+        "h": 44
+      },
+      "under44": []
+    },
+    "paramsOpen": {
+      "vw": 320,
+      "vh": 640,
+      "scrollW": 320,
+      "scrollH": 1416,
+      "canvas": {
+        "top": 51,
+        "bottom": 286,
+        "w": 302,
+        "h": 235
+      },
+      "readout": {
+        "top": 188,
+        "bottom": 287,
+        "w": 302,
+        "h": 99
+      },
+      "timeSlider": {
+        "top": 87,
+        "bottom": 131,
+        "w": 292,
+        "h": 44
+      },
+      "under44": []
+    },
+    "layersOpen": {
+      "vw": 320,
+      "vh": 640,
+      "scrollW": 320,
+      "scrollH": 857,
+      "canvas": {
+        "top": 51,
+        "bottom": 286,
+        "w": 302,
+        "h": 235
+      },
+      "readout": {
+        "top": 418,
+        "bottom": 517,
+        "w": 302,
+        "h": 99
+      },
+      "timeSlider": {
+        "top": 317,
+        "bottom": 361,
+        "w": 292,
+        "h": 44
+      },
+      "under44": [
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 15x18",
+        "INPUT 17x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 15x18",
+        "INPUT 18x18",
+        "INPUT 15x18",
+        "INPUT 17x18"
+      ]
+    },
+    "guided": {
+      "vw": 320,
+      "vh": 640,
+      "scrollW": 320,
+      "scrollH": 1342,
+      "canvas": {
+        "top": 158,
+        "bottom": 393,
+        "w": 302,
+        "h": 235
+      },
+      "readout": {
+        "top": 550,
+        "bottom": 584,
+        "w": 302,
+        "h": 34
+      },
+      "timeSlider": {
+        "top": 449,
+        "bottom": 493,
+        "w": 292,
+        "h": 44
+      },
+      "under44": []
+    }
+  },
+  "844x390-landscape": {
+    "initial": {
+      "vw": 844,
+      "vh": 390,
+      "scrollW": 844,
+      "scrollH": 799,
+      "canvas": {
+        "top": 133,
+        "bottom": 549,
+        "w": 791,
+        "h": 416
+      },
+      "readout": {
+        "top": 681,
+        "bottom": 782,
+        "w": 791,
+        "h": 101
+      },
+      "timeSlider": {
+        "top": 625,
+        "bottom": 669,
+        "w": 541,
+        "h": 44
+      },
+      "under44": []
+    },
+    "paramsOpen": {
+      "vw": 844,
+      "vh": 390,
+      "scrollW": 844,
+      "scrollH": 1375,
+      "canvas": {
+        "top": -636,
+        "bottom": -220,
+        "w": 791,
+        "h": 416
+      },
+      "readout": {
+        "top": -88,
+        "bottom": 13,
+        "w": 791,
+        "h": 101
+      },
+      "timeSlider": {
+        "top": -144,
+        "bottom": -100,
+        "w": 541,
+        "h": 44
+      },
+      "under44": []
+    },
+    "layersOpen": {
+      "vw": 844,
+      "vh": 390,
+      "scrollW": 844,
+      "scrollH": 799,
+      "canvas": {
+        "top": 133,
+        "bottom": 549,
+        "w": 791,
+        "h": 416
+      },
+      "readout": {
+        "top": 681,
+        "bottom": 782,
+        "w": 791,
+        "h": 101
+      },
+      "timeSlider": {
+        "top": 625,
+        "bottom": 669,
+        "w": 541,
+        "h": 44
+      },
+      "under44": [
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 17x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 18x18",
+        "INPUT 17x18",
+        "INPUT 18x18",
+        "INPUT 17x18",
+        "INPUT 18x18"
+      ]
+    },
+    "guided": {
+      "vw": 844,
+      "vh": 390,
+      "scrollW": 844,
+      "scrollH": 1263,
+      "canvas": {
+        "top": 133,
+        "bottom": 549,
+        "w": 791,
+        "h": 416
+      },
+      "readout": {
+        "top": 681,
+        "bottom": 727,
+        "w": 791,
+        "h": 46
+      },
+      "timeSlider": {
+        "top": 625,
+        "bottom": 669,
+        "w": 541,
+        "h": 44
+      },
+      "under44": []
+    }
+  }
+}

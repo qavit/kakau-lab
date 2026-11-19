@@ -1,0 +1,24 @@
+
+Running 20 tests using 5 workers
+
+[1/20] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 1366x768
+[2/20] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 1366x768
+[3/20] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:5:1 › projectile: at 400% zoom the page scrolls and reflows instead of pinning bars over the chart
+[4/20] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:12:1 › Projectile layers, probe/readout, presets and validated deep link
+[5/20] [desktop-chromium] › tests/e2e/projectile-qa-roundtrip.spec.ts:21:1 › share → clean browser reopen is paused at start; setup identical; export JSON/SVG share one snapshot
+[6/20] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:31:1 › projectile: enlarged view keeps focus inside, and Escape returns it to the trigger
+[7/20] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 1280x720
+[8/20] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:48:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 360px
+[9/20] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 390x844
+[10/20] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:50:1 › Projectile guided prediction and free state restore; modal focus; standalone notes
+[11/20] [desktop-chromium] › tests/e2e/projectile-qa-roundtrip.spec.ts:60:1 › legacy golden v1 link opens in a clean browser, paused, with its preset state
+[12/20] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:48:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 472px
+[13/20] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 1280x720
+[14/20] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 360x800
+[15/20] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:48:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 820px
+[16/20] [mobile-chromium] › tests/e2e/projectile-uplift.spec.ts:79:1 › Projectile mobile controls, layers, theme and keyboard @mobile
+[17/20] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:48:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 1280px
+[18/20] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:100:1 › Projectile bad/repeated share falls back and explains the error
+[19/20] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 390x844
+[20/20] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 360x800
+  20 passed (11.1s)

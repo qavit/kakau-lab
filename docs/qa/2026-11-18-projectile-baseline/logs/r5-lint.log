@@ -1,0 +1,29 @@
+
+> kakau-lab@0.1.0 lint
+> eslint . --ignore-pattern dist --ignore-pattern .next
+
+
+<worktree>/components/ProjectileLab.tsx
+  1326:72  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+<worktree>/components/ProjectileLab.tsx:1326:72
+  1324 |     shellRef.current?.setAttribute("data-interactive", "true");
+  1325 |     // prefers-reduced-motion: never start the animation on its own; 播放 remains available (WCAG 2.2.2 / R10).
+> 1326 |     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setState((current) => (current.playing ? { ...current, playing: false } : current));
+       |                                                                        ^^^^^^^^ Avoid calling setState() directly within an effect
+  1327 |     const bar = appBarRef.current;
+  1328 |     if (!bar) return;
+  1329 |     const update = () => setAppBarBottom(bar.getBoundingClientRect().bottom);  react-hooks/set-state-in-effect
+
+<worktree>/components/StandardAtmosphereLab.tsx
+  249:9  warning  The 'plot' conditional could make the dependencies of useCallback Hook (at line 253) change on every render. To fix this, wrap the initialization of 'plot' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  249:9  warning  The 'plot' conditional could make the dependencies of useCallback Hook (at line 259) change on every render. To fix this, wrap the initialization of 'plot' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+✖ 3 problems (1 error, 2 warnings)
+

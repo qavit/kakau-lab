@@ -1,0 +1,458 @@
+{
+  "360x800": {
+    "before": {
+      "initial": {
+        "canvas": {
+          "size": "342x235",
+          "visiblePct": 100,
+          "top": 158
+        },
+        "readoutInView": true,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "342x235",
+          "visiblePct": 100,
+          "top": 51
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "參數 → 教學預設 → 月球重力",
+      "presetOperations": 3,
+      "expanded": {
+        "canvas": {
+          "size": "334x520",
+          "visiblePct": 100,
+          "top": 63
+        },
+        "dockInView": true
+      }
+    },
+    "after": {
+      "initial": {
+        "canvas": {
+          "size": "342x235",
+          "visiblePct": 100,
+          "top": 158
+        },
+        "readoutInView": true,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "342x235",
+          "visiblePct": 100,
+          "top": 51
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "預設 → 月球重力",
+      "presetOperations": 2,
+      "expanded": {
+        "canvas": {
+          "size": "334x520",
+          "visiblePct": 100,
+          "top": 63
+        },
+        "dockInView": true
+      }
+    }
+  },
+  "390x844": {
+    "before": {
+      "initial": {
+        "canvas": {
+          "size": "372x235",
+          "visiblePct": 100,
+          "top": 158
+        },
+        "readoutInView": true,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "372x235",
+          "visiblePct": 100,
+          "top": 51
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "參數 → 教學預設 → 月球重力",
+      "presetOperations": 3,
+      "expanded": {
+        "canvas": {
+          "size": "364x564",
+          "visiblePct": 100,
+          "top": 63
+        },
+        "dockInView": true
+      }
+    },
+    "after": {
+      "initial": {
+        "canvas": {
+          "size": "372x235",
+          "visiblePct": 100,
+          "top": 158
+        },
+        "readoutInView": true,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "372x235",
+          "visiblePct": 100,
+          "top": 51
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "預設 → 月球重力",
+      "presetOperations": 2,
+      "expanded": {
+        "canvas": {
+          "size": "364x564",
+          "visiblePct": 100,
+          "top": 63
+        },
+        "dockInView": true
+      }
+    }
+  },
+  "320x640": {
+    "before": {
+      "initial": {
+        "canvas": {
+          "size": "302x235",
+          "visiblePct": 100,
+          "top": 158
+        },
+        "readoutInView": false,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "302x235",
+          "visiblePct": 100,
+          "top": 51
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "參數 → 教學預設 → 月球重力",
+      "presetOperations": 3,
+      "expanded": {
+        "canvas": {
+          "size": "294x360",
+          "visiblePct": 100,
+          "top": 63
+        },
+        "dockInView": true
+      }
+    },
+    "after": {
+      "initial": {
+        "canvas": {
+          "size": "302x235",
+          "visiblePct": 100,
+          "top": 158
+        },
+        "readoutInView": false,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "302x235",
+          "visiblePct": 100,
+          "top": 51
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "預設 → 月球重力",
+      "presetOperations": 2,
+      "expanded": {
+        "canvas": {
+          "size": "294x360",
+          "visiblePct": 100,
+          "top": 63
+        },
+        "dockInView": true
+      }
+    }
+  },
+  "844x390": {
+    "before": {
+      "initial": {
+        "canvas": {
+          "size": "791x416",
+          "visiblePct": 62,
+          "top": 133
+        },
+        "readoutInView": false,
+        "transportInView": false,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "791x416",
+          "visiblePct": 0,
+          "top": -614
+        },
+        "sliderInView": true,
+        "readoutInView": false,
+        "playInView": false
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "參數 → 教學預設 → 月球重力",
+      "presetOperations": 3,
+      "expanded": {
+        "canvas": {
+          "size": "818x131",
+          "visiblePct": 100,
+          "top": 13
+        },
+        "dockInView": true
+      }
+    },
+    "after": {
+      "initial": {
+        "canvas": {
+          "size": "453x261",
+          "visiblePct": 100,
+          "top": 120
+        },
+        "readoutInView": true,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "453x172",
+          "visiblePct": 100,
+          "top": 120
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "預設 → 月球重力",
+      "presetOperations": 2,
+      "expanded": {
+        "canvas": {
+          "size": "488x372",
+          "visiblePct": 100,
+          "top": 9
+        },
+        "dockInView": true
+      }
+    }
+  },
+  "1366x768": {
+    "before": {
+      "initial": {
+        "canvas": {
+          "size": "1270x446",
+          "visiblePct": 100,
+          "top": 133
+        },
+        "readoutInView": false,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "910x338",
+          "visiblePct": 100,
+          "top": 133
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "參數 → 教學預設 → 月球重力",
+      "presetOperations": 3,
+      "expanded": {
+        "canvas": {
+          "size": "1340x509",
+          "visiblePct": 100,
+          "top": 13
+        },
+        "dockInView": true
+      }
+    },
+    "after": {
+      "initial": {
+        "canvas": {
+          "size": "1270x446",
+          "visiblePct": 100,
+          "top": 133
+        },
+        "readoutInView": false,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "910x338",
+          "visiblePct": 100,
+          "top": 133
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "參數 → 教學預設 → 月球重力",
+      "presetOperations": 3,
+      "expanded": {
+        "canvas": {
+          "size": "1340x509",
+          "visiblePct": 100,
+          "top": 13
+        },
+        "dockInView": true
+      }
+    }
+  },
+  "1280x720": {
+    "before": {
+      "initial": {
+        "canvas": {
+          "size": "1189x398",
+          "visiblePct": 100,
+          "top": 133
+        },
+        "readoutInView": false,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "829x338",
+          "visiblePct": 100,
+          "top": 133
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "參數 → 教學預設 → 月球重力",
+      "presetOperations": 3,
+      "expanded": {
+        "canvas": {
+          "size": "1254x461",
+          "visiblePct": 100,
+          "top": 13
+        },
+        "dockInView": true
+      }
+    },
+    "after": {
+      "initial": {
+        "canvas": {
+          "size": "1189x398",
+          "visiblePct": 100,
+          "top": 133
+        },
+        "readoutInView": false,
+        "transportInView": true,
+        "hScroll": false
+      },
+      "paramsOpen": {
+        "canvas": {
+          "size": "829x338",
+          "visiblePct": 100,
+          "top": 133
+        },
+        "sliderInView": true,
+        "readoutInView": true,
+        "playInView": true
+      },
+      "presetListLastItem": {
+        "text": "月球重力",
+        "fullyInViewport": true,
+        "notCovered": true
+      },
+      "presetPath": "參數 → 教學預設 → 月球重力",
+      "presetOperations": 3,
+      "expanded": {
+        "canvas": {
+          "size": "1254x461",
+          "visiblePct": 100,
+          "top": 13
+        },
+        "dockInView": true
+      }
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "A": {
+    "1440x900": {
+      "identical": true,
+      "differing": []
+    },
+    "1366x768": {
+      "identical": true,
+      "differing": []
+    },
+    "1280x720": {
+      "identical": true,
+      "differing": []
+    },
+    "1024x768": {
+      "identical": true,
+      "differing": []
+    },
+    "768x1024": {
+      "identical": true,
+      "differing": []
+    },
+    "900x600": {
+      "identical": true,
+      "differing": []
+    },
+    "640x360": {
+      "identical": true,
+      "differing": []
+    }
+  },
+  "B": {
+    "1440x900": {
+      "identical": false,
+      "differing": [
+        ".projectile-panel-actions"
+      ]
+    },
+    "1366x768": {
+      "identical": false,
+      "differing": [
+        ".projectile-panel-actions"
+      ]
+    },
+    "1280x720": {
+      "identical": false,
+      "differing": [
+        ".projectile-panel-actions"
+      ]
+    },
+    "1024x768": {
+      "identical": false,
+      "differing": [
+        ".projectile-panel-actions"
+      ]
+    },
+    "768x1024": {
+      "identical": false,
+      "differing": [
+        ".projectile-panel-actions"
+      ]
+    },
+    "900x600": {
+      "identical": false,
+      "differing": [
+        ".projectile-panel-actions"
+      ]
+    },
+    "640x360": {
+      "identical": true,
+      "differing": []
+    }
+  },
+  "C": {
+    "1440x900": {
+      "identical": true,
+      "differing": []
+    },
+    "1366x768": {
+      "identical": true,
+      "differing": []
+    },
+    "1280x720": {
+      "identical": true,
+      "differing": []
+    },
+    "1024x768": {
+      "identical": true,
+      "differing": []
+    },
+    "768x1024": {
+      "identical": true,
+      "differing": []
+    },
+    "900x600": {
+      "identical": true,
+      "differing": []
+    },
+    "640x360": {
+      "identical": true,
+      "differing": []
+    }
+  }
+}

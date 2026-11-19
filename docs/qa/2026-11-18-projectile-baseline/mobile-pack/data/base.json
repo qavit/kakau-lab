@@ -1,0 +1,376 @@
+{
+  "baseUrl": "http://localhost:3100",
+  "when": "2026-11-18T03:41:10.317Z",
+  "results": {
+    "base": {
+      "360x800": {
+        "initial": {
+          "canvasPx": "342x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 158,
+          "readoutKeyRow": {
+            "top": 642,
+            "bottom": 680,
+            "fullyInViewport": true
+          },
+          "transport": {
+            "top": 477,
+            "bottom": 635,
+            "fullyInViewport": true
+          },
+          "scrollH": 857,
+          "vh": 800
+        },
+        "paramsOpen": {
+          "canvasPx": "342x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 51,
+          "speedSliderInViewport": true,
+          "speedSliderY": 470,
+          "readoutKeyRow": {
+            "top": 195,
+            "bottom": 233,
+            "fullyInViewport": true
+          },
+          "scrollY": 362
+        },
+        "afterEdit": {
+          "canvasPx": "342x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 51,
+          "readoutKeyRow": {
+            "top": 195,
+            "bottom": 233,
+            "fullyInViewport": true
+          },
+          "scrollY": 362
+        },
+        "preset": {
+          "clicksFromFreshLoad": 3,
+          "canvasPx": "342x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 51,
+          "readoutKeyRow": {
+            "top": -7,
+            "bottom": 31,
+            "fullyInViewport": false
+          }
+        },
+        "rotation": {
+          "before": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "342x235",
+            "canvasVisiblePct": 100,
+            "canvasVisiblePx": 235,
+            "canvasTop": 51
+          },
+          "rotated": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "750x394",
+            "canvasVisiblePct": 91,
+            "canvasVisiblePx": 359,
+            "canvasTop": 1
+          },
+          "back": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "342x235",
+            "canvasVisiblePct": 100,
+            "canvasVisiblePx": 235,
+            "canvasTop": 51
+          },
+          "stateKept": true,
+          "panelKept": true
+        }
+      },
+      "390x844": {
+        "initial": {
+          "canvasPx": "372x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 158,
+          "readoutKeyRow": {
+            "top": 642,
+            "bottom": 680,
+            "fullyInViewport": true
+          },
+          "transport": {
+            "top": 477,
+            "bottom": 635,
+            "fullyInViewport": true
+          },
+          "scrollH": 857,
+          "vh": 844
+        },
+        "paramsOpen": {
+          "canvasPx": "372x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 51,
+          "speedSliderInViewport": true,
+          "speedSliderY": 470,
+          "readoutKeyRow": {
+            "top": 195,
+            "bottom": 233,
+            "fullyInViewport": true
+          },
+          "scrollY": 362
+        },
+        "afterEdit": {
+          "canvasPx": "372x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 51,
+          "readoutKeyRow": {
+            "top": 195,
+            "bottom": 233,
+            "fullyInViewport": true
+          },
+          "scrollY": 362
+        },
+        "preset": {
+          "clicksFromFreshLoad": 3,
+          "canvasPx": "372x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 51,
+          "readoutKeyRow": {
+            "top": 178,
+            "bottom": 216,
+            "fullyInViewport": true
+          }
+        },
+        "rotation": {
+          "before": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "372x235",
+            "canvasVisiblePct": 100,
+            "canvasVisiblePx": 235,
+            "canvasTop": 51
+          },
+          "rotated": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "791x416",
+            "canvasVisiblePct": 94,
+            "canvasVisiblePx": 389,
+            "canvasTop": 1
+          },
+          "back": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "372x235",
+            "canvasVisiblePct": 100,
+            "canvasVisiblePx": 235,
+            "canvasTop": 51
+          },
+          "stateKept": true,
+          "panelKept": true
+        }
+      },
+      "320x640": {
+        "initial": {
+          "canvasPx": "302x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 158,
+          "readoutKeyRow": {
+            "top": 642,
+            "bottom": 680,
+            "fullyInViewport": false
+          },
+          "transport": {
+            "top": 477,
+            "bottom": 635,
+            "fullyInViewport": true
+          },
+          "scrollH": 857,
+          "vh": 640
+        },
+        "paramsOpen": {
+          "canvasPx": "302x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 51,
+          "speedSliderInViewport": true,
+          "speedSliderY": 522,
+          "readoutKeyRow": {
+            "top": 195,
+            "bottom": 233,
+            "fullyInViewport": true
+          },
+          "scrollY": 362
+        },
+        "afterEdit": {
+          "canvasPx": "302x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 51,
+          "readoutKeyRow": {
+            "top": 195,
+            "bottom": 233,
+            "fullyInViewport": true
+          },
+          "scrollY": 362
+        },
+        "preset": {
+          "clicksFromFreshLoad": 3,
+          "canvasPx": "302x235",
+          "canvasVisiblePct": 100,
+          "canvasVisiblePx": 235,
+          "canvasTop": 51,
+          "readoutKeyRow": {
+            "top": 158,
+            "bottom": 196,
+            "fullyInViewport": true
+          }
+        },
+        "rotation": {
+          "before": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "302x235",
+            "canvasVisiblePct": 100,
+            "canvasVisiblePx": 235,
+            "canvasTop": 51
+          },
+          "rotated": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "622x224",
+            "canvasVisiblePct": 100,
+            "canvasVisiblePx": 224,
+            "canvasTop": 39
+          },
+          "back": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "302x235",
+            "canvasVisiblePct": 100,
+            "canvasVisiblePx": 235,
+            "canvasTop": 51
+          },
+          "stateKept": true,
+          "panelKept": true
+        }
+      },
+      "844x390": {
+        "initial": {
+          "canvasPx": "791x416",
+          "canvasVisiblePct": 62,
+          "canvasVisiblePx": 257,
+          "canvasTop": 133,
+          "readoutKeyRow": {
+            "top": 694,
+            "bottom": 718,
+            "fullyInViewport": false
+          },
+          "transport": {
+            "top": 559,
+            "bottom": 681,
+            "fullyInViewport": false
+          },
+          "scrollH": 799,
+          "vh": 390
+        },
+        "paramsOpen": {
+          "canvasPx": "791x416",
+          "canvasVisiblePct": 0,
+          "canvasVisiblePx": 0,
+          "canvasTop": -646,
+          "speedSliderInViewport": true,
+          "speedSliderY": 190,
+          "readoutKeyRow": {
+            "top": -85,
+            "bottom": -61,
+            "fullyInViewport": false
+          },
+          "scrollY": 779
+        },
+        "afterEdit": {
+          "canvasPx": "791x416",
+          "canvasVisiblePct": 0,
+          "canvasVisiblePx": 0,
+          "canvasTop": -650,
+          "readoutKeyRow": {
+            "top": -89,
+            "bottom": -65,
+            "fullyInViewport": false
+          },
+          "scrollY": 783
+        },
+        "preset": {
+          "clicksFromFreshLoad": 3,
+          "canvasPx": "791x416",
+          "canvasVisiblePct": 0,
+          "canvasVisiblePx": 0,
+          "canvasTop": -528,
+          "readoutKeyRow": {
+            "top": 33,
+            "bottom": 57,
+            "fullyInViewport": true
+          }
+        },
+        "rotation": {
+          "before": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "791x416",
+            "canvasVisiblePct": 23,
+            "canvasVisiblePx": 97,
+            "canvasTop": -319
+          },
+          "rotated": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "372x235",
+            "canvasVisiblePct": 100,
+            "canvasVisiblePx": 235,
+            "canvasTop": 51
+          },
+          "back": {
+            "speed": "27",
+            "angle": "52",
+            "cursor": "0.7",
+            "paramsPanelVisible": true,
+            "canvasPx": "791x416",
+            "canvasVisiblePct": 94,
+            "canvasVisiblePx": 389,
+            "canvasTop": 1
+          },
+          "stateKept": true,
+          "panelKept": true
+        }
+      }
+    }
+  }
+}

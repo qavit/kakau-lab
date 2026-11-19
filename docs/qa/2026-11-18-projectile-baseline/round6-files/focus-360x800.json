@@ -1,0 +1,197 @@
+[
+  {
+    "label": "Kakau Lab 模型目錄",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "工具",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "模型資訊",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "外觀：跟隨系統",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "自由探索",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "探索任務",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "理論與計算",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "參數",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "圖層",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "放大視圖",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "放大",
+    "ok": true,
+    "how": "solid/3px/rgb(212, 224, 229) shadow=false"
+  },
+  {
+    "label": "縮小",
+    "ok": true,
+    "how": "solid/3px/rgb(212, 224, 229) shadow=false"
+  },
+  {
+    "label": "回到預設視圖",
+    "ok": true,
+    "how": "solid/3px/rgb(212, 224, 229) shadow=true"
+  },
+  {
+    "label": "𝑣\n→",
+    "ok": true,
+    "how": "solid/2px/rgb(155, 215, 221) shadow=false"
+  },
+  {
+    "label": "𝑔",
+    "ok": true,
+    "how": "solid/2px/rgb(155, 215, 221) shadow=false"
+  },
+  {
+    "label": "回到起點",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "退 0.05 秒",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "暫停",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=true"
+  },
+  {
+    "label": "進 0.05 秒",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "反向播放",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "跳到結束",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "時間游標",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "0.25×",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "0.5×",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "1×",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=true"
+  },
+  {
+    "label": "2×",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "完整讀值",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "Kakau Lab 模型目錄",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "工具",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "模型資訊",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "外觀：跟隨系統",
+    "ok": true,
+    "how": "solid/2px/rgb(33, 110, 132) shadow=false"
+  },
+  {
+    "label": "自由探索",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "探索任務",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "理論與計算",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "參數",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "圖層",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "放大視圖",
+    "ok": true,
+    "how": "solid/3px/rgb(22, 24, 29) shadow=false"
+  },
+  {
+    "label": "放大",
+    "ok": true,
+    "how": "solid/3px/rgb(212, 224, 229) shadow=false"
+  },
+  {
+    "label": "縮小",
+    "ok": true,
+    "how": "solid/3px/rgb(212, 224, 229) shadow=false"
+  }
+]

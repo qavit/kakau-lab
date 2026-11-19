@@ -1,0 +1,804 @@
+
+Running 278 tests using 3 workers
+
+[1/278] [desktop-chromium] › tests/e2e/electrostatic-field-lines.spec.ts:19:1 › field lines default off and toggle independently of arrows and the strength map
+[2/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:42:1 › empty Canvas click clears selection without changing physical state
+[3/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:20:1 › quick presets stay reachable with nothing, a source, and the probe selected
+[4/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:56:1 › layers are display-only, gated, and viewport Home preserves the physical setup
+[5/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:32:1 › presets render under an explicit category with the approved naming and copy
+[6/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:46:1 › preset cards show title/subtitle hierarchy and are left-aligned
+[7/278] [desktop-chromium] › tests/e2e/electrostatic-field-lines.spec.ts:45:1 › dipole shows only the upstream-owned copy of each + → − line
+[8/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:56:1 › applying a preset updates the physical setup and marks it active
+[9/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:79:1 › shared Layers drawer returns focus and keeps its closed controls out of Tab order
+[10/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:69:1 › source magnitude typing does not mutate physics until commit, and Escape restores display
+[11/278] [desktop-chromium] › tests/e2e/electrostatic-field-lines.spec.ts:55:1 › field lines are unavailable in guided activities
+[12/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:104:1 › guided prediction cannot expose gated evidence through Layers
+[13/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:95:1 › source magnitude commits on blur
+[14/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:114:1 › persistent pointer tools add and delete several sources, respecting their boundaries
+[15/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:108:1 › source magnitude spinner commits immediately without Enter or blur
+[16/278] [desktop-chromium] › tests/e2e/electrostatic-field-lines.spec.ts:66:1 › probe moves and particle playback reuse the traced lines; source edits retrace
+[17/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:116:1 › clicking the native spinner and ArrowDown both commit immediately
+[18/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:161:1 › keyboard tool shortcuts, Escape, exact Arrow movement, and focus affordances are real behavior
+[19/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:129:1 › source x and y spinners move the source immediately
+[20/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:142:1 › probe x and y spinners move the measurement point immediately
+[21/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:234:1 › hover and focus explain the measurement point and test charge
+[22/278] [desktop-chromium] › tests/e2e/electrostatic-field-lines.spec.ts:92:1 › source drag with arrows, strength map and field lines stays within the 100 ms p95 budget
+[23/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:244:1 › source tooltip follows the same source while it is dragged
+[24/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:159:1 › sign toggle, add/delete, layer drawer, and viewport controls still work
+[25/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:269:1 › source inspector keeps the global delete tool as its only visible delete affordance
+[26/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:282:1 › sign toggle changes only sign, including keyboard activation
+[27/278] [desktop-chromium] › tests/e2e/electrostatic-gate4a.spec.ts:188:1 › guided entry basic smoke still works
+[28/278] [desktop-chromium] › tests/e2e/electrostatic-canvas.spec.ts:309:1 › source inspector rows align sign + magnitude and x + y on desktop
+[29/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:27:1 › Canvas source hover emphasizes its contribution row, and leaving clears it
+[desktop-chromium] › tests/e2e/electrostatic-field-lines.spec.ts:92:1 › source drag with arrows, strength map and field lines stays within the 100 ms p95 budget
+all-layers drag p95: 34.1 ms (20 samples)
+
+[30/278] [desktop-chromium] › tests/e2e/electrostatic-gate5.spec.ts:18:1 › single source: no construction-scale sentence, and vectors don't fabricate an extra arrow
+[31/278] [desktop-chromium] › tests/e2e/electrostatic-guided-redesign.spec.ts:17:1 › A uses a native spatial chooser, previews only the learner guess, then reveals evidence in order
+[32/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:42:1 › Canvas source keyboard focus emphasizes its contribution row
+[33/278] [desktop-chromium] › tests/e2e/electrostatic-gate5.spec.ts:28:1 › two sources: shared-scale sentence appears, and both contributions plus the resultant are drawn
+[34/278] [desktop-chromium] › tests/e2e/electrostatic-guided-redesign.spec.ts:56:1 › reduced motion suppresses only the attention animation, not the revealed evidence
+[35/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:53:1 › contribution row hover emphasizes the matching Canvas source, and leaving clears it
+[36/278] [desktop-chromium] › tests/e2e/electrostatic-guided-redesign.spec.ts:64:1 › B keeps zero prediction distinct and uses four-source symmetry feedback in its transfer
+[37/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:67:1 › contribution row keyboard focus emphasizes the matching Canvas source
+[38/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:78:1 › emphasis never changes selection or the physical setup
+[39/278] [desktop-chromium] › tests/e2e/electrostatic-guided-redesign.spec.ts:92:1 › C anchors predictions at the particle and C4 compares trajectory with initial acceleration
+[40/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:91:1 › gated contribution rows stay unavailable pre-commit and hovering their source is a no-op
+[41/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:101:1 › only one advanced disclosure covers per-source contributions and resultant components
+[42/278] [desktop-chromium] › tests/e2e/electrostatic-guided.spec.ts:17:1 › guided entry starts task one with evidence gated and no reason tags
+[43/278] [desktop-chromium] › tests/e2e/electrostatic-guided.spec.ts:40:1 › feedback compares the learner prediction with model-derived components
+[44/278] [desktop-chromium] › tests/e2e/electrostatic-guided.spec.ts:69:1 › task two has a visible natural title without leaking the zero-field answer
+[45/278] [desktop-chromium] › tests/e2e/electrostatic-guided.spec.ts:117:1 › task three reveals E, F and a only after commitment while preserving time gating
+[46/278] [desktop-chromium] › tests/e2e/electrostatic-guided.spec.ts:134:1 › guided mode keeps fixed task state out of the share workflow
+[47/278] [desktop-chromium] › tests/e2e/electrostatic-guided.spec.ts:144:1 › task three presents progress, fixed-position readouts, and an explicit evidence link
+[48/278] [desktop-chromium] › tests/e2e/electrostatic-guided.spec.ts:161:1 › task three keeps charge and mass labels on Canvas and separates v/a learner markers
+[49/278] [desktop-chromium] › tests/e2e/electrostatic-m5.spec.ts:17:3 › responsive 1440px keeps the canvas, intent and transport usable without overflow
+  1) [desktop-chromium] › tests/e2e/electrostatic-gate5.spec.ts:28:1 › two sources: shared-scale sentence appears, and both contributions plus the resultant are drawn 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByTestId('probe-panel')
+    Expected substring: "使用同一線性比例"
+    Received string:    "電場|E→|=149.8N/C方向0.0°各來源分量各來源分量來源EₓEᵧ|E|正電荷 174.90074.90 N/C負電荷 274.90074.90 N/C"
+    Timeout: 7000ms
+
+    Call log:
+      - Expect "toContainText" getByTestId('probe-panel') with timeout 7000ms
+      - waiting for getByTestId('probe-panel')
+        18 × locator resolved to <section aria-label="電場讀值" data-focus="false" data-probe-state="valid" data-testid="probe-panel" class="_readoutPanel_40jty_319 _probeReadoutPanel_40jty_326 ">…</section>
+           - unexpected value "電場|E→|=149.8N/C方向0.0°各來源分量各來源分量來源EₓEᵧ|E|正電荷 174.90074.90 N/C負電荷 274.90074.90 N/C"
+
+
+      31 |   await page.getByTestId("probe-handle").click();
+      32 |   await page.getByTestId("probe-panel").locator("summary").click();
+    > 33 |   await expect(page.getByTestId("probe-panel")).toContainText("使用同一線性比例");
+         |                                                 ^
+      34 |   await expect(page.getByTestId("field-viewport")).toHaveAttribute("data-probe-vectors", "3");
+      35 | });
+      36 |
+        at <worktree>/tests/e2e/electrostatic-gate5.spec.ts:33:49
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/electrostatic-gate5-two-so-f8977-lus-the-resultant-are-drawn-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/electrostatic-gate5-two-so-f8977-lus-the-resultant-are-drawn-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/electrostatic-gate5-two-so-f8977-lus-the-resultant-are-drawn-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/electrostatic-gate5-two-so-f8977-lus-the-resultant-are-drawn-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[50/278] [desktop-chromium] › tests/e2e/electrostatic-m5.spec.ts:17:3 › responsive 1024px keeps the canvas, intent and transport usable without overflow
+[51/278] [desktop-chromium] › tests/e2e/electrostatic-gate5.spec.ts:37:1 › zero resultant: the construction closes without a fabricated non-zero resultant arrow
+[52/278] [desktop-chromium] › tests/e2e/electrostatic-m5.spec.ts:17:3 › responsive 768px keeps the canvas, intent and transport usable without overflow
+[53/278] [desktop-chromium] › tests/e2e/electrostatic-gate5.spec.ts:46:1 › hovering a contribution row emphasizes its Canvas source (extends Gate 4B linkage to Gate 5 evidence)
+[54/278] [desktop-chromium] › tests/e2e/electrostatic-m5.spec.ts:17:3 › responsive 320px keeps the canvas, intent and transport usable without overflow
+[55/278] [desktop-chromium] › tests/e2e/electrostatic-m5.spec.ts:35:1 › source drag paints within the 100 ms p95 interaction budget
+[56/278] [desktop-chromium] › tests/e2e/electrostatic-particle.spec.ts:19:1 › test-charge inspector uses semantic rows and shared MathJax formulas
+[57/278] [desktop-chromium] › tests/e2e/electrostatic-particle.spec.ts:29:1 › D-10 transport records history, seeks by 0.1 s, forbids future scrub, and resets
+  2) [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:101:1 › only one advanced disclosure covers per-source contributions and resultant components 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByTestId('probe-panel').locator('details')
+    Expected substring: "大小"
+    Received string:    "各來源分量各來源分量來源EₓEᵧ|E|正電荷 174.90074.90 N/C正電荷 2-74.90074.90 N/C"
+    Timeout: 7000ms
+
+    Call log:
+      - Expect "toContainText" getByTestId('probe-panel').locator('details') with timeout 7000ms
+      - waiting for getByTestId('probe-panel').locator('details')
+        18 × locator resolved to <details open="" class="_readoutDetails_40jty_307">…</details>
+           - unexpected value "各來源分量各來源分量來源EₓEᵧ|E|正電荷 174.90074.90 N/C正電荷 2-74.90074.90 N/C"
+
+
+      106 |   const details = page.getByTestId("probe-panel").locator("details");
+      107 |   await details.locator("summary").click();
+    > 108 |   await expect(details).toContainText("大小");
+          |                         ^
+      109 |   await expect(details.locator("table")).toBeVisible();
+      110 |   await expect(details.locator("p").last()).toBeVisible();
+      111 | });
+        at <worktree>/tests/e2e/electrostatic-gate4b.spec.ts:108:25
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/electrostatic-gate4b-only--36969-ns-and-resultant-components-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/electrostatic-gate4b-only--36969-ns-and-resultant-components-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/electrostatic-gate4b-only--36969-ns-and-resultant-components-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/electrostatic-gate4b-only--36969-ns-and-resultant-components-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[58/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:113:1 › zero field still reports undefined direction, excluded-core invalid state still works
+[desktop-chromium] › tests/e2e/electrostatic-m5.spec.ts:35:1 › source drag paints within the 100 ms p95 interaction budget
+field-strength-map drag p95: 33.5 ms (20 samples)
+
+[59/278] [desktop-chromium] › tests/e2e/electrostatic-m5.spec.ts:60:1 › field-strength map is independent in free exploration and unavailable in guided activities
+[60/278] [desktop-chromium] › tests/e2e/electrostatic-particle.spec.ts:51:1 › playback speed changes wall scheduling only and never exposes the fixed physics dt
+[61/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:137:1 › positive/negative accessible names remain correct after sign toggles
+[62/278] [desktop-chromium] › tests/e2e/electrostatic-particle.spec.ts:61:1 › probe edits preserve history while source edits invalidate it
+[63/278] [desktop-chromium] › tests/e2e/electrostatic-m5.spec.ts:79:1 › capture the 12 Owner-review UX states
+[64/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:145:1 › source and test-charge roles remain distinguishable by accessible name
+[65/278] [desktop-chromium] › tests/e2e/electrostatic.a11y.spec.ts:4:1 › @a11y electrostatic sandbox has no serious or critical axe violations
+[66/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:151:1 › source magnitude changes the halo ring weight, not the core hit-target radius
+[67/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:164:1 › sign change does not corrupt magnitude semantics
+[68/278] [desktop-chromium] › tests/e2e/electrostatic.a11y.spec.ts:16:1 › @a11y running and stopped particle states have no serious or critical axe violations
+[69/278] [desktop-chromium] › tests/e2e/electrostatic-particle.spec.ts:75:1 › test-charge initial edits invalidate history and invalid drafts retain the attempted text
+[70/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:185:1 › desktop: trigger and drawer header bounding boxes do not overlap
+[71/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:208:1 › external trigger still toggle-closes the drawer
+[72/278] [desktop-chromium] › tests/e2e/electrostatic-particle.spec.ts:90:1 › Space provides keyboard parity for play and pause
+[73/278] [desktop-chromium] › tests/e2e/electrostatic.spec.ts:26:1 › D-05 starts with a visible intent choice and natural task names
+[74/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:214:1 › Escape and close-button both close the drawer and return focus to the trigger
+[75/278] [desktop-chromium] › tests/e2e/electrostatic.spec.ts:36:1 › any present share parameter bypasses intent and malformed payloads fail closed
+[76/278] [desktop-chromium] › tests/e2e/electrostatic.a11y.spec.ts:37:1 › @a11y model-info panel opens and closes with Escape, no serious or critical axe violations
+[77/278] [desktop-chromium] › tests/e2e/electrostatic.spec.ts:45:1 › legacy route is a permanent redirect that preserves empty and repeated query values
+[78/278] [desktop-chromium] › tests/e2e/electrostatic.spec.ts:54:1 › canvas selection opens one contextual inspector; add-source auto-selects
+[79/278] [desktop-chromium] › tests/e2e/electrostatic.spec.ts:71:1 › numeric editing is transient until commit, rejects locally, and Escape restores display
+[80/278] [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:228:1 › closed drawer stays inert and its controls are skipped in Tab order
+[81/278] [desktop-chromium] › tests/e2e/electrostatic.spec.ts:88:1 › clearing a numeric field is an in-progress edit, not an immediate validation error
+[82/278] [desktop-chromium] › tests/e2e/fbd-graphite.spec.ts:33:1 › direct manipulation: select, drag direction, fixed anchor/length, magnitude unchanged @graphite
+[83/278] [desktop-chromium] › tests/e2e/electrostatic.a11y.spec.ts:57:1 › @a11y open shared Layers drawer is non-modal and has no serious or critical axe violations
+[84/278] [desktop-chromium] › tests/e2e/electrostatic.spec.ts:103:1 › measurement point exposes compact MathJax readout and natural zero/invalid states
+[85/278] [desktop-chromium] › tests/e2e/electrostatic.a11y.spec.ts:72:1 › status notices never move the Canvas: overlay appears without shifting layout
+[86/278] [desktop-chromium] › tests/e2e/fbd-graphite.spec.ts:59:1 › non-horizontal direction and learning flow with dragged forces @graphite
+[87/278] [desktop-chromium] › tests/e2e/electrostatic.spec.ts:124:1 › sharing always produces the canonical route and reloads the physical setup
+[88/278] [desktop-chromium] › tests/e2e/electrostatic.a11y.spec.ts:92:1 › @a11y theory modal moves focus in, contains Tab, and returns focus to its button
+[89/278] [desktop-chromium] › tests/e2e/fbd-support-removal.spec.ts:25:1 › remove support: wrong prediction, old normal diagnosis, revision, then evidence
+[90/278] [desktop-chromium] › tests/e2e/fbd.spec.ts:18:1 › FBD commit, compare, wrong direction, revise and remove interaction
+[91/278] [desktop-chromium] › tests/e2e/fbd-graphite.spec.ts:82:1 › canvas cannot create anonymous forces; slider/button fallback still works @graphite
+[92/278] [desktop-chromium] › tests/e2e/fbd-support-removal.spec.ts:68:1 › remove support: missing gravity and invented acceleration can be corrected; restart returns to baseline
+[93/278] [desktop-chromium] › tests/e2e/hydrogen-guided.spec.ts:29:1 › the entry offers both modes and either one starts clean
+[94/278] [desktop-chromium] › tests/e2e/i18n-atmosphere-profile.spec.ts:3:1 › atmosphere profile has reciprocal locale routes and localized SEO
+[95/278] [desktop-chromium] › tests/e2e/hydrogen-guided.spec.ts:42:1 › free exploration keeps selecting, placing and firing
+[96/278] [desktop-chromium] › tests/e2e/interference-b3.spec.ts:6:1 › guided activities, measurement, keyboard, dialog and advanced edge exploration
+[97/278] [desktop-chromium] › tests/e2e/hydrogen-guided.spec.ts:56:1 › guided mode starts on the spectrum without the answer anywhere
+[98/278] [desktop-chromium] › tests/e2e/hydrogen-guided.spec.ts:67:1 › wrong guess, retry, then the right one, then the evidence
+[99/278] [desktop-chromium] › tests/e2e/interference-c2-browser.spec.ts:3:1 › cross browser simulation and guided controls @cross-browser
+[100/278] [desktop-chromium] › tests/e2e/hydrogen-guided.spec.ts:108:1 › submitting a prediction leaves the electron on n=4 until the student fires
+[101/278] [desktop-chromium] › tests/e2e/hydrogen-guided.spec.ts:119:1 › switching modes resets both sides
+[102/278] [desktop-chromium] › tests/e2e/hydrogen-guided.spec.ts:133:1 › the whole activity works from the keyboard
+[103/278] [desktop-chromium] › tests/e2e/interference-c2.spec.ts:8:1 › keyboard focus order, hidden sidebar and point readout @c2
+[104/278] [desktop-chromium] › tests/e2e/interference-c2.spec.ts:43:1 › dialog focus, reduced motion and semantic audit @c2
+[105/278] [desktop-chromium] › tests/e2e/interference-c2.spec.ts:68:1 › responsive controls and canvas aspect ratio @c2
+[106/278] [desktop-chromium] › tests/e2e/interference-c2.spec.ts:86:1 › repeated mount, play, dispose and remount @c2
+  3) [desktop-chromium] › tests/e2e/interference-b3.spec.ts:6:1 › guided activities, measurement, keyboard, dialog and advanced edge exploration 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('interference-host').locator('[data-interference-runtime]')
+    Expected: 1
+    Received: 0
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('interference-host').locator('[data-interference-runtime]') with timeout 7000ms
+      - waiting for getByTestId('interference-host').locator('[data-interference-runtime]')
+        18 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       8 |   const host = page.getByTestId("interference-host");
+       9 |   const plot = host.locator("[data-interference-plot]");
+    > 10 |   await expect(host.locator("[data-interference-runtime]")).toHaveCount(1);
+         |                                                             ^
+      11 |
+      12 |   await host.locator('[data-action="projection"]').click();
+      13 |   await expect(host).toHaveClass(/interference-projection/);
+        at <worktree>/tests/e2e/interference-b3.spec.ts:10:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-b3-guided-act-e44d5-d-advanced-edge-exploration-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-b3-guided-act-e44d5-d-advanced-edge-exploration-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-b3-guided-act-e44d5-d-advanced-edge-exploration-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-b3-guided-act-e44d5-d-advanced-edge-exploration-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[107/278] [desktop-chromium] › tests/e2e/interference-b3.spec.ts:119:1 › interference host exposes named controls and has no serious axe violations @a11y
+  4) [desktop-chromium] › tests/e2e/interference-b3.spec.ts:119:1 › interference host exposes named controls and has no serious axe violations @a11y 
+
+    Error: frame.evaluate: Error: No elements found for include in page Context
+        at validateContext (eval at evaluate (:311:30), <anonymous>:19556:15)
+        at new Context (eval at evaluate (:311:30), <anonymous>:19537:7)
+        at Object._getFrameContexts (eval at evaluate (:311:30), <anonymous>:19578:22)
+        at eval (eval at evaluate (:311:30), <anonymous>:4:27)
+        at UtilityScript.evaluate (<anonymous>:313:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at validateContext (eval at evaluate (:311:30), <anonymous>:19556:15)
+        at Context (eval at evaluate (:311:30), <anonymous>:19537:7)
+        at Object._getFrameContexts (eval at evaluate (:311:30), <anonymous>:19578:22)
+        at eval (eval at evaluate (:311:30), <anonymous>:4:27)
+        at UtilityScript.evaluate (<anonymous>:313:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at AxeBuilder.runPartialRecursive (<worktree>/node_modules/@axe-core/playwright/dist/index.mjs:280:39)
+        at AxeBuilder.analyze (<worktree>/node_modules/@axe-core/playwright/dist/index.mjs:210:39)
+        at <worktree>/tests/e2e/interference-b3.spec.ts:122:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-b3-interferen-db6de-serious-axe-violations-a11y-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-b3-interferen-db6de-serious-axe-violations-a11y-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-b3-interferen-db6de-serious-axe-violations-a11y-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-b3-interferen-db6de-serious-axe-violations-a11y-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[108/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:29:3 › desktop 1440: toolbar, plot, rail, activities and time bar keep Front's spatial relations @c3
+  5) [desktop-chromium] › tests/e2e/interference-c2-browser.spec.ts:3:1 › cross browser simulation and guided controls @cross-browser 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('interference-host').locator('[data-interference-runtime]')
+    Expected: 1
+    Received: 0
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('interference-host').locator('[data-interference-runtime]') with timeout 7000ms
+      - waiting for getByTestId('interference-host').locator('[data-interference-runtime]')
+        18 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      4 |   await page.goto("/interference-lifecycle");
+      5 |   const host = page.getByTestId("interference-host");
+    > 6 |   await expect(host.locator("[data-interference-runtime]")).toHaveCount(1);
+        |                                                             ^
+      7 |   await expect(host.locator("canvas[data-interference-canvas]")).toBeVisible();
+      8 |   await expect(host.locator('[data-layer="conditions"] path')).not.toHaveCount(0);
+      9 |   const wavelength = host.locator('[data-control="wavelength"]');
+        at <worktree>/tests/e2e/interference-c2-browser.spec.ts:6:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-c2-browser-cr-1152b-ided-controls-cross-browser-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-c2-browser-cr-1152b-ided-controls-cross-browser-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-c2-browser-cr-1152b-ided-controls-cross-browser-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-c2-browser-cr-1152b-ided-controls-cross-browser-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[109/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:57:3 › activity step titles with inline math flow as text at 1440px @c4 @cross-browser
+[110/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:29:3 › desktop 1280: toolbar, plot, rail, activities and time bar keep Front's spatial relations @c3
+[111/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:55:1 › formulas update live, textbook counts and advanced mode stay distinct @c3
+[112/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:57:3 › activity step titles with inline math flow as text at 390px @c4 @cross-browser
+[113/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:78:1 › measurement rail: empty prompt, P readouts, classification and waveform @c3
+[114/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:57:3 › activity step titles with inline math flow as text at 320px @c4 @cross-browser
+[115/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:98:1 › activity 2 masks the live counts until the answer is revealed @c3
+[116/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:72:1 › activity 3 title survives 200% text size without overflow @c4
+[117/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:112:1 › projection mode enlarges the field, keeps measurement and restores state @c3
+  6) [desktop-chromium] › tests/e2e/interference-c4.spec.ts:72:1 › activity 3 title survives 200% text size without overflow @c4 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      76 |   await expect(page.locator('[data-activity="antiphase"] mjx-container').first()).toBeVisible();
+      77 |   expect(await checkTitles(page)).toEqual([]);
+    > 78 |   expect(await noOverflow(page)).toBe(true);
+         |                                  ^
+      79 |   await shot(page, "activity3-title-390-200pct", '[data-activity="antiphase"]');
+      80 | });
+      81 |
+        at <worktree>/tests/e2e/interference-c4.spec.ts:78:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-c4-activity-3-0f71e-xt-size-without-overflow-c4-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-c4-activity-3-0f71e-xt-size-without-overflow-c4-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-c4-activity-3-0f71e-xt-size-without-overflow-c4-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-c4-activity-3-0f71e-xt-size-without-overflow-c4-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[118/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:82:1 › wave speed updates v, f, λ, T, MathJax formula and sr text while paused @c4 @cross-browser
+[119/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:131:1 › teaching dialog stays inside the viewport and returns focus @c3
+[120/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:108:1 › playback does not retypeset kinematics formulas @c4
+[121/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:146:3 › no serious contrast or semantic violations in light theme @c3
+  7) [desktop-chromium] › tests/e2e/interference-c2.spec.ts:86:1 › repeated mount, play, dispose and remount @c2 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('interference-host').locator('[data-interference-runtime]')
+    Expected: 1
+    Received: 0
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('interference-host').locator('[data-interference-runtime]') with timeout 7000ms
+      - waiting for getByTestId('interference-host').locator('[data-interference-runtime]')
+        18 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      91 |   const toggle = page.getByTestId("toggle-interference");
+      92 |   for (let i = 0; i < 5; i++) {
+    > 93 |     await expect(host.locator("[data-interference-runtime]")).toHaveCount(1);
+         |                                                               ^
+      94 |     await host.locator('[data-action="play-pause"]').click();
+      95 |     await expect(host.locator('[data-action="play-pause"]')).toHaveAttribute("aria-pressed", "true");
+      96 |     await toggle.click();
+        at <worktree>/tests/e2e/interference-c2.spec.ts:93:63
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-c2-repeated-mount-play-dispose-and-remount-c2-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-c2-repeated-mount-play-dispose-and-remount-c2-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-c2-repeated-mount-play-dispose-and-remount-c2-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-c2-repeated-mount-play-dispose-and-remount-c2-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[122/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:146:3 › no serious contrast or semantic violations in dark theme @c3
+[123/278] [desktop-chromium] › tests/e2e/interference-c2.spec.ts:103:1 › guided count activity completes with keyboard input @c2
+[124/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:120:3 › short formulas have no phantom scrollbar at 1440px @c4 @cross-browser
+[125/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:120:3 › short formulas have no phantom scrollbar at 390px @c4 @cross-browser
+[126/278] [desktop-chromium] › tests/e2e/interference-d1-summary.spec.ts:10:3 › summary formulas are MathJax SVG without overflow at 320px
+[127/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:157:3 › responsive 768: single column, no overflow, usable plot @c3
+[128/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:120:3 › short formulas have no phantom scrollbar at 320px @c4 @cross-browser
+[129/278] [desktop-chromium] › tests/e2e/interference-d1-summary.spec.ts:10:3 › summary formulas are MathJax SVG without overflow at 390px
+[130/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:134:1 › dialog inline math keeps the text baseline and long derivations scroll with a hint @c4
+[131/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:157:3 › responsive 390: single column, no overflow, usable plot @c3
+[132/278] [desktop-chromium] › tests/e2e/interference-d1-summary.spec.ts:10:3 › summary formulas are MathJax SVG without overflow at 1440px
+[133/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:148:1 › activity 1 keeps finished steps visible as the lesson advances @c4 @cross-browser
+[134/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:157:3 › responsive 320: single column, no overflow, usable plot @c3
+[135/278] [desktop-chromium] › tests/e2e/interference-d1-summary.spec.ts:62:1 › summary is not re-typeset while the animation plays
+[136/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:171:1 › advanced mode keeps phase conditions distinct from zero amplitude and returns to textbook @c4 @cross-browser
+[137/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:178:1 › mobile formulas and dialog scroll locally without widening the page @c3
+[138/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:191:1 › projection round-trip preserves parameters, P and the active activity @c4 @cross-browser
+[139/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:191:1 › rail, activities and dialogs are real MathJax SVG and update without node growth @c3
+[140/278] [desktop-chromium] › tests/e2e/interference-gate-c.spec.ts:5:1 › Gate C dialog content and stored preferences survive reload
+[141/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:213:1 › activity 1 keeps steps 1–3 and adds the explanation after a correct check @c4 @cross-browser
+[142/278] [desktop-chromium] › tests/e2e/interference-c3-visual.spec.ts:221:1 › MathJax formulas stay readable in dark theme and on mobile @c3
+[143/278] [desktop-chromium] › tests/e2e/interference-c4.spec.ts:236:1 › previous/next walks all five activities in order and stops at both ends @c4 @cross-browser
+[144/278] [desktop-chromium] › tests/e2e/interference-lifecycle.spec.ts:3:1 › development harness survives StrictMode replay, unmount, and remount
+[145/278] [desktop-chromium] › tests/e2e/interference-renderer.spec.ts:6:1 › renderer shows the field and keeps controls, measurement and lifecycle in sync
+  8) [desktop-chromium] › tests/e2e/interference-gate-c.spec.ts:5:1 › Gate C dialog content and stored preferences survive reload 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('interference-host').locator('[data-interference-runtime]')
+    Expected: 1
+    Received: 0
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('interference-host').locator('[data-interference-runtime]') with timeout 7000ms
+      - waiting for getByTestId('interference-host').locator('[data-interference-runtime]')
+        18 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       6 |   await page.goto("/interference-lifecycle");
+       7 |   const host = page.getByTestId("interference-host");
+    >  8 |   await expect(host.locator("[data-interference-runtime]")).toHaveCount(1);
+         |                                                             ^
+       9 |   await expect(host.locator('[data-dialog="counts"]')).toContainText("等號也要算");
+      10 |   await expect(host.locator('[data-dialog="antiphase"]')).toContainText("同調不等於同相");
+      11 |   await expect(host.locator('[data-dialog="time"]')).toContainText("模擬器畫的是什麼");
+        at <worktree>/tests/e2e/interference-gate-c.spec.ts:8:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-gate-c-Gate-C-e913c--preferences-survive-reload-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-gate-c-Gate-C-e913c--preferences-survive-reload-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-gate-c-Gate-C-e913c--preferences-survive-reload-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-gate-c-Gate-C-e913c--preferences-survive-reload-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[146/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:66:5 › C2 1440px light: 44px targets, 12px text, AA contrast, no horizontal overflow @w45
+[147/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:66:5 › C2 1440px dark: 44px targets, 12px text, AA contrast, no horizontal overflow @w45
+[148/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:66:5 › C2 1280px light: 44px targets, 12px text, AA contrast, no horizontal overflow @w45
+[149/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:66:5 › C2 1280px dark: 44px targets, 12px text, AA contrast, no horizontal overflow @w45
+  9) [desktop-chromium] › tests/e2e/interference-lifecycle.spec.ts:3:1 › development harness survives StrictMode replay, unmount, and remount 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('interference-host')
+    Expected: 1
+    Received: 0
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('interference-host') with timeout 7000ms
+      - waiting for getByTestId('interference-host')
+        18 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      16 |   const runtime = host.locator("[data-interference-runtime]");
+      17 |
+    > 18 |   await expect(host).toHaveCount(1);
+         |                      ^
+      19 |   await expect(runtime).toHaveCount(1);
+      20 |   await expect.poll(() => runtime.getAttribute("data-interference-frame")).not.toBeNull();
+      21 |
+        at <worktree>/tests/e2e/interference-lifecycle.spec.ts:18:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-lifecycle-dev-2c077--replay-unmount-and-remount-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-lifecycle-dev-2c077--replay-unmount-and-remount-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-lifecycle-dev-2c077--replay-unmount-and-remount-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-lifecycle-dev-2c077--replay-unmount-and-remount-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[150/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:66:5 › C2 390px light: 44px targets, 12px text, AA contrast, no horizontal overflow @w45
+[151/278] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 1366x768
+  10) [desktop-chromium] › tests/e2e/interference-renderer.spec.ts:6:1 › renderer shows the field and keeps controls, measurement and lifecycle in sync 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('interference-host').locator('canvas[data-interference-canvas]')
+    Expected: visible
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('interference-host').locator('canvas[data-interference-canvas]') with timeout 7000ms
+      - waiting for getByTestId('interference-host').locator('canvas[data-interference-canvas]')
+
+
+       8 |   const host = page.getByTestId("interference-host");
+       9 |   const canvas = host.locator("canvas[data-interference-canvas]");
+    > 10 |   await expect(canvas).toBeVisible();
+         |                        ^
+      11 |   await expect(host.locator('[data-condition="constructive-0"]')).toHaveAttribute("d", /M/);
+      12 |   const fieldPixel = await canvas.evaluate((element) => {
+      13 |     const canvas = element as HTMLCanvasElement;
+        at <worktree>/tests/e2e/interference-renderer.spec.ts:10:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-renderer-rend-cfd79-ement-and-lifecycle-in-sync-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-renderer-rend-cfd79-ement-and-lifecycle-in-sync-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-renderer-rend-cfd79-ement-and-lifecycle-in-sync-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-renderer-rend-cfd79-ement-and-lifecycle-in-sync-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[152/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:66:5 › C2 390px dark: 44px targets, 12px text, AA contrast, no horizontal overflow @w45
+[153/278] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 1366x768
+[154/278] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 1280x720
+[155/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:66:5 › C2 360px light: 44px targets, 12px text, AA contrast, no horizontal overflow @w45
+[156/278] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 390x844
+[157/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:66:5 › C2 360px dark: 44px targets, 12px text, AA contrast, no horizontal overflow @w45
+[158/278] [desktop-chromium] › tests/e2e/projectile-export.spec.ts:5:3 › trajectory downloads and Guided protection 360x800
+[159/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:79:1 › C2: keyboard focus shows one 2px --lc-focus ring and the plot is reachable @w45 @a11y
+[160/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 1 @1366
+[161/278] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 1280x720
+[162/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 2 @1366
+[163/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 3 @1366
+[164/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 1 @390
+[165/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 2 @390
+[166/278] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 390x844
+[167/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:38:5 › predict phase leaks no result, readout or free-state control: activity 3 @390
+[168/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:58:1 › activity 1: predict → gated manipulate → observe → explain → complete; reveals only after the gate
+[169/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:78:1 › activity 2: observe is masked until prediction; playback + table then explain
+[170/278] [desktop-chromium] › tests/e2e/projectile-layered.spec.ts:15:3 › workspace and disclosure 360x800
+[171/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:91:1 › activity 3: result withheld until h≈25 m; then reveals; completes
+[172/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:103:1 › C2: scientific colours stay independent of the interface accent @w45
+[173/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:106:1 › restart clears prediction; leaving mid-task asks first; cancel keeps progress; leave restores free state
+[174/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:119:1 › C2: selected view and projection toggle keep ARIA state; theme menu is the shared one @w45 @a11y
+[175/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:127:1 › keyboard only: choose a prediction with Tab/Enter
+[176/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:147:1 › C2: reduced motion removes button and summary transitions @w45 @a11y
+[177/278] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:13:3 › reduced motion › does not autoplay; 播放 still works
+[178/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:137:1 › answers never reach share URL or exports after a completed task
+[179/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:154:1 › C2 1280x800: toolbar keeps 44px targets in two 44px rows and the plot is not smaller than main's 476px @w45
+[180/278] [desktop-chromium] › tests/e2e/interference-w45-c2.spec.ts:164:1 › C2 1440x900: plot stays at main's 623px @w45
+[181/278] [desktop-chromium] › tests/e2e/projectile-qa-guided.spec.ts:162:1 › session progress is not persisted: reload returns to free mode with no task state
+[182/278] [desktop-chromium] › tests/e2e/projectile-qa-roundtrip.spec.ts:21:1 › share → clean browser reopen is paused at start; setup identical; export JSON/SVG share one snapshot
+[183/278] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 1366x768: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[184/278] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:24:1 › no reduced-motion preference: the animation still starts on its own (regression guard)
+[185/278] [desktop-chromium] › tests/e2e/projectile-qa-roundtrip.spec.ts:60:1 › legacy golden v1 link opens in a clean browser, paused, with its preset state
+[186/278] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:12:1 › Projectile layers, probe/readout, presets and validated deep link
+[187/278] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 1280x720: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[188/278] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:31:1 › share failure modes fall back to defaults, paused, with an explanation
+[189/278] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:50:1 › Projectile guided prediction and free state restore; modal focus; standalone notes
+[190/278] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 390x844: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[191/278] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:50:1 › export failure is reported and a retry succeeds (no stuck state)
+[192/278] [desktop-chromium] › tests/e2e/projectile-uplift.spec.ts:100:1 › Projectile bad/repeated share falls back and explains the error
+[193/278] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:5:1 › projectile: at 400% zoom the page scrolls and reflows instead of pinning bars over the chart
+[194/278] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:74:3 › fullscreen rejects: in-window enlarge remains usable, notice shown, exit returns focus
+[195/278] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:31:1 › projectile: enlarged view keeps focus inside, and Escape returns it to the trigger
+[196/278] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:74:3 › fullscreen missing: in-window enlarge remains usable, notice shown, exit returns focus
+[197/278] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:92:1 › non-colour encoding: simultaneously shown series differ in dash pattern, not hue alone
+[198/278] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:50:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 360px
+[199/278] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 360x800: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[200/278] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:50:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 472px
+[201/278] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:50:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 820px
+[202/278] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:114:3 › reflow at zoom200-equiv-640x360 (browser-zoom equivalent): no horizontal scroll, controls reachable by scrolling
+[203/278] [desktop-chromium] › tests/e2e/projectile-usability.spec.ts:50:3 › projectile: hover readout stays a compact card and time controls do not wrap or clip at 1280px
+[204/278] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:114:3 › reflow at zoom400-equiv-320x180 (browser-zoom equivalent): no horizontal scroll, controls reachable by scrolling
+[205/278] [desktop-chromium] › tests/e2e/solar-layers.spec.ts:4:1 › Solar consumes the shared layer drawer with keyboard-close and working toggles
+[206/278] [desktop-chromium] › tests/e2e/projectile-qa-resilience.spec.ts:128:1 › axe: free / params / layers / guided / theory — blocking (serious|critical) violations recorded
+[207/278] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 320x640: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[208/278] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:31:3 › viewport 844x390-landscape: no h-overflow, targets ≥44, canvas usable with params/layers open; screenshots
+[209/278] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:73:3 › keyboard: every Tab stop shows a visible focus indicator @1366x768
+[210/278] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:73:3 › keyboard: every Tab stop shows a visible focus indicator @360x800
+[211/278] [desktop-chromium] › tests/e2e/projectile-qa-viewports.spec.ts:99:1 › measured operation counts at 360x800 (clicks from a fresh load)
+[212/278] [desktop-chromium] › tests/e2e/solar-layers.spec.ts:18:1 › Solar shared Layers drawer returns focus and hides closed controls from Tab
+[213/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:21:5 › Solar 1440px: appearance menu works with the layer drawer closed and open
+[214/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Catalog: one 44px control at the end of the header, closed list is not focusable
+[215/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Catalog: keyboard, Escape, outside click, focus return and aria-pressed
+[216/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Catalog: open list stays inside the 1440px viewport without horizontal overflow
+[217/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Catalog: open list stays inside the 390px viewport without horizontal overflow
+[218/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Catalog: open list stays inside the 360px viewport without horizontal overflow
+[219/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Projectile: one 44px control at the end of the header, closed list is not focusable
+[220/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Projectile: keyboard, Escape, outside click, focus return and aria-pressed
+[221/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Projectile: open list stays inside the 1440px viewport without horizontal overflow
+[222/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Projectile: open list stays inside the 390px viewport without horizontal overflow
+[223/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Projectile: open list stays inside the 360px viewport without horizontal overflow
+[224/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Solar: one 44px control at the end of the header, closed list is not focusable
+[225/278] [desktop-chromium] › tests/e2e/solar-layers.spec.ts:43:1 › Solar open shared drawer has no serious or critical axe violations
+[226/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:21:5 › Solar 390px: appearance menu works with the layer drawer closed and open
+[227/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Solar: keyboard, Escape, outside click, focus return and aria-pressed
+[228/278] [mobile-chromium] › tests/e2e/electrostatic-canvas.spec.ts:321:1 › @mobile source inspector has no horizontal overflow at 320px
+[229/278] [mobile-chromium] › tests/e2e/electrostatic-canvas.spec.ts:330:1 › @mobile touch can place and delete a source at the chosen Canvas point
+[230/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:21:5 › Solar 360px: appearance menu works with the layer drawer closed and open
+[231/278] [mobile-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:196:1 › @mobile 320px: trigger and drawer header do not overlap, no horizontal overflow
+[232/278] [mobile-chromium] › tests/e2e/electrostatic-gate5.spec.ts:58:1 › @mobile 320px: vector-addition evidence renders without horizontal overflow
+[233/278] [mobile-chromium] › tests/e2e/electrostatic-guided-redesign.spec.ts:134:1 › @mobile spatial chooser and Canvas remain usable at 320px
+[234/278] [mobile-chromium] › tests/e2e/electrostatic-guided.spec.ts:205:1 › @mobile guided task remains usable at 320px
+[235/278] [mobile-chromium] › tests/e2e/electrostatic-particle.spec.ts:100:1 › @mobile transport and precision disclosure remain reachable
+[236/278] [mobile-chromium] › tests/e2e/electrostatic.spec.ts:138:1 › @mobile 320px keeps canvas and fixed bottom tabs reachable without horizontal overflow
+[237/278] [mobile-chromium] › tests/e2e/fbd-graphite.spec.ts:95:1 › direct manipulation works with touch input on mobile @graphite @mobile
+[238/278] [mobile-chromium] › tests/e2e/fbd.spec.ts:38:1 › FBD keyboard controls and mobile layout @mobile
+[239/278] [mobile-chromium] › tests/e2e/hydrogen-guided.spec.ts:149:1 › @mobile guided activity fits a phone: no sideways scroll and the next step is reachable
+[240/278] [mobile-chromium] › tests/e2e/i18n-atmosphere-profile.spec.ts:18:1 › @mobile the language switcher remains reachable without horizontal overflow
+[241/278] [mobile-chromium] › tests/e2e/interference-b3.spec.ts:104:1 › activity controls fit a narrow touch viewport @mobile
+[242/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:66:3 › Solar: keyboard reaches the appearance trigger while the drawer is open; closed drawer is inert
+  11) [mobile-chromium] › tests/e2e/interference-b3.spec.ts:104:1 › activity controls fit a narrow touch viewport @mobile 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('interference-host').locator('[data-interference-runtime]')
+    Expected: 1
+    Received: 0
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('interference-host').locator('[data-interference-runtime]') with timeout 7000ms
+      - waiting for getByTestId('interference-host').locator('[data-interference-runtime]')
+        18 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      106 |   await page.goto("/interference-lifecycle");
+      107 |   const host = page.getByTestId("interference-host");
+    > 108 |   await expect(host.locator("[data-interference-runtime]")).toHaveCount(1);
+          |                                                             ^
+      109 |   await host.locator('[data-action="toggle-activities"]').tap();
+      110 |   await host.locator('[data-activity-tab="count"]').tap();
+      111 |   await host.locator('[data-answer="count-predict-antinodes"]').fill("7");
+        at <worktree>/tests/e2e/interference-b3.spec.ts:108:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-b3-activity-c-118ad-arrow-touch-viewport-mobile-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-b3-activity-c-118ad-arrow-touch-viewport-mobile-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-b3-activity-c-118ad-arrow-touch-viewport-mobile-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-b3-activity-c-118ad-arrow-touch-viewport-mobile-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[243/278] [mobile-chromium] › tests/e2e/interference-gate-c.spec.ts:36:1 › Gate C mobile sidebar defaults closed and can be reopened @mobile
+[244/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Solar: open list stays inside the 1440px viewport without horizontal overflow
+[245/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:21:5 › Atmosphere zh 1440px: appearance menu works with the layer drawer closed and open
+[246/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:21:5 › Atmosphere zh 390px: appearance menu works with the layer drawer closed and open
+[247/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:21:5 › Atmosphere zh 360px: appearance menu works with the layer drawer closed and open
+[248/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:66:3 › Atmosphere zh: keyboard reaches the appearance trigger while the drawer is open; closed drawer is inert
+[249/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:21:5 › Atmosphere en 1440px: appearance menu works with the layer drawer closed and open
+[250/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:21:5 › Atmosphere en 390px: appearance menu works with the layer drawer closed and open
+[251/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Solar: open list stays inside the 390px viewport without horizontal overflow
+[252/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:21:5 › Atmosphere en 360px: appearance menu works with the layer drawer closed and open
+[253/278] [desktop-chromium] › tests/e2e/theme-menu-drawer.spec.ts:66:3 › Atmosphere en: keyboard reaches the appearance trigger while the drawer is open; closed drawer is inert
+  12) [mobile-chromium] › tests/e2e/interference-gate-c.spec.ts:36:1 › Gate C mobile sidebar defaults closed and can be reopened @mobile 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('interference-host').locator('[data-interference-runtime]')
+    Expected: 1
+    Received: 0
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('interference-host').locator('[data-interference-runtime]') with timeout 7000ms
+      - waiting for getByTestId('interference-host').locator('[data-interference-runtime]')
+        18 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      37 |   await page.goto("/interference-lifecycle");
+      38 |   const host = page.getByTestId("interference-host");
+    > 39 |   await expect(host.locator("[data-interference-runtime]")).toHaveCount(1);
+         |                                                             ^
+      40 |   const toggle = host.locator('[data-action="toggle-activities"]');
+      41 |   await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      42 |   await toggle.tap();
+        at <worktree>/tests/e2e/interference-gate-c.spec.ts:39:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-gate-c-Gate-C-d5731--and-can-be-reopened-mobile-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-gate-c-Gate-C-d5731--and-can-be-reopened-mobile-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-gate-c-Gate-C-d5731--and-can-be-reopened-mobile-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-gate-c-Gate-C-d5731--and-can-be-reopened-mobile-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[254/278] [mobile-chromium] › tests/e2e/interference-renderer.spec.ts:80:1 › renderer fits a touch viewport and can place a measurement point @mobile
+[255/278] [mobile-chromium] › tests/e2e/interference-w45-c2.spec.ts:133:1 › C2 mobile: the projection exit button stays hittable after P was placed @w45 @mobile-layout
+[256/278] [mobile-chromium] › tests/e2e/projectile-uplift.spec.ts:79:1 › Projectile mobile controls, layers, theme and keyboard @mobile
+[257/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Solar: open list stays inside the 360px viewport without horizontal overflow
+  13) [mobile-chromium] › tests/e2e/interference-renderer.spec.ts:80:1 › renderer fits a touch viewport and can place a measurement point @mobile 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('interference-host').locator('canvas[data-interference-canvas]')
+    Expected: visible
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('interference-host').locator('canvas[data-interference-canvas]') with timeout 7000ms
+      - waiting for getByTestId('interference-host').locator('canvas[data-interference-canvas]')
+
+
+      82 |   const host = page.getByTestId("interference-host");
+      83 |   const plot = host.locator("[data-interference-plot]");
+    > 84 |   await expect(host.locator("canvas[data-interference-canvas]")).toBeVisible();
+         |                                                                  ^
+      85 |   await expect(host.locator("[data-interference-runtime]")).toHaveAttribute("data-interference-frame", /.+/);
+      86 |   const bounds = await plot.boundingBox();
+      87 |   if (!bounds) throw new Error("Plot has no visible bounds");
+        at <worktree>/tests/e2e/interference-renderer.spec.ts:84:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-renderer-rend-133a1--a-measurement-point-mobile-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/pw-qa/interference-renderer-rend-133a1--a-measurement-point-mobile-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/pw-qa/interference-renderer-rend-133a1--a-measurement-point-mobile-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../../tmp/pw-qa/interference-renderer-rend-133a1--a-measurement-point-mobile-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[258/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Atmosphere zh: one 44px control at the end of the header, closed list is not focusable
+[259/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Atmosphere zh: keyboard, Escape, outside click, focus return and aria-pressed
+[260/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere zh: open list stays inside the 1440px viewport without horizontal overflow
+[261/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere zh: open list stays inside the 390px viewport without horizontal overflow
+[262/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere zh: open list stays inside the 360px viewport without horizontal overflow
+[263/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Atmosphere en: one 44px control at the end of the header, closed list is not focusable
+[264/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Atmosphere en: keyboard, Escape, outside click, focus return and aria-pressed
+[265/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere en: open list stays inside the 1440px viewport without horizontal overflow
+[266/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere en: open list stays inside the 390px viewport without horizontal overflow
+[267/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Atmosphere en: open list stays inside the 360px viewport without horizontal overflow
+[268/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Electrostatics: one 44px control at the end of the header, closed list is not focusable
+[269/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Electrostatics: keyboard, Escape, outside click, focus return and aria-pressed
+[270/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Electrostatics: open list stays inside the 1440px viewport without horizontal overflow
+[271/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Electrostatics: open list stays inside the 390px viewport without horizontal overflow
+[272/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Electrostatics: open list stays inside the 360px viewport without horizontal overflow
+[273/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:25:3 › ThemeMenu Interference: one 44px control at the end of the header, closed list is not focusable
+[274/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:39:3 › ThemeMenu Interference: keyboard, Escape, outside click, focus return and aria-pressed
+[275/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Interference: open list stays inside the 1440px viewport without horizontal overflow
+[276/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Interference: open list stays inside the 390px viewport without horizontal overflow
+[277/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:99:5 › ThemeMenu Interference: open list stays inside the 360px viewport without horizontal overflow
+[278/278] [desktop-chromium] › tests/e2e/theme-menu.spec.ts:121:1 › ThemeMenu choice persists across pages and System follows the OS preference
+  13 failed
+    [desktop-chromium] › tests/e2e/electrostatic-gate4b.spec.ts:101:1 › only one advanced disclosure covers per-source contributions and resultant components 
+    [desktop-chromium] › tests/e2e/electrostatic-gate5.spec.ts:28:1 › two sources: shared-scale sentence appears, and both contributions plus the resultant are drawn 
+    [desktop-chromium] › tests/e2e/interference-b3.spec.ts:6:1 › guided activities, measurement, keyboard, dialog and advanced edge exploration 
+    [desktop-chromium] › tests/e2e/interference-b3.spec.ts:119:1 › interference host exposes named controls and has no serious axe violations @a11y 
+    [desktop-chromium] › tests/e2e/interference-c2-browser.spec.ts:3:1 › cross browser simulation and guided controls @cross-browser 
+    [desktop-chromium] › tests/e2e/interference-c2.spec.ts:86:1 › repeated mount, play, dispose and remount @c2 
+    [desktop-chromium] › tests/e2e/interference-c4.spec.ts:72:1 › activity 3 title survives 200% text size without overflow @c4 
+    [desktop-chromium] › tests/e2e/interference-gate-c.spec.ts:5:1 › Gate C dialog content and stored preferences survive reload 
+    [desktop-chromium] › tests/e2e/interference-lifecycle.spec.ts:3:1 › development harness survives StrictMode replay, unmount, and remount 
+    [desktop-chromium] › tests/e2e/interference-renderer.spec.ts:6:1 › renderer shows the field and keeps controls, measurement and lifecycle in sync 
+    [mobile-chromium] › tests/e2e/interference-b3.spec.ts:104:1 › activity controls fit a narrow touch viewport @mobile 
+    [mobile-chromium] › tests/e2e/interference-gate-c.spec.ts:36:1 › Gate C mobile sidebar defaults closed and can be reopened @mobile 
+    [mobile-chromium] › tests/e2e/interference-renderer.spec.ts:80:1 › renderer fits a touch viewport and can place a measurement point @mobile 
+  1 skipped
+  264 passed (2.2m)
