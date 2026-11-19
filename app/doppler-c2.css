@@ -90,8 +90,14 @@ html[data-mode="dark"] .doppler-c2 .doppler-toast[data-tone="warn"] .doppler-toa
 /* ---- Stage: figures + dock on the left, readouts and controls on the right ---- */
 .doppler-c2 .doppler-stage { display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-areas: "figures side" "dock side"; align-items: start; gap: 8px 12px; }
 .doppler-c2 .doppler-figures { grid-area: figures; display: grid; gap: 8px; min-width: 0; }
-.doppler-c2 .doppler-dock { grid-area: dock; min-width: 0; border: 1px solid var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
-.doppler-c2 .doppler-side { grid-area: side; min-width: 0; align-self: start; }
+.doppler-c2 .doppler-dock { grid-area: dock; min-width: 0; container: doppler-dock / inline-size; border: 1px solid var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+.doppler-c2 .doppler-side { grid-area: side; min-width: 0; align-self: stretch; }
+/* On wide screens the side panel is exactly as tall as the figures and the dock beside it, and scrolls inside itself. */
+@media (min-width: 901px) {
+  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-side { position: relative; min-height: 0; }
+  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-side-inner,
+  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-guided .guided-inner { position: absolute; inset: 0; width: auto; max-height: none; overflow-y: auto; }
+}
 
 /* Cards keep the dark data surface of the lab; only the frame follows C2. */
 .doppler-c2 .doppler-card { display: flex; flex-direction: column; min-width: 0; }
@@ -114,6 +120,13 @@ html[data-mode="dark"] .doppler-c2 .doppler-toast[data-tone="warn"] .doppler-toa
 
 /* ---- Dock: transport and live readout ---- */
 .doppler-c2 .doppler-transport { display: grid; grid-template-columns: auto minmax(120px, 1fr) auto auto; align-items: center; gap: 8px 14px; padding: 10px 14px; }
+/* The layout follows the width of the dock, not of the window: when the five buttons, the scrubber, the clock and the
+ * rate menu no longer fit on one row, the scrubber gets a row of its own and the clock and rate menu share the last. */
+@container doppler-dock (max-width: 720px) {
+  .doppler-c2 .doppler-transport { grid-template-columns: minmax(0, 1fr) auto; }
+  .doppler-c2 .doppler-transport-buttons { grid-column: 1 / -1; }
+  .doppler-c2 .doppler-scrub { grid-column: 1 / -1; }
+}
 .doppler-c2 .doppler-transport-buttons { display: flex; gap: 6px; }
 .doppler-c2 .doppler-transport-buttons button { min-width: 44px; padding: 8px 10px; white-space: nowrap; }
 .doppler-c2 .doppler-transport-buttons button[aria-label="播放"], .doppler-c2 .doppler-transport-buttons button[aria-label="暫停"],
@@ -184,9 +197,6 @@ html[data-mode="dark"] .doppler-c2 .doppler-toast[data-tone="warn"] .doppler-toa
   .doppler-c2 .doppler-stage { grid-template-columns: minmax(0, 1fr); grid-template-areas: "figures" "dock" "side"; }
   .doppler-c2 .doppler-wave-host { height: clamp(220px, 40vh, 340px); }
   .doppler-c2 .doppler-side-inner, .doppler-c2 .doppler-guided .guided-inner { max-height: none; overflow: visible; }
-  .doppler-c2 .doppler-transport { grid-template-columns: minmax(0, 1fr) auto; }
-  .doppler-c2 .doppler-transport-buttons { grid-column: 1 / -1; }
-  .doppler-c2 .doppler-scrub { grid-column: 1 / -1; }
 }
 @media (max-width: 660px) {
   .doppler-c2.lab-shell { padding: 8px 8px 24px; }

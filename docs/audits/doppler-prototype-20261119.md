@@ -47,7 +47,7 @@
 | Lint | `npm run lint` | 0 error；2 個 `StandardAtmosphereLab.tsx` 既有 warning（與本改動無關） |
 | Unit + build | `npm test`（= `npm run build` + `node --test tests/*.test.mjs`） | build 成功；**485 / 485 pass** |
 | 型別 | `npx tsc --noEmit` | 本改動無錯；`db/index.ts`、`worker/index.ts` 的 cloudflare 型別錯誤在 main 上即存在 |
-| Doppler E2E | `BASE_URL=http://localhost:3100 npx playwright test tests/e2e/doppler.spec.ts --project=desktop-chromium` | **30 / 30 pass**（dev server、Chromium） |
+| Doppler E2E | `BASE_URL=http://localhost:3100 npx playwright test tests/e2e/doppler.spec.ts --project=desktop-chromium` | **31 / 31 pass**（dev server、Chromium） |
 | 既有 Projectile E2E | `projectile-layered`、`projectile-export` | pass（一併跑的 32 個通過；theme-menu 見下） |
 | theme-menu E2E | `tests/e2e/theme-menu.spec.ts` | 本分支 12 / 36 失敗；**同一份 spec 在 main（dev server，同機）10 / 36 失敗**，失敗集合不同、症狀同為「選單 list 未出現」，判為 dev server 水合時序的既有不穩，**未診斷、未修**；Doppler 未影響這些頁面 |
 | 效能（非門檻） | `DOPPLER_PERF=1 npx playwright test tests/e2e/doppler-perf.spec.ts` | dev server／headless Chromium／未降速：首次可操作 322 ms；2× 播放 frame 平均 16.6 ms、p95 18.4 ms；放大視圖切換 22.7 ms。**這不是代表裝置的 baseline** |

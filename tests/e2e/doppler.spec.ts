@@ -302,6 +302,37 @@ test.describe("Doppler — free exploration", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   });
 
+  test("wide layouts: the side panel is as tall as figures plus dock, and the rate menu never leaves the dock", async ({ page }) => {
+    for (const [width, height] of [[1440, 900], [1280, 720], [1100, 800], [1000, 800], [920, 800]]) {
+      await page.setViewportSize({ width, height });
+      await open(page);
+      const rect = (selector: string) => page.evaluate((q) => { const r = document.querySelector(q)!.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, left: r.left, right: r.right }; }, selector);
+      const figures = await rect(".doppler-figures");
+      const dock = await rect(".doppler-dock");
+      const side = await rect(".doppler-side");
+      expect(Math.abs(side.top - figures.top), `${width}: tops`).toBeLessThanOrEqual(1);
+      expect(Math.abs(side.bottom - dock.bottom), `${width}: bottoms`).toBeLessThanOrEqual(1);
+      const menu = await rect(".doppler-transport .doppler-menu > button");
+      expect(menu.right, `${width}: rate menu inside the dock`).toBeLessThanOrEqual(dock.right + 0.5);
+      expect(menu.left).toBeGreaterThanOrEqual(dock.left);
+      for (const selector of [".doppler-transport-buttons", ".doppler-scrub", ".doppler-clock"]) {
+        const box = await rect(selector);
+        expect(box.right, `${width}: ${selector}`).toBeLessThanOrEqual(dock.right + 0.5);
+      }
+      // The menu list stays on screen when opened.
+      await page.getByRole("button", { name: /^播放倍率：/ }).click();
+      const list = await rect(".doppler-transport .doppler-menu-list");
+      expect(list.left).toBeGreaterThanOrEqual(0);
+      expect(list.right).toBeLessThanOrEqual(width);
+      expect(list.top).toBeGreaterThanOrEqual(0);
+      await page.keyboard.press("Escape");
+      await mode(page, "探索任務").click();
+      const guidedSide = await rect(".doppler-side");
+      const guidedDock = await rect(".doppler-dock"); // the masked readout makes the dock a little shorter
+      expect(Math.abs(guidedSide.bottom - guidedDock.bottom), `${width}: guided bottom`).toBeLessThanOrEqual(1);
+    }
+  });
+
   test("reduced motion: playback steps from event to event and stays readable and controllable", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await open(page);
