@@ -1,0 +1,264 @@
+/* Doppler effect of sound — C2 neutral scientific workbench, this workspace only.
+ * Every rule is scoped to .doppler-c2 (the <main> of /doppler and /en/doppler). Shared tokens and rules live in
+ * lab-c2.css (import that first); the guided-task blocks reuse the shared .guided-* rules from globals.css.
+ * Nothing here changes the physics or the two SVG views; their dark data surface and data colours stay as they
+ * are in both themes. Colour is never the only code: S is a diamond, O a square, the selected pair is thick.
+ */
+.doppler-c2.lab-shell { padding: 6px clamp(12px, 2vw, 28px) 12px; }
+
+/* ---- Header ---- */
+.doppler-c2 .doppler-topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--lc-border); }
+.doppler-c2 .doppler-identity { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.doppler-c2 .doppler-identity .eyebrow { font-size: 11px; }
+.doppler-c2 .doppler-identity h1 { margin: 0; font-size: 22px; line-height: 1.25; }
+.doppler-c2 .doppler-identity { order: 1; }
+.doppler-c2 .doppler-topbar .header-actions { display: flex; flex-wrap: wrap; align-items: center; flex: none; order: 3; }
+.doppler-c2 .doppler-icon-button { min-width: 44px; min-height: 44px; }
+
+/* ---- Buttons: one 44px control height, selected state = tint + ring + weight (not colour alone) ---- */
+.doppler-c2 :is(.header-actions, .doppler-menu-list, .doppler-modebar, .doppler-side, .doppler-dock, .doppler-toast, .doppler-leave-confirm, .guided-inner) button {
+  min-height: 44px;
+  border-color: var(--lc-border-control);
+  border-radius: 10px;
+  background: var(--lc-raised);
+  color: var(--lc-text);
+  font-size: 14px;
+  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+.doppler-c2 :is(.header-actions, .doppler-menu-list, .doppler-modebar, .doppler-side, .doppler-dock, .guided-inner) button:hover:not(:disabled) { transform: none; border-color: var(--lc-accent); background: var(--lc-sunken); }
+.doppler-c2 :is(.header-actions, .doppler-menu-list, .doppler-modebar, .doppler-side, .doppler-dock, .guided-inner) button:is(.active, [aria-pressed="true"], [aria-expanded="true"]) {
+  border-color: var(--lc-accent);
+  background: var(--lc-accent-subtle);
+  box-shadow: inset 0 0 0 1px var(--lc-accent);
+  color: var(--lc-text);
+  font-weight: 650;
+}
+.doppler-c2 button:disabled { cursor: not-allowed; opacity: .5; }
+.doppler-c2 .guided-block button.primary { border-color: var(--lc-accent); background: var(--lc-accent); color: var(--lc-on-accent); }
+.doppler-c2 .guided-block button.primary:hover:not(:disabled) { background: var(--lc-accent); filter: brightness(.92); }
+.doppler-c2 .guided-head > button { width: 44px; height: 44px; padding: 0; }
+.doppler-c2 .guided-progress { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.doppler-c2 .guided-progress button { min-height: 44px; font-size: 12px; }
+.doppler-c2 .guided-progress button.active { border-color: var(--lc-accent); background: var(--lc-accent-subtle); box-shadow: inset 0 0 0 1px var(--lc-accent); }
+.doppler-c2 .guided-progress button.active span { background: var(--lc-accent); color: var(--lc-on-accent); }
+.doppler-c2 .guided-question { font-family: inherit; font-weight: 600; }
+.doppler-c2 .guided-choices button { min-height: 44px; }
+.doppler-c2 .guided-block p { color: var(--lc-body); }
+.doppler-c2 .guided-head > div > span { color: var(--lc-muted); font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace; letter-spacing: .08em; }
+.doppler-c2 .guided-head h2 { font-family: inherit; font-weight: 650; }
+.doppler-c2 .guided-footer span { font-size: 12px; }
+.doppler-c2 .guided-measures dt { font-size: 12px; }
+.doppler-c2 .guided-inner { border: 1px solid var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+
+/* ---- Focus: 2px in the interface colour (light on the dark data surface) ---- */
+.doppler-lab.doppler-c2 :is(button, a, input, select, summary):focus-visible { outline: 2px solid var(--lc-focus); outline-offset: 2px; }
+.doppler-lab.doppler-c2 .doppler-card :is(button, a, input):focus-visible { outline-color: var(--lc-focus-on-dark); outline-offset: -2px; }
+
+/* ---- Menu ---- */
+.doppler-c2 .doppler-menu { position: relative; }
+.doppler-c2 .doppler-menu-list { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; display: flex; flex-direction: column; gap: 3px; min-width: 240px; padding: 8px; border: 1px solid var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+.doppler-c2 .doppler-menu-list button { justify-content: flex-start; width: 100%; border-color: transparent; background: transparent; text-align: left; }
+.doppler-c2 .doppler-menu-list[data-up="true"] { top: auto; bottom: calc(100% + 6px); min-width: 120px; }
+.doppler-c2 .doppler-menu-list a.doppler-menu-link { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 10px; border-radius: 10px; color: var(--lc-text); font-size: 14px; text-decoration: none; }
+.doppler-c2 .doppler-menu-list a.doppler-menu-link:hover { background: var(--lc-sunken); }
+.doppler-c2 .doppler-menu-gap { display: inline-block; width: 14px; flex: none; }
+.doppler-c2 .doppler-menu-note { margin: 0; padding: 8px 10px; max-width: 260px; color: var(--lc-muted); font-size: 13px; line-height: 1.5; }
+
+/* ---- Mode toggle: one segmented control with a thumb that slides to the chosen mode ---- */
+.doppler-c2 .doppler-modebar { display: flex; flex: 1 1 auto; align-items: center; order: 2; }
+.doppler-c2 .doppler-segmented { position: relative; display: inline-grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: 100%; padding: 3px; border: 1px solid var(--lc-border-control); border-radius: 13px; background: var(--lc-sunken); }
+.doppler-c2 .doppler-segmented::before { content: ""; position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 10px; background: var(--lc-raised); box-shadow: 0 0 0 1px var(--lc-accent), 0 1px 3px #16181d33; transition: transform 160ms ease; }
+.doppler-c2 .doppler-segmented[data-value="tasks"]::before { transform: translateX(100%); }
+.doppler-c2 .doppler-modebar .doppler-segmented > button { position: relative; z-index: 1; min-height: 44px; padding: 6px 18px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; color: var(--lc-body); font-weight: 500; white-space: nowrap; }
+.doppler-c2 .doppler-modebar .doppler-segmented > button:is(.active, [aria-pressed="true"]) { background: transparent; box-shadow: none; color: var(--lc-text); font-weight: 700; }
+.doppler-c2 .doppler-modebar .doppler-segmented > button:hover:not(:disabled) { background: transparent; border: 0; color: var(--lc-text); }
+.doppler-lab.doppler-c2 .doppler-segmented > button:focus-visible { outline-offset: -2px; }
+@media (prefers-reduced-motion: reduce) { .doppler-c2 .doppler-segmented::before { transition: none; } }
+
+/* ---- Header icon controls with a tooltip label (hover and keyboard focus) ---- */
+.doppler-c2 .doppler-tip { position: relative; display: inline-flex; }
+/* Not rendered at all until needed, so an invisible tooltip can never widen the page. */
+.doppler-c2 .doppler-tip::after { content: attr(data-tip); display: none; position: absolute; z-index: 60; top: calc(100% + 6px); right: 0; padding: 4px 9px; border-radius: 7px; background: var(--lc-text); color: var(--lc-page); font-size: 12px; line-height: 1.5; white-space: nowrap; pointer-events: none; }
+.doppler-c2 .doppler-tip[data-open="true"]::after { display: block; animation: doppler-tip-in 120ms ease 250ms both; }
+@keyframes doppler-tip-in { from { opacity: 0; } to { opacity: 1; } }
+.doppler-c2 .doppler-tip:has([aria-expanded="true"])::after { display: none !important; }
+@media (prefers-reduced-motion: reduce) { .doppler-c2 .doppler-tip::after { animation: none !important; } }
+.doppler-c2 .doppler-tip .doppler-menu > button { min-width: 44px; padding: 0 10px; gap: 4px; font-weight: 600; letter-spacing: .02em; }
+.doppler-c2 .doppler-icon-button { min-width: 44px; min-height: 44px; padding: 0; }
+.doppler-c2 .doppler-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.doppler-c2 .doppler-leave-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 8px; padding: 10px 12px; border: 1px solid var(--lc-accent); border-radius: 10px; background: var(--lc-raised); }
+.doppler-c2 .doppler-leave-confirm p { flex: 1 1 220px; margin: 0; font-size: 14px; line-height: 1.5; }
+/* Notices float over the workspace, so showing or closing one never moves anything else. */
+.doppler-c2 .doppler-toast { position: fixed; z-index: 120; right: 16px; bottom: 16px; display: flex; align-items: flex-start; gap: 10px; width: min(440px, calc(100vw - 24px)); padding: 12px 8px 12px 14px; border: 1px solid var(--lc-border-control); border-left: 4px solid var(--lc-accent); border-radius: 12px; background: var(--lc-raised); color: var(--lc-text); box-shadow: 0 12px 32px #0000003d, var(--lc-card-shadow); }
+.doppler-c2 .doppler-toast[data-tone="warn"] { border-left-color: #b45309; }
+.doppler-c2 .doppler-toast-icon { flex: none; margin-top: 11px; color: var(--lc-accent); }
+.doppler-c2 .doppler-toast[data-tone="warn"] .doppler-toast-icon { color: #b45309; }
+.doppler-c2 .doppler-toast-body { flex: 1 1 auto; min-width: 0; padding-top: 10px; }
+.doppler-c2 .doppler-toast-body p { margin: 0; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+.doppler-c2 .doppler-toast-link { display: flex; align-items: flex-end; gap: 6px; margin-top: 8px; }
+.doppler-c2 .doppler-toast-link label { flex: 1 1 auto; min-width: 0; margin-top: 0; }
+.doppler-c2 .doppler-toast-link > button { flex: none; width: 44px; min-width: 44px; padding: 0; }
+.doppler-c2 .doppler-toast-link > button[data-copied="true"] { border-color: var(--lc-accent); background: var(--lc-accent-subtle); }
+.doppler-c2 .doppler-toast-body label { display: grid; gap: 4px; margin-top: 8px; font-size: 12px; color: var(--lc-muted); }
+.doppler-c2 .doppler-toast-body input { width: 100%; min-height: 44px; padding: 0 10px; border: 1px solid var(--lc-border-control); border-radius: 10px; background: var(--lc-raised); color: var(--lc-text); font-size: 13px; }
+.doppler-c2 .doppler-toast-close { flex: none; width: 44px; min-width: 44px; padding: 0; }
+@media (prefers-color-scheme: dark) { html:not([data-mode]) .doppler-c2 .doppler-toast[data-tone="warn"] { border-left-color: #f59e0b; } html:not([data-mode]) .doppler-c2 .doppler-toast[data-tone="warn"] .doppler-toast-icon { color: #f59e0b; } }
+html[data-mode="dark"] .doppler-c2 .doppler-toast[data-tone="warn"] { border-left-color: #f59e0b; }
+html[data-mode="dark"] .doppler-c2 .doppler-toast[data-tone="warn"] .doppler-toast-icon { color: #f59e0b; }
+
+/* ---- Stage: figures + dock on the left, readouts and controls on the right ---- */
+.doppler-c2 .doppler-stage { display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-areas: "figures side" "dock side"; align-items: start; gap: 8px 12px; }
+.doppler-c2 .doppler-figures { grid-area: figures; display: grid; gap: 8px; min-width: 0; }
+.doppler-c2 .doppler-dock { grid-area: dock; min-width: 0; container: doppler-dock / inline-size; border: 1px solid var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+.doppler-c2 .doppler-side { grid-area: side; min-width: 0; align-self: stretch; }
+/* On wide screens the side panel is exactly as tall as the figures and the dock beside it, and scrolls inside itself. */
+@media (min-width: 901px) {
+  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-side { position: relative; min-height: 0; }
+  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-side-inner,
+  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-guided .guided-inner { position: absolute; inset: 0; width: auto; max-height: none; overflow-y: auto; }
+}
+
+/* Cards keep the dark data surface of the lab; only the frame follows C2. */
+.doppler-c2 .doppler-card { display: flex; flex-direction: column; min-width: 0; }
+.doppler-c2 .doppler-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 8px 8px 0 14px; color: #f4f7f8; }
+.doppler-c2 .doppler-card-head > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; padding-top: 6px; }
+.doppler-c2 .doppler-card-head strong { font-size: 15px; font-weight: 600; }
+.doppler-c2 .doppler-card-head small { color: #a8bdc8; font-size: 12px; }
+.doppler-c2 .doppler-expand, .doppler-c2 .doppler-expand-actions button { min-width: 44px; min-height: 44px; border: 1px solid rgba(255, 255, 255, .28); border-radius: 10px; background: rgba(5, 20, 30, .5); color: #f4f7f8; }
+.doppler-c2 .doppler-expand:hover, .doppler-c2 .doppler-expand-actions button:hover { border-color: #9bd7dd; background: rgba(5, 20, 30, .8); transform: none; }
+.doppler-c2 .doppler-expand-actions { display: flex; gap: 6px; }
+.doppler-c2 .doppler-expand-actions button { width: 44px; padding: 0; }
+.doppler-c2 .doppler-expand-notice { margin: 0 14px; padding: 6px 10px; border-radius: 6px; background: #092439; color: #fff; font-size: 13px; }
+.doppler-c2 .doppler-host { position: relative; width: 100%; min-width: 0; }
+.doppler-c2 .doppler-wave-host { height: clamp(188px, calc(100vh - 530px), 340px); }
+.doppler-c2 .doppler-band-host { height: 176px; }
+.doppler-c2 .doppler-host > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.doppler-c2 .doppler-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 4px 14px 10px; color: #d4e0e5; font-size: 12px; }
+.doppler-c2 .doppler-legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.doppler-c2 .doppler-legend i { display: inline-block; width: 16px; height: 2px; }
+
+/* ---- Dock: transport and live readout ---- */
+.doppler-c2 .doppler-transport { display: grid; grid-template-columns: auto minmax(120px, 1fr) auto auto; align-items: center; gap: 8px 14px; padding: 10px 14px; }
+/* The layout follows the width of the dock, not of the window: when the five buttons, the scrubber, the clock and the
+ * rate menu no longer fit on one row, the scrubber gets a row of its own and the clock and rate menu share the last. */
+@container doppler-dock (max-width: 720px) {
+  .doppler-c2 .doppler-transport { grid-template-columns: minmax(0, 1fr) auto; }
+  .doppler-c2 .doppler-transport-buttons { grid-column: 1 / -1; }
+  .doppler-c2 .doppler-scrub { grid-column: 1 / -1; }
+}
+.doppler-c2 .doppler-transport-buttons { display: flex; gap: 6px; }
+.doppler-c2 .doppler-transport-buttons button { min-width: 44px; padding: 8px 10px; white-space: nowrap; }
+.doppler-c2 .doppler-transport-buttons button[aria-label="播放"], .doppler-c2 .doppler-transport-buttons button[aria-label="暫停"],
+.doppler-c2 .doppler-transport-buttons button[aria-label="Play"], .doppler-c2 .doppler-transport-buttons button[aria-label="Pause"] { min-width: 96px; }
+.doppler-c2 .doppler-scrub { width: 100%; min-width: 0; margin: 0; }
+.doppler-c2 .doppler-clock { color: var(--lc-muted); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.doppler-c2 .doppler-transport .doppler-menu > button { min-width: 72px; padding: 6px 10px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.doppler-c2 .doppler-live { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 24px; padding: 8px 14px; border-top: 1px solid var(--lc-border); font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.doppler-c2 .doppler-live i { margin-right: 6px; color: var(--lc-muted); font-size: 12px; font-style: normal; font-weight: 400; }
+.doppler-c2 .doppler-live .doppler-masked { font-size: 14px; font-weight: 500; color: var(--lc-body); }
+.doppler-c2 .doppler-note { margin: 0; padding: 0 14px 8px; color: var(--lc-muted); font-size: 12px; line-height: 1.65; }
+.doppler-c2 .doppler-side .doppler-note { padding: 6px 0 0; }
+
+/* ---- Side panel ---- */
+.doppler-c2 .doppler-side-inner { max-height: calc(100vh - 150px); overflow-y: auto; border: 1px solid var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
+.doppler-c2 .doppler-group { padding: 12px 14px; }
+.doppler-c2 .doppler-group + .doppler-group { border-top: 1px solid var(--lc-border); }
+.doppler-c2 .doppler-group-label { margin: 0 0 8px; color: var(--lc-muted); font: 500 12px/1.5 ui-monospace, SFMono-Regular, monospace; letter-spacing: .08em; }
+.doppler-c2 .doppler-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.doppler-c2 .doppler-presets button { flex: 1 1 auto; padding: 6px 10px; }
+.doppler-c2 .doppler-pair-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.doppler-c2 .doppler-pair-head .doppler-group-label { margin: 0; }
+.doppler-c2 .doppler-pair-stepper { display: flex; align-items: center; gap: 4px; }
+.doppler-c2 .doppler-pair-stepper button { min-width: 44px; padding: 0; }
+.doppler-c2 .doppler-pair-stepper output { min-width: 66px; text-align: center; font-weight: 650; font-variant-numeric: tabular-nums; }
+.doppler-c2 .doppler-readout-list { display: grid; gap: 4px; margin: 0; }
+.doppler-c2 .doppler-readout-list > div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--lc-border); }
+.doppler-c2 .doppler-readout-list dt { color: var(--lc-body); font-size: 13px; }
+.doppler-c2 .doppler-readout-list dd { margin: 0; font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
+.doppler-c2 .doppler-readout-list dd[data-waiting="true"] { color: var(--lc-muted); font-size: 13px; font-weight: 500; }
+.doppler-c2 .doppler-reference-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.doppler-c2 .doppler-compare { width: 100%; margin-top: 8px; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.doppler-c2 .doppler-compare caption { padding-bottom: 4px; color: var(--lc-muted); font-size: 12px; text-align: left; }
+.doppler-c2 .doppler-compare th, .doppler-c2 .doppler-compare td { padding: 6px 8px; border-bottom: 1px solid var(--lc-border); text-align: right; }
+.doppler-c2 .doppler-compare th[scope="row"] { text-align: left; font-weight: 500; color: var(--lc-body); }
+.doppler-c2 .doppler-compare thead th { color: var(--lc-muted); font-size: 12px; font-weight: 600; }
+.doppler-c2 .doppler-compare .doppler-higher { font-weight: 700; box-shadow: inset 0 -2px 0 var(--lc-accent); }
+.doppler-c2 .doppler-check { margin-top: 8px; color: var(--lc-body); font-size: 13px; }
+.doppler-c2 .doppler-check summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; list-style: none; font-weight: 600; }
+.doppler-c2 .doppler-check summary::-webkit-details-marker { display: none; }
+.doppler-c2 .doppler-check summary::before { content: "▸"; display: inline-block; width: 1.2em; color: var(--lc-muted); transition: none; }
+.doppler-c2 .doppler-check[open] > summary::before { content: "▾"; }
+.doppler-c2 .doppler-check p { margin: 0 0 6px; line-height: 1.6; }
+.doppler-c2 .doppler-speed { display: grid; gap: 0; margin-bottom: 4px; }
+.doppler-c2 .doppler-speed label span { font-size: 14px; }
+.doppler-c2 .doppler-speed b { margin-left: 6px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.doppler-c2 .doppler-speed-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.doppler-c2 .doppler-speed-row button { padding: 6px 12px; }
+.doppler-c2 .doppler-layer-toggles { display: grid; gap: 2px; margin-top: 6px; }
+.doppler-c2 .doppler-layer-toggles label { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; cursor: pointer; }
+.doppler-c2 .doppler-layer-toggles input { width: 18px; height: 18px; accent-color: var(--lc-accent); }
+.doppler-c2 .guided-side, .doppler-c2 .doppler-guided { min-width: 0; }
+.doppler-c2 .doppler-guided .guided-inner { width: 100%; max-height: calc(100vh - 150px); overflow-y: auto; }
+.doppler-c2 .guided-table th, .doppler-c2 .guided-table td { white-space: normal; }
+.doppler-c2 .guided-table .doppler-higher { font-weight: 700; box-shadow: inset 0 -2px 0 var(--lc-accent); }
+
+/* ---- Immersive view: one science view with the clock still in reach ---- */
+.doppler-c2 .doppler-stage:not([data-expanded="none"]) { position: fixed; z-index: 90; inset: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: "figures" "dock"; overflow: auto; padding: 12px; background: var(--lc-sunken); }
+.doppler-c2 .doppler-stage[data-expanded="wave"] [data-card="band"], .doppler-c2 .doppler-stage[data-expanded="band"] [data-card="wave"],
+.doppler-c2 .doppler-stage:not([data-expanded="none"]) .doppler-side { display: none; }
+.doppler-c2 .doppler-stage:not([data-expanded="none"]) .doppler-figures { height: 100%; min-height: 0; grid-template-rows: minmax(0, 1fr); }
+.doppler-c2 .doppler-stage:not([data-expanded="none"]) .doppler-card { height: 100%; min-height: 0; }
+.doppler-c2 .doppler-stage:not([data-expanded="none"]) .doppler-host { flex: 1; height: auto; min-height: 200px; }
+
+/* ---- Tablet and phone: reading order is figures, clock, key readout, presets and controls ---- */
+@media (max-width: 900px) {
+  .doppler-c2 .doppler-modebar { order: 4; flex-basis: 100%; }
+  .doppler-c2 .doppler-stage { grid-template-columns: minmax(0, 1fr); grid-template-areas: "figures" "dock" "side"; }
+  .doppler-c2 .doppler-wave-host { height: clamp(220px, 40vh, 340px); }
+  .doppler-c2 .doppler-side-inner, .doppler-c2 .doppler-guided .guided-inner { max-height: none; overflow: visible; }
+}
+@media (max-width: 660px) {
+  .doppler-c2.lab-shell { padding: 8px 8px 24px; }
+  .doppler-c2 .doppler-topbar { flex-direction: row; align-items: center; gap: 4px 8px; }
+  .doppler-c2 .doppler-identity h1 { font-size: 18px; }
+  .doppler-c2 .doppler-identity .eyebrow { display: none; }
+  .doppler-c2 .doppler-topbar .header-actions { width: 100%; gap: 6px; }
+  .doppler-c2 .doppler-topbar .header-actions > * { flex: 0 0 auto; }
+  .doppler-c2 .doppler-segmented { width: 100%; }
+  .doppler-c2 .doppler-modebar .doppler-segmented > button { padding: 6px 6px; font-size: 13px; line-height: 1.2; white-space: normal; }
+  .doppler-c2 .doppler-tip::after { right: auto; left: 0; }
+  .doppler-c2 .doppler-tip:nth-last-child(-n+2)::after { left: auto; right: 0; }
+  .doppler-c2 .doppler-wave-host { height: 216px; }
+  .doppler-c2 .doppler-card-head small { display: none; }
+  .doppler-c2 .doppler-legend { padding: 2px 10px 8px; font-size: 11px; }
+  .doppler-c2 .doppler-transport { padding: 8px; gap: 6px; }
+  .doppler-c2 .doppler-transport-buttons { display: grid; grid-template-columns: 44px 44px minmax(0, 1fr) 44px 44px; gap: 4px; width: 100%; }
+  .doppler-c2 .doppler-transport-buttons button { min-width: 0; padding: 6px 4px; }
+  .doppler-c2 .doppler-transport-buttons button[aria-label] { min-width: 0; }
+  .doppler-c2 .doppler-transport .doppler-menu { margin-left: auto; }
+  .doppler-c2 .doppler-transport .doppler-menu > button { min-width: 64px; }
+  .doppler-c2 .doppler-clock { font-size: 12px; }
+  .doppler-c2 .doppler-live { padding: 6px 10px; gap: 2px 14px; font-size: 14px; }
+  .doppler-c2 .doppler-presets button { flex: 1 1 calc(50% - 6px); }
+  .doppler-c2 .doppler-menu-list { right: auto; left: 0; max-width: calc(100vw - 24px); }
+  .doppler-c2 .doppler-transport .doppler-menu-list { left: auto; right: 0; }
+  .doppler-c2 .doppler-toast { right: 8px; left: 8px; bottom: 8px; width: auto; }
+}
+/* With enough height the two figures stay pinned while the controls scroll underneath. */
+@media (max-width: 660px) and (min-height: 700px) {
+  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-figures { position: sticky; top: 0; z-index: 15; padding-bottom: 4px; background: var(--lc-page); }
+  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-band-host { height: 176px; }
+  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-wave-host { height: 190px; }
+}
+@media (max-width: 660px) and (max-height: 520px) {
+  .doppler-c2 .doppler-wave-host { height: clamp(150px, calc(100dvh - 96px), 216px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .doppler-c2 * { scroll-behavior: auto !important; }
+}
+
+/* ---- Theory dialog: the symbol table scrolls sideways inside itself on narrow screens ---- */
+.doppler-c2 .theory-table-scroll { overflow-x: auto; margin: 10px 0 18px; }
+.doppler-c2 .theory-symbols { min-width: 560px; margin-top: 0; }
+.doppler-c2 .theory-symbols th[scope="row"] { white-space: nowrap; font-weight: 500; }
+.doppler-c2 .theory-symbols thead th { font-size: 13px; }

@@ -1,0 +1,281 @@
+# 聲音的都普勒效應｜本機 prototype 證據矩陣（2026-11-19）
+
+狀態：**本機 prototype，未公開**。registry 為 `prototype` × `unlisted`、頁面 `noindex`、不在 sitemap。初版撰寫時沒有推送、沒有 PR、沒有部署（之後已開 draft PR，見第 10 節）。
+這是新模組候選，不是 Hydrogen STOP 之後的替代 Pilot；11/30 範圍仍待 Owner 11/20 REPLAN。
+
+> **閱讀方式（2026-11-20 收斂）**：第 1–10 節是**歷史紀錄**，依序記錄初版（`d73d347`）與其後各輪回饋，數字與狀態維持當時的結果，不回頭改寫。**現行**的固定版本、CI、測試數字、R01–R12 狀態、未解決問題與裁決，只以 **第 11 節** 為準；本文件是這個模組唯一的證據真本。
+
+證據分級依契約：**程式存在**（找得到實作）、**測試通過**（指定環境與範圍的結果）、**產品通過**（Owner 驗收）。本文件只宣稱前兩級，且逐項標出沒驗的部分。
+
+## 1. 基準
+
+| 項目 | 內容 |
+| --- | --- |
+| 基準 main | `58f244d`（feat(projectile): Gate A layered scientific workspace） |
+| 工作區 | 獨立 worktree `../lab-doppler`，分支 `feat/doppler-prototype`；原 main 工作樹未動 |
+| 實作 commit | `f353717`（科學核心）→ `df01b00`（模型層）→ `da262c6`（介面、路由、測試）；本文件與截圖是其後的 docs commit |
+| PR #52 | **Draft、OPEN**，head `qa/projectile-baseline-20261118`，`MERGEABLE`，CI `check` SUCCESS，未合併。依指示以已合併 main 為基礎，只把它當 QA 參考 |
+| Notion 契約 v1.0-d1 | 已讀（R01–R12、七週順序、分享與狀態相容性） |
+| Notion 11/30 里程碑 | 已讀；狀態「等待」。2026-11-16 Hydrogen STOP：Owner Product UX Gate **FAIL**、Student Learning Gate **NOT CHECKED**、Release **NOT APPROVED**；11/18 Scope Reset 為「建議但未核定」。本 prototype 不改這些狀態 |
+| Owner Gate（本模組） | **尚無**：Product UX、Student Learning、Release 全部未檢查 |
+
+## 2. 重用與缺口
+
+**直接重用（未複製）**：`app/lab-c2.css` 的 `--lc-*` token 與 44px range、`LabInfoDialog`（理論與模型；新增選用 `closeLabel`，預設值不變，Projectile 行為不變）、`components/math/MathJax`（自架 MathJax）、`ThemeToggle`、`KakauLabMark`、`lib/i18n`（`Locale`、`localizedPath`）與 `proxy.ts` 的 URL 語系、`lib/site-metadata`、`globals.css` 內的 `.viewport-card`、`.theory-*`、`.guided-*`、registry、Playwright 設定與 `tests/e2e/evidence.ts`。
+
+**沿用慣例但各自實作（缺口，非平台抽象）**：工具選單、放大視圖／Fullscreen 回退、元素量測尺寸 hook、傳輸控制（播放、單步、倍率）、引導任務狀態機與揭露政策、分享 codec 的驗證邊界。這些在 Projectile 與本模組各有一份，**現在已有第二個 consumer**；是否抽取、抽成什麼，留給既有 Gate。本輪刻意不新增通用工作區、時鐘或物理引擎。
+
+**平台上沒有、本輪也沒補的**：共用的模式列、共用傳輸／時鐘、`/doppler/notes` 獨立理論頁（理論只做成 dialog）、catalog 卡片美術。
+
+## 3. 實際修改與入口
+
+- 入口：`/doppler`（繁中）、`/en/doppler`（英文）。本機：`npm run dev` 後開 `http://localhost:3000/doppler`。
+- 新增：`lib/science/doppler.ts`、`models/doppler{,-learning,-serialization,-export}.ts`、`components/DopplerLab.tsx`、`components/doppler/*`、`app/doppler{,-c2.css}`、`app/en/doppler`；registry 第 11 號。
+- 修改既有：`lib/labs/registry.ts`（新增項目）、`tests/registry.test.mjs`（11→12 項、矩陣）、`components/overlays/LabInfoDialog.tsx`（選用 `closeLabel`）、`docs/architecture.md`、`CHANGELOG.md`。
+
+### 我自己定的、需要 Owner 知道的選擇
+
+1. **S、O 初距 6 λ₀、實驗上限 16 T₀。** 初距 8 λ₀、上限 14 T₀ 時，O 以 0.5c 遠離根本收不到兩次波前；6／16 讓所有 |u|≤0.5c 的單一運動情況都至少有兩對可讀，同時 x 軸（−12…12 λ₀）能固定不變。
+2. **改任何速度即重新生成實驗並回到 t = 0、暫停。** 沒有嘗試「保留目前時間」，因為事件資料整份改變。
+3. **預設波前對為 #2、#3。** 步進器會把所選對限制在「兩個接收都在實驗內」的範圍。
+4. **分享不含參考結果、時間、任務作答。** 語言切換連結只帶起始設定，因此切換語言會保留實驗，但不保留時間、參考與任務。
+5. **速度滑桿用有號單一軸（−0.5c…+0.5c）加「反向」鈕**，而不是方向＋大小兩個控制，鍵盤與觸控都只需一個控制項。
+6. 同向同速預設（兩者 0.2c 向右）：f/f₀ = 1 但 λ/λ₀ = 0.8，作為「間距會變、頻率不變」的對照。
+
+## 4. 驗證結果（初版 `d73d347`；現行數字見第 11 節）
+
+| 項目 | 指令 | 結果 |
+| --- | --- | --- |
+| Lint | `npm run lint` | 0 error；2 個 `StandardAtmosphereLab.tsx` 既有 warning（與本改動無關） |
+| Unit + build | `npm test`（= `npm run build` + `node --test tests/*.test.mjs`） | build 成功；**485 / 485 pass** |
+| 型別 | `npx tsc --noEmit` | 本改動無錯；`db/index.ts`、`worker/index.ts` 的 cloudflare 型別錯誤在 main 上即存在 |
+| Doppler E2E | `BASE_URL=http://localhost:3100 npx playwright test tests/e2e/doppler.spec.ts --project=desktop-chromium` | **32 / 32 pass**（dev server、Chromium） |
+| 既有 Projectile E2E | `projectile-layered`、`projectile-export` | pass（一併跑的 32 個通過；theme-menu 見下） |
+| theme-menu E2E | `tests/e2e/theme-menu.spec.ts` | 本分支 12 / 36 失敗；**同一份 spec 在 main（dev server，同機）10 / 36 失敗**，失敗集合不同、症狀同為「選單 list 未出現」，判為 dev server 水合時序的既有不穩，**未診斷、未修**；Doppler 未影響這些頁面 |
+| 效能（非門檻） | `DOPPLER_PERF=1 npx playwright test tests/e2e/doppler-perf.spec.ts` | dev server／headless Chromium／未降速：首次可操作 322 ms；2× 播放 frame 平均 16.6 ms、p95 18.4 ms；放大視圖切換 22.7 ms。**這不是代表裝置的 baseline** |
+
+### 科學單元測試（獨立解析值，`tests/doppler-science.test.mjs`）
+
+| 情況（O 在 S 右側） | λ/λ₀ | f_obs/f₀ | 結果 |
+| --- | --- | --- | --- |
+| 都靜止 | 1 | 1 | pass |
+| 波源向右 0.2c（靠近） | 0.8 | 1.25 | pass |
+| 觀察者向左 0.2c（靠近） | 1 | 1.20 | pass |
+| 波源向左 0.2c（遠離） | 1.2 | 1/1.2 | pass |
+| 觀察者向右 0.2c（遠離） | 1 | 0.80 | pass |
+| 同向同速 u = 0.2、−0.3、0.5 | 1−u | 1 | pass |
+
+另有：左右鏡像（O 在左，時間相同、位置反號）、第一／第二次接收（一次接收不構成間隔）、任意時間路徑下狀態相同（步長不變性）、事件步進逐一走訪且不重複、重合前停止（0.5c 對 −0.5c 在相距 1 λ₀ 結束，S 從未到 O）、八種非法參數（NaN、Infinity、|u|>0.5c、距離過近／過遠、位置過大）、層級（science 不 import、models 只 import `lib/science`、`lib/render` 不認得 Doppler）。
+
+## 5. R01–R12 證據矩陣（初版 `d73d347`；現行狀態見第 11.5 節）
+
+「E」＝已有的證據；「缺」＝這輪沒做或沒驗。瀏覽器證據都是 **Chromium（Playwright，視窗大小模擬）**；沒有真機、沒有 Safari／Firefox、沒有螢幕閱讀器。
+
+| 編號 | 狀態 | E：證據 | 缺：缺口 |
+| --- | --- | --- | --- |
+| R01 共同資訊架構 | 部分 | 自由探索／探索任務／理論與模型三入口皆實質有內容，無空分頁；參數與讀值在工作區側欄，分享、匯出、語言、外觀、模型資訊在標頭（`doppler.spec`：Activity 1/2、free 系列） | 沒有「圖層」抽屜（只有 2 個 checkbox：連線、編號）；工具選單是本模組自有 |
+| R02 桌機與手機工作區 | 部分 | 1366×768、1280×720、390×844、360×800、320×640 皆無橫向捲動、兩圖與時鐘在視窗寬內、主要入口 ≥44 px、tab 順序每一站有 ≥2 px 焦點環且在視窗內；1280×720 核心圖、傳輸、側欄操作在同一畫面（截圖 `free-1280x720.png`）；手機依「圖→時鐘→預設→參數→讀值」堆疊，兩圖在高度≥700 時釘住 | 200% 文字、400% zoom、旋轉**未測**；1280×720 頁面本身不捲動（量得 dock 底 705 px、`scrollHeight` 720），預設與兩個速度滑桿在首屏，但所選對讀值卡在側欄內要捲動才看全 |
+| R03 沉浸與重設 | 部分 | 兩個科學視圖各自放大／退出（Esc、焦點回到該視圖的觸發鈕），放大前後參數、時間、所選對皆保留；Fullscreen API 失敗時視窗內放大仍可用（程式存在）；重設實驗與重新開始任務分開 | Fullscreen API 成功與失敗路徑**初版未在瀏覽器驗（已於第 10 節補驗）**；波前圖沒有平移／縮放，所以沒有「視角復位」 |
+| R04 可重現分享 | 通過（測試範圍內） | 分享＝起始設定；含模型版本 `doppler-wavefront-1`、格式 v1、初始位置、速度、預設、所選對、呈現旗標；乾淨 browser context 開啟後暫停在 t=0 且參數、預設、所選對一致，再播放得 1.20；無效 JSON、格式 v2、模型版本不符、速度越界皆回到預設並說明原因（`doppler.spec` share 測試＋`doppler-state.test.mjs`＋伺服端渲染測試）。不含時間、作答、學生資訊 | 沒有舊格式可遷移（本模組只有 v1）；URL 長度上限 2000 之外的行為只靠單元測試 |
+| R05 可用成果匯出 | 通過（測試範圍內） | SVG 教學圖＋JSON 事件資料；SVG 含波前圖、接收時間帶、比較表（目前／參考／公式核對）、條件、單位、模型版本、結果／分享格式、假設、全部事件於 `<metadata>`；實際以檔案開啟並看過（`export-observer-approach.png`），逐一檢查文字都在畫面內、無裁切，並修掉第一版的標籤重疊（A 標題與說明列、標籤壓在圓上） | 只匯出目前游標時刻的波前圖（時間帶與比較表是整個實驗）；匯出固定白底；PNG 匯出未做 |
+| R06 完整雙語與 ruby | 部分 | 繁中預設、`/en/doppler`；介面、導學、錯誤、理論、匯出、對話框關閉鈕皆雙語；320 與 390 px 英文長標籤無橫向捲動、按鈕文字無裁切；語言切換保留起始設定 | **台文 ruby specimen 未驗**；英文實驗文案未經人工審稿；螢幕閱讀器的語言切換未驗 |
+| R07 完整探索活動 | 通過（測試範圍內） | 任務一「波源怎麼發聲？」（預測→量→解釋→完成）；任務二「誰在動？」（預測→波源動→觀察者動→比較→解釋→遠離驗證→完成）。每步的揭露、保留結果、重新開始、離開確認、切換任務、返回自由探索還原先前設定與參考的規則皆有測試 | 沒有學生使用觀察；提示文案未經學生驗證 |
+| R08 多重表徵與比較 | 通過（測試範圍內） | 同一波前在波前圖、時間帶、讀值卡以編號與粗線連動；時間帶標記、步進器皆可選對（`doppler.spec` 選取連動測試）；保留一次參考後改條件，在同一尺度（固定 x 軸、固定時間軸）下比較 1.25 與 1.20 | 波前圖上直接點圓只有程式、測試用的是時間帶與步進器 |
+| R09 科學透明度 | 部分 | 理論 dialog：名稱、`doppler-wavefront-1`、方程、符號與 s 的定義、假設、數值方法（封閉解、無時間步進）、結束條件、適用範圍與限制、OpenStax §17.7 來源；模型資訊說明「圓、接收時刻、讀值＝模型；箭頭長度、標記大小、標籤位置＝示意」；匯出再列一次 | 沒有獨立 `/doppler/notes` 頁 |
+| R10 操作與可及性 | 部分 | 預設、速度、時鐘、步進器、放大都可只用鍵盤完成（`doppler.spec` 鍵盤測試）；有可辨焦點；S＝菱形、O＝方塊、所選對＝粗線，不靠顏色；本模組沒有拖曳操作，所選對有「上一對／下一對」替代；結構化讀值（`dl`／`table`）；axe：自由探索、接收後、導學預測、導學量測、理論 dialog、暗色自由／比較／理論皆無 serious／critical | 未做螢幕閱讀器實測；axe 不等於 WCAG 2.2 AA 全項；SVG 標記的點擊區約 22 px（<44，已有按鈕替代） |
+| R11 效能與恢復 | 部分 | 上表的非門檻數字；非法／過期分享、匯出失敗、Fullscreen 失敗皆有可理解的訊息與回復 | 沒有代表裝置的 baseline、沒有低階手機量測、沒有拖曳延遲（無拖曳） |
+| R12 可維護與可追溯 | 部分 | science／models／components 分層由 `doppler-state.test.mjs` 斷言；科學、互動、教學、視覺（截圖）、分享／匯出、雙語各有獨立測試；三種版本名稱分開（模型、分享、結果）；registry 與 CHANGELOG 已更新；`lint` + `test` 本機通過 | 沒跑遠端 CI、沒部署、沒有正式 smoke；PR 未開 |
+
+## 6. 截圖與檔案
+
+均在 `docs/audits/doppler-prototype-20261119/`：
+
+- 自由探索：`free-1366x768.png`、`free-1280x720.png`、`free-390x844.png`、`free-360x800.png`、`free-320x640.png`；暗色 `free-dark-1280x720.png`
+- 導學：`guided-predict-320x640.png`、`guided-b-predict-390x844.png`、`guided-b-measure-390x844.png`、暗色比較 `guided-b-compare-dark-1280x720.png`
+- 英文：`en-free-{320,390}x700.png`、`en-guided-predict-{320,390}x700.png`
+- 理論（暗色）：`theory-dark-1280x720.png`
+- 成果：`export-observer-approach.svg`／`.json`（實際下載的檔案）、`.png`（以 `<img>` 載入該 SVG 的畫面）
+
+## 7. 待 Owner 審查：UX 與學生可用性
+
+**UX（Owner Product UX Gate，未檢查）**
+
+1. 兩張圖上下堆疊、讀值卡放右側——是否符合「同一波前、兩種表徵」的第一眼？時間帶的連線是否太多？
+2. 波前通過 O 的瞬間，「#2／#3」標籤、間距括號與 O 標記會擠在一起（截圖可見）；是否接受，或要改成只標在圖外？
+3. 1280×720 能同屏看到兩圖、傳輸、預設與滑桿，但右側「所選對讀值」要在側欄內捲動；我把滑桿排在讀值前（連續操作優先），是否要反過來？時間帶上的括號與底部即時 f/f₀ 已重複顯示關鍵數字。
+4. 導學任務二用的是「保留結果」按鈕串起兩組實驗，是否比並排雙圖更容易理解？
+5. 有號單一滑桿＋「反向」是否比「方向＋大小」更直覺？
+6. 配色（S 橘、O 藍、所選對青）與暗面資料畫布，屬待實畫選型的 Science 配色，**未經選型 Gate**。
+
+**學生可用性（Student Learning Gate，未檢查；沒有任何學生看過）**
+
+- 驗收題：**學生能從兩張圖說明為什麼 1.25 f₀ 和 1.20 f₀ 不同。** 介面把答案所需的三個量放在同一張比較卡：波源靠近 λ = 0.80 λ₀、Δt = 0.80 T₀（O 靜止，波前以 c 通過）；觀察者靠近 λ = 1.00 λ₀、Δt = 0.83 T₀（間距不變，O 以 1.2c 迎向）。能否由學生自己說出來，需要觀察，這裡沒有證據。
+- 要觀察的點：預測選項（「只看相對速率」）是否抓得到迷思；「間距」與「接收間隔」兩個詞學生是否分得開；提示三層是否夠用；任務一是否太簡單。
+
+## 8. 試用後的修正（Owner 回饋）
+
+分享、匯出的通知改成浮動 toast（圖示、關閉鈕、Esc，不再推動版面）；實驗結束改成時間帶內固定繪製的結束線與標示，不再在 dock 多出一行；播放倍率收成一個選單並加入 4×；全螢幕與退出放大改為圖示鈕；標籤、讀值、公式核對、模型資訊與導學比較卡的公式改用 MathJax。對應 3 個新 E2E（版面不位移、toast、倍率選單／圖示／排版）。導學選項按鈕內的 `λ₀`、`T₀` 仍是純文字（它們是被引用的整句選項，也是測試的選取依據）。
+
+### 第二輪回饋
+
+分享 toast 加複製鈕（實測會寫入剪貼簿、短暫顯示勾號）；匯出選單項目加圖示；代表「波源」「觀察者」的下標一律改為正體大寫（$u_\\mathrm{S}$、$u_\\mathrm{O}$、$x_\\mathrm{S}$、$\\lambda_\\mathrm{S}$、$t_{\\mathrm{R},n}$、$\\Delta t_\\mathrm{R}$；匯出 SVG 以降低的 tspan 呈現），`f_\\mathrm{obs}` 與表示傳播方向的 $s$ 維持原樣，並以原始碼掃描測試防止小寫下標回來；理論對話框在公式旁新增符號表（符號、名稱、SI 單位，另附本模型的正規化單位，共 15 列，中英文各一份，窄螢幕在表內橫向捲動）。
+
+### 第三輪回饋
+
+模式切換改成單一分段式 toggle（滑動的選取塊，`data-value` 與 `aria-pressed` 同步；減少動態時不滑動）；標頭統一為圖示按鈕（理論與模型、工具、語言、外觀），名稱在 `aria-label`，滑過或鍵盤聚焦時顯示 tooltip，閒置的 tooltip 不渲染所以不會撐寬頁面；「模型資訊」與「理論與計算」合併為一個「理論與模型」入口（模型資訊獨有的「圓與讀值來自模型、箭頭與標記只是示意」併入理論的適用範圍；預測期間同樣鎖住）。側欄與圖＋dock 等高、傳輸列改依 dock 寬度換行（見 commit `b7b783b`）。
+當時未處理：tooltip 不支援 Esc 關閉（已於第 10 節修正），觸控裝置沒有 hover，圖示名稱只靠 `aria-label`。
+
+## 9. 未做與後續
+
+- 音訊、路旁掠過、Mach 錐、光譜紅移、音量模型：依任務範圍列為後續。
+- 若 Owner 要把 Projectile 與本模組共有的模式列、傳輸、放大視圖、揭露政策抽成平台元件，需先走既有 Gate；本輪沒有動。
+- 台文 ruby、200%／400% 縮放、旋轉、Safari／Firefox、螢幕閱讀器、代表裝置效能：全部未驗。
+
+## 10. 審查後更新（PR #53，2026-11-19）
+
+本節只增補，不改寫前面各節的歷史數字（例如第 4 節的 485 / 485 與 25 / 25 是當時的結果）。
+
+### PR 與 CI 紀錄
+
+| 項目 | 內容 |
+| --- | --- |
+| PR | [qavit/kakau-lab#53](https://github.com/qavit/kakau-lab/pull/53)，**Draft**，base `main` |
+| 審查固定版本 | `9e0a64c` |
+| CI | GitHub Actions CI [run 44544607636](https://github.com/qavit/kakau-lab/actions/runs/44544607636)：success（`npm run lint` + `npm test`） |
+| 審查 | ChatGPT 第一輪靜態審查（原始碼與既有測試證據；未實際操作瀏覽器）。工程：有條件可進入合併審查；產品 UX：待實際操作；學生學習：尚未驗證；公開：尚未核准 |
+
+### 審查項目與處理
+
+| 優先 | 審查意見 | 處理 | 證據 |
+| --- | --- | --- | --- |
+| P1 | 稽核文件寫「PR 未開」、測試總數過時 | 本節補 PR／CI 紀錄與最新數字，保留歷史數字 | 本節 |
+| P1 | Header tooltip 無法按 Esc 關閉 | Esc 關閉顯示中的 tooltip，焦點不動、不連帶關閉通知或選單；移開再進入或重新聚焦即恢復（WCAG 1.4.13） | E2E「header tooltip is dismissed by Escape」 |
+| P1 | 波前標籤、量測括號可能在特定時刻互相遮蔽 | **確認為真**：接收瞬間 `#n`／`#n+1` 壓到 O 標記；時間帶的括號數字壓到 `t / T₀`、相鄰兩位數編號互撞、結束標示壓到括號數字。重排版面後（見下）加入自動檢查 | `tests/e2e/doppler-collisions.spec.ts`：2 語言 × 5 寬度（320、360、390、768、1280）× 6 預設 × 4 個波前對（0、2、4、最後一對）＋提早結束的情況，任何文字與文字、文字與 S／O／事件標記重疊即失敗；10 / 10 通過 |
+| P1 | Fullscreen API 成功、拒絕、退出未實測 | 實測：成功（Chromium 真的進入全螢幕、時間與設定保留）、由外部離開全螢幕（等同瀏覽器自己的 Esc）會一併離開放大視圖並還原焦點、被拒絕（顯示「全螢幕不可用；視窗內放大仍可使用」）、API 不存在（不顯示全螢幕鈕）；四種情況時鐘與 Esc 仍可用 | E2E「full screen」兩項 |
+| P2 | 點最後幾個事件會被轉成較早的波前對 | 分兩種：最後一個「被接收」的波前，本來就屬於它所結束的那一對，tooltip 現在寫明實際選到的對；**不會被 O 接收**的波前不再被偷換成別的對，改為不選取並說明原因 | E2E「clicking a front that O never receives」 |
+| P2 | 學生尚未使用過 | **未處理**：需要真實學生觀察，仍待 Student Learning Gate | 第 7 節 |
+
+### 版面重排（碰撞修正的內容）
+
+波前圖：`#n` 標籤上移到 O 標記之上、`#n+1` 與量測括號下移，`x / λ₀` 改放右上角。時間帶：軌道、括號、軸距改為固定位移（不再按高度比例），`t / T₀` 移到左側欄位，兩位數相鄰編號合併為「n–m」，只在有餘裕時才標全部編號；實驗結束線永遠畫出，提早結束時把原因（「S 與 O 即將重合」）寫在結束線右側無事件的灰區，不再與括號數字同一列。手機釘住時的時間帶高度由 150 增為 176 px。
+
+### 最新數字（commit 後的本機結果）
+
+| 項目 | 結果 |
+| --- | --- |
+| `npm run lint` | 0 error（2 個既有 warning） |
+| `npm test`（build + unit） | 486 / 486 |
+| Doppler Playwright | `doppler.spec.ts` 37 + `doppler-collisions.spec.ts` 10 = **47 / 47**（第四輪後） |
+
+### 仍未通過或未驗
+
+學生理解（解釋題）、Owner Product UX Gate、真機與 Safari／Firefox／螢幕閱讀器、200%／400% 縮放與旋轉、台文 ruby、英文文案人工審稿、代表裝置效能、觸控裝置上的 tooltip（沒有 hover）。
+
+### 第四輪回饋（tooltip 殘留、標頭選單）
+
+- **tooltip 殘留**：原因是 tooltip 用 CSS 的 `:focus-within` 顯示，滑鼠點擊或對話框關閉後把焦點放回按鈕，焦點就一直在，tooltip 跟著不消失。改為由狀態驅動：只在**滑過**或**以 Tab／Shift+Tab 抵達的焦點**時顯示；程式放回的焦點（對話框、選單回到觸發鈕）不顯示；使用該控制項（點擊）即收起；Esc 仍可關閉。E2E 覆蓋：點開理論再關、關閉分享通知、鍵盤開關對話框後皆無殘留。
+- **標頭**：工具（無 chevron）、語言（顯示語言代碼 `ZH`／`EN`，下拉列出兩種語言、目前者打勾、另一種為連結並帶起始設定）、外觀（本來就是下拉）皆為 drop-down；理論與模型維持單一圖示按鈕。
+
+## 11. 最終工程審查（2026-11-20）
+
+範圍：判斷本模組是否具備「**合併至 main、但維持 prototype／unlisted／noindex**」的工程條件。這不是公開 Release Gate，也不是 Student Learning Gate。
+
+### 11.1 固定版本與 CI
+
+| 版本 | 內容 | CI（GitHub Actions `CI`，lint + `npm test`） |
+| --- | --- | --- |
+| `da262c6` → `d73d347` | 初版實作與證據文件 | 本機通過（當時尚未推送） |
+| `9e0a64c` | 審查 #1 的固定版本 | [44544607636](https://github.com/qavit/kakau-lab/actions/runs/44544607636) success |
+| `cd65e1f` | 審查 #1 後修正（碰撞、tooltip Esc、Fullscreen、不可接收波前） | [44550447642](https://github.com/qavit/kakau-lab/actions/runs/44550447642) success |
+| `f4cd5ed` | 審查 #2 的固定候選基準（tooltip 殘留、標頭選單） | [44554318658](https://github.com/qavit/kakau-lab/actions/runs/44554318658) success |
+| `e4cb28a` | **本輪最後一個程式 commit**（Tab 焦點判斷、選單鍵盤一致、標頭互動測試、unlisted 斷言） | [44564370932](https://github.com/qavit/kakau-lab/actions/runs/44564370932) success，head SHA 與該 commit 完全相同 |
+| 本節所在的文件 commit | 只改 `docs/`（本文件與截圖） | 文件 commit 之後的最終 head SHA 及其 CI run，記在 [PR #53](https://github.com/qavit/kakau-lab/pull/53) 描述（避免文件自我引用 SHA）；判讀時以 PR 描述上列出的 head 為準，且該 run 的 head SHA 必須與之相同 |
+
+PR #53 為 **Draft**，base `main`；沒有 merge、沒有部署。
+
+### 11.2 本輪審查找到並修正的缺陷
+
+1. **Tooltip 的 300 ms 時間窗不可靠（真缺陷）。** 以「Tab 後 300 ms 內取得的焦點視為鍵盤焦點」判斷時，腳本在 Tab 之後 3 ms 內呼叫的 `focus()`（例如對話框把焦點放回按鈕、選單把焦點放回觸發鈕）會被誤認為導覽，tooltip 因此出現。targeted E2E 重現了這件事（`doppler-header.spec.ts`）。改為：**只有 Tab 鍵按下到放開之間**移動的焦點算鍵盤焦點；其他按鍵、指標按下、100 ms 後備計時或視窗失焦都會結束。沒有重建通用 focus manager。
+2. **工具／語言／倍率下拉與共用外觀選單的規則不一致。** 原本 Tab 離開不會關閉、沒有方向鍵、外部點擊用 `mousedown`。現在與共用外觀選單一致：觸發鈕開關、Esc 關閉並還原焦點、焦點離開或外部 `pointerdown` 關閉、ArrowDown／ArrowUp／Home／End 移動（循環）、選擇後焦點回到觸發鈕、關閉時不渲染任何項目（沒有隱藏仍可聚焦的項目）、開啟時該控制項的 tooltip 讓位。**未修改**共用的外觀選單（`ThemeToggle`），測試只把它當黑箱驗證行為一致。
+
+### 11.3 現行驗證（`e4cb28a`，本機，Chromium）
+
+| 項目 | 指令 | 結果 |
+| --- | --- | --- |
+| Lint | `npm run lint` | 0 error；2 個 `StandardAtmosphereLab.tsx` 既有 warning |
+| Build + unit | `npm test` | build 成功；**487 / 487 pass** |
+| Doppler E2E | `BASE_URL=http://localhost:3100 npx playwright test tests/e2e/doppler.spec.ts tests/e2e/doppler-header.spec.ts tests/e2e/doppler-collisions.spec.ts --project=desktop-chromium` | **54 / 54 pass**（`doppler.spec` 37、`doppler-header.spec` 7、`doppler-collisions.spec` 10；另有選用的 `doppler-perf.spec`，不計入） |
+| CI | 見 11.1 | `e4cb28a` success |
+
+**科學**：事件模型與解析核對值（靜止 (1, 1)；波源靠近 0.2c (0.8, 1.25)；觀察者靠近 0.2c (1, 1.20)；遠離 (1.2, 1/1.2)、(1, 0.80)；同向同速 f 比為 1）、左右鏡像、步長不變性、重合前停止、非法參數，包含在 487 個 unit 內，**本輪未改動**科學程式（`lib/science/doppler.ts`）。
+
+**互動**：標頭契約（`doppler-header.spec.ts`）：Tab／Shift+Tab 逐一抵達四個控制項且各自顯示 tooltip；hover、Esc、移開、重新進入行為一致；腳本焦點不觸發 tooltip；工具與語言的 Enter／方向鍵／Home／End／Esc／Tab 離開；三個選單互斥（指標）、外部按壓關閉、Esc 還原到正確觸發鈕；外觀選單（共用、未改）在同一套規則下可用鍵盤操作；語言下拉顯示 `ZH`／`EN`、目前語言標記、切換帶著起始設定（種類、速度、預設、所選對）並在目標語言暫停於 t = 0。其餘互動（導學、分享、匯出、放大、Fullscreen、版面、碰撞）見第 8、10 節與 `doppler.spec`、`doppler-collisions.spec`。
+
+**可及性**：axe（serious／critical）掃描亮色、暗色、導學、理論對話框皆通過（`doppler.spec` 的 `@a11y` 測試）；鍵盤可操作全部選單且無焦點陷阱；關閉的選單不含可聚焦項目。**這不等於 WCAG 2.2 AA 全項**，也未做螢幕閱讀器實測。
+
+**回歸**：本分支相對 main 只改了三個既有檔案：`lib/labs/registry.ts`（新增第 11 號）、`components/overlays/LabInfoDialog.tsx`（新增選用 `closeLabel`，預設值不變）、`CHANGELOG.md`；其餘皆為新檔。受影響面是 catalog／sitemap（registry）與使用 `LabInfoDialog` 的 Projectile、Electrostatics。同一組既有 E2E（8 個檔、73 個測試：`electrostatic-canvas`、`electrostatic.a11y`、`solar-layers`、`projectile-uplift`、`projectile-layered`、`projectile-export`、`projectile-usability`、`theme-menu`），在**同一台機器、同樣的 dev server、`--workers=1`**，分別對本分支與 main（`58f244d`）執行：
+
+| | 通過 | 失敗 |
+| --- | --- | --- |
+| 本分支 | 63 | 10（`solar-layers` 1 + `theme-menu` 9） |
+| main `58f244d` | 63 | 10（`solar-layers` 1 + `theme-menu` 9） |
+
+- `solar-layers`（「Solar consumes the shared layer drawer…」）在 main 與本分支都失敗，加 `--retries=2` 仍失敗：**既有、確定性失敗，與本模組無關，未修、未診斷**。
+- `theme-menu`：兩邊每次失敗的測試集合都不同；本分支加 `--retries=2` 後 14 個測試為 flaky（重試即通過）。症狀都是「點擊後 `.theme-menu__list` 沒出現」，判為 dev server 水合時序造成的**既有不穩定**。**沒有新證據，不宣稱已修復**，也未發現新回歸。
+- catalog、sitemap、registry：`tests/registry.test.mjs`、`tests/catalog-c2.test.mjs` 與新增的建置產物斷言通過。
+
+**不被公開列示**（以建置產物驗證，`tests/doppler-rendered.test.mjs`）：registry `doppler-effect`：`maturity = prototype`、`visibility = unlisted`；`/sitemap.xml` 不含 `/doppler` 與 `/en/doppler`；首頁（catalog）沒有連結也沒有模組名稱；`/doppler` 與 `/en/doppler` 皆有 `<meta name="robots" content="noindex, follow">`；非正式主機另由 `proxy.ts` 加 `X-Robots-Tag`。
+
+### 11.4 未解決問題
+
+**Blocker（阻擋「合併至 main、維持 prototype」）**：**無**已知項目。
+
+**Non-blocker（不阻擋本次合併；各自有後續 Gate 或後續工作）**
+
+| 項目 | 說明 |
+| --- | --- |
+| Safari／Firefox／WebKit 未驗 | 全部瀏覽器證據都是 Chromium（含 Fullscreen、`:focus-visible`、`:has()`、container query、SVG `baseline-shift`）。`PLAYWRIGHT_CROSS_BROWSER=1` 的路徑沒有為本模組標記 |
+| 真機與觸控 | 只有視窗大小模擬；觸控裝置沒有 hover，tooltip 在觸控上不出現（名稱仍在 `aria-label`） |
+| 螢幕閱讀器 | 未做實測；僅有 axe 自動掃描與結構化讀值（`dl`／`table`） |
+| 200%／400% 縮放、旋轉 | 未測 |
+| 英文審稿 | 英文介面、導學、理論文案未經人工審稿；台文 ruby specimen 未驗 |
+| 學生測試 | 沒有任何學生使用過；「能從兩張圖說明為什麼 1.25 f₀ 與 1.20 f₀ 不同」是否成立，**沒有證據** |
+| Tooltip 不可懸停 | 目前 tooltip 為 `pointer-events: none`，滑鼠移到 tooltip 上它會消失，不符合 WCAG 1.4.13 的 hoverable。它只重複控制項的可存取名稱，影響有限，但列為已知差距 |
+| 效能 | 只有 dev server、headless、未降速的非門檻數字；沒有代表裝置 baseline |
+| `solar-layers`、`theme-menu` 既有不穩定 | 見 11.3；與本模組無關 |
+| 自動碰撞檢查的範圍 | 只覆蓋 2 語言 × 5 寬度 × 6 預設 × 4 個波前對與一個提早結束的情況，且只在 Chromium |
+| 平台層 | 工具選單、放大視圖、傳輸、導學狀態機、標頭 tooltip 與下拉與 Projectile／共用元件並存而非共用；是否抽取由既有 Gate 裁決（本輪刻意不做） |
+
+### 11.5 R01–R12 現行狀態（`e4cb28a`；PASS／PARTIAL／NOT VERIFIED 只依證據）
+
+| 編號 | 狀態 | 證據與限制 |
+| --- | --- | --- |
+| R01 共同資訊架構 | PARTIAL | 三入口皆實質有內容、無空分頁；參數與讀值屬工作區；分享、匯出、語言、外觀、理論與模型為標頭共通工具。**沒有圖層抽屜**（只有「發射—接收連線」「波前編號」兩個切換） |
+| R02 桌機與手機工作區 | PARTIAL | 1366×768、1280×720、390×844、360×800、320×640 及 920–1440 寬度版面測試通過（無橫向捲動、≥44 px、焦點環、側欄與 dock 等高）；**200%／400% 縮放、旋轉 NOT VERIFIED**；僅 Chromium 視窗模擬 |
+| R03 沉浸與重設 | PARTIAL | 各視圖獨立放大／退出、Esc、焦點還原；Fullscreen 的成功、外部離開、拒絕、API 不存在四條路徑皆在 Chromium 實測；**非 Chromium 與 iOS 的 Fullscreen NOT VERIFIED**；沒有平移／縮放，故無視角復位 |
+| R04 可重現分享 | PASS | 起始設定（模型版本、格式版本、位置、速度、預設、所選對、呈現旗標）；乾淨 context 往返、開啟後暫停於 t = 0；無效 JSON、不同格式、不同模型版本、越界皆回復並說明；不含時間、作答、學生資訊。範圍：Chromium。沒有舊格式可遷移（只有 v1） |
+| R05 可用成果匯出 | PASS | SVG（波前圖、時間帶、比較表、條件、單位、模型版本、全部事件）與 JSON；實際以檔案開啟並檢視、文字無裁切；範圍：Chromium 開啟。其他檢視器（簡報軟體、Word）NOT VERIFIED |
+| R06 完整雙語與 ruby | PARTIAL | 繁中與英文介面、導學、錯誤、理論、匯出皆有；320／390 px 英文無橫向溢出；切換保留起始設定。**台文 ruby NOT VERIFIED；英文人工審稿 NOT VERIFIED** |
+| R07 完整探索活動 | PASS（工程證據） | 兩個任務的預測→操作→解釋→改條件、揭露、重試、返回、離開確認、進度規則皆有測試。**學習成效 NOT VERIFIED**（屬 Student Learning Gate） |
+| R08 多重表徵與比較 | PASS | 波前圖、時間帶、讀值卡以編號與粗線連動；可由時間帶、步進器、波前選取；保留參考後在同一尺度比較；不可接收的波前不被換成別的對 |
+| R09 科學透明度 | PASS（工程證據） | 理論與模型對話框含名稱與模型版本、方程、符號表（SI 單位與正規化單位）、假設、數值方法、結束條件、適用範圍與限制、來源，並區分模型計算與示意。**科學文字尚未經 Owner 審稿** |
+| R10 操作與可及性 | PARTIAL | 全部主要任務可只用鍵盤；選單鍵盤契約與無焦點陷阱有測試；axe serious／critical 為 0（亮、暗、導學、對話框）；S／O／所選對不靠顏色。**螢幕閱讀器 NOT VERIFIED；WCAG 2.2 AA 全項 NOT VERIFIED；tooltip 不可懸停（1.4.13）；觸控 tooltip 不出現** |
+| R11 效能與恢復 | PARTIAL | 錯誤、分享、匯出、Fullscreen 失敗皆可理解且可復原（有測試）。**代表裝置效能 NOT VERIFIED**（僅非門檻的 dev／headless 數字） |
+| R12 可維護與可追溯 | PASS（合併前範圍） | 分層以測試斷言；三種版本名稱分開；`e4cb28a` 的 CI 成功且 SHA 相符；registry、CHANGELOG、architecture 已更新；既有失敗與新回歸已區分（11.3）。**部署與正式 smoke NOT VERIFIED（未部署）** |
+
+### 11.6 裁決
+
+**READY FOR OWNER MERGE REVIEW**——僅限「合併至 main、維持 `prototype`／`unlisted`／`noindex`、不列入 catalog 與 sitemap」。
+
+理由：沒有已知 Blocker；科學核心與解析核對未被本輪改動；本輪找到的兩個真缺陷已修並有 targeted 測試；lint、build／unit（487）、Doppler E2E（54）與 CI 均對應固定 SHA；與 main 的同組既有 E2E 比較沒有新回歸（既有失敗兩邊相同）。這**不是**對 Product UX、學生學習或公開發布的判斷。
+
+若 Owner 審查發現新的阻斷問題，轉為 HOLD；最小必要修正是針對該問題的 targeted 修正與對應測試，停止條件是 lint、`npm test`、Doppler E2E 與對應 SHA 的 CI 皆通過。不應為此擴張功能或重構共用選單。
+
+### 11.7 後續 Gate 的責任與範圍（本審查不裁決）
+
+| Gate | 責任 | 範圍 |
+| --- | --- | --- |
+| Owner Merge Review | Owner | 是否合併 PR #53（維持 prototype／unlisted／noindex）；本文件第 11 節與 PR 描述為輸入 |
+| Product UX Gate | Owner | 實際操作：版面、配色（Science 配色待選型）、兩圖並列與側欄讀值的取捨、標頭與選單、手機堆疊；Safari／Firefox／真機／縮放／旋轉的實測安排 |
+| Student Learning Gate | Owner ＋ 學生觀察 | 以解釋題驗證學生能否從兩張圖說明 1.25 f₀ 與 1.20 f₀ 為何不同；提示、預測選項與迷思；英文與（日後）台文文案審稿 |
+| Release Gate | Owner | 公開資格（maturity／visibility、catalog、sitemap、SEO）、部署與正式 smoke、代表裝置效能與可及性（含螢幕閱讀器）；是否與 Projectile 抽取共用元件 |

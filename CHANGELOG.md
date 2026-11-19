@@ -8,6 +8,12 @@ History is intentionally not backfilled beyond the recent milestones below.
 
 ## Unreleased
 
+- Doppler Effect of Sound Lab prototype (`/doppler`, `/en/doppler`, model 11, unlisted, not indexed): a
+  wavefront diagram in the air's frame and an emission/reception time band, linked by wavefront number, with
+  event-based (closed-form) reception times. Compare a moving source with a moving observer at the same
+  closing speed, keep a reference result, step through events, share a starting setup, export a bilingual SVG
+  figure and JSON event data. Two guided tasks ("how does the source make sound?", "who is moving?"). Traditional
+  Chinese and English. Model `doppler-wavefront-1`.
 - Hydrogen Atom Lab prototype (`/hydrogen`, model 10, unlisted): Bohr orbit diagram, energy-level diagram and
   line spectrum driven by one transition state. Emission and absorption modes, Lyman/Balmer/Paschen series. Viewing a transition no longer moves the electron; a transition fires only from
   its starting level. The spectrum axis auto-fits ultraviolet and infrared series.

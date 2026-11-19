@@ -4,7 +4,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 
 /** Shared focus/close/scroll presentation; scientific content and state stay with each lab. */
-export default function LabInfoDialog({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
+export default function LabInfoDialog({ title, children, onClose, closeLabel = "關閉" }: { title: string; children: ReactNode; onClose: () => void; closeLabel?: string }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
@@ -49,7 +49,7 @@ export default function LabInfoDialog({ title, children, onClose }: { title: str
         aria-label={title}
         onClick={(event) => event.stopPropagation()}
       >
-        <button ref={closeRef} className="theory-close" onClick={onClose} aria-label="關閉"><X size={16} /></button>
+        <button ref={closeRef} className="theory-close" onClick={onClose} aria-label={closeLabel}><X size={16} /></button>
         <div className="theory-scroll">{children}</div>
       </div>
     </div>

@@ -1,0 +1,240 @@
+{
+  "schema": "doppler-result-1",
+  "modelVersion": "doppler-wavefront-1",
+  "shareFormat": 1,
+  "units": {
+    "t": "T₀ (=1/f₀)",
+    "x": "λ₀ (=c·T₀)",
+    "velocity": "c",
+    "frequency": "f₀",
+    "ratios": "dimensionless"
+  },
+  "normalization": {
+    "c": 1,
+    "f0": 1,
+    "T0": 1,
+    "lambda0": 1
+  },
+  "assumptions": [
+    "靜止、均勻、無色散的空氣；波源與觀察者共線等速，各自低於聲速。 Still, uniform, non-dispersive air; S and O collinear at constant velocity, each below the speed of sound.",
+    "速度以空氣為參考系、向右為正；|u| ≤ 0.5c。 Velocities in the air frame, positive to the right; |u| ≤ 0.5c.",
+    "波前 n 在 t = nT₀ 自波源當時位置發出，之後圓心固定、半徑 c(t − tₙ)；接收時刻為解析交會。 Front n is emitted at t = nT₀ from the source's position then; its centre stays fixed, radius c(t − tₙ); receptions are exact intersections.",
+    "實驗在 S、O 相距 1 λ₀ 前或 16 T₀ 結束。 The run ends before S and O come within 1 λ₀, or at 16 T₀.",
+    "分享 v1 只重建起始設定並暫停；結果另存游標時刻。 Share v1 restores a paused starting setup; the result stores the cursor separately."
+  ],
+  "setup": {
+    "sourceStart": -3,
+    "observerStart": 3,
+    "sourceVelocity": 0,
+    "observerVelocity": -0.2
+  },
+  "preset": "observerApproach",
+  "view": {
+    "pair": 2,
+    "connectors": true,
+    "labels": true
+  },
+  "cursorTime": 7.5,
+  "duration": 16,
+  "endReason": "time-limit",
+  "emissions": [
+    {
+      "n": 0,
+      "t": 0,
+      "x": -3
+    },
+    {
+      "n": 1,
+      "t": 1,
+      "x": -3
+    },
+    {
+      "n": 2,
+      "t": 2,
+      "x": -3
+    },
+    {
+      "n": 3,
+      "t": 3,
+      "x": -3
+    },
+    {
+      "n": 4,
+      "t": 4,
+      "x": -3
+    },
+    {
+      "n": 5,
+      "t": 5,
+      "x": -3
+    },
+    {
+      "n": 6,
+      "t": 6,
+      "x": -3
+    },
+    {
+      "n": 7,
+      "t": 7,
+      "x": -3
+    },
+    {
+      "n": 8,
+      "t": 8,
+      "x": -3
+    },
+    {
+      "n": 9,
+      "t": 9,
+      "x": -3
+    },
+    {
+      "n": 10,
+      "t": 10,
+      "x": -3
+    },
+    {
+      "n": 11,
+      "t": 11,
+      "x": -3
+    },
+    {
+      "n": 12,
+      "t": 12,
+      "x": -3
+    },
+    {
+      "n": 13,
+      "t": 13,
+      "x": -3
+    },
+    {
+      "n": 14,
+      "t": 14,
+      "x": -3
+    },
+    {
+      "n": 15,
+      "t": 15,
+      "x": -3
+    },
+    {
+      "n": 16,
+      "t": 16,
+      "x": -3
+    }
+  ],
+  "receptions": [
+    {
+      "n": 0,
+      "t": 5,
+      "x": 2,
+      "direction": 1
+    },
+    {
+      "n": 1,
+      "t": 5.833333333,
+      "x": 1.833333333,
+      "direction": 1
+    },
+    {
+      "n": 2,
+      "t": 6.666666667,
+      "x": 1.666666667,
+      "direction": 1
+    },
+    {
+      "n": 3,
+      "t": 7.5,
+      "x": 1.5,
+      "direction": 1
+    },
+    {
+      "n": 4,
+      "t": 8.333333333,
+      "x": 1.333333333,
+      "direction": 1
+    },
+    {
+      "n": 5,
+      "t": 9.166666667,
+      "x": 1.166666667,
+      "direction": 1
+    },
+    {
+      "n": 6,
+      "t": 10,
+      "x": 1,
+      "direction": 1
+    },
+    {
+      "n": 7,
+      "t": 10.833333333,
+      "x": 0.833333333,
+      "direction": 1
+    },
+    {
+      "n": 8,
+      "t": 11.666666667,
+      "x": 0.666666667,
+      "direction": 1
+    },
+    {
+      "n": 9,
+      "t": 12.5,
+      "x": 0.5,
+      "direction": 1
+    },
+    {
+      "n": 10,
+      "t": 13.333333333,
+      "x": 0.333333333,
+      "direction": 1
+    },
+    {
+      "n": 11,
+      "t": 14.166666667,
+      "x": 0.166666667,
+      "direction": 1
+    },
+    {
+      "n": 12,
+      "t": 15,
+      "x": 0,
+      "direction": 1
+    },
+    {
+      "n": 13,
+      "t": 15.833333333,
+      "x": -0.166666667,
+      "direction": 1
+    }
+  ],
+  "pair": {
+    "n": 2,
+    "direction": 1,
+    "emissionInterval": 1,
+    "spacing": 1,
+    "receptionInterval": 0.833333333
+  },
+  "ratios": {
+    "wavelength": 1,
+    "period": 0.833333333,
+    "frequency": 1.2
+  },
+  "analytic": {
+    "wavelength": 1,
+    "period": 0.833333333,
+    "frequency": 1.2
+  },
+  "reference": {
+    "sourceVelocity": 0.2,
+    "observerVelocity": 0,
+    "pair": 2,
+    "ratios": {
+      "wavelength": 0.7999999999999998,
+      "period": 0.8000000000000007,
+      "frequency": 1.249999999999999
+    }
+  }
+}
