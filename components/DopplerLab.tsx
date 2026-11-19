@@ -2,12 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { BookOpen, ChevronDown, ChevronLeft, ChevronRight, Info, Lock, Maximize2, Pause, Play, RotateCcw, Share2, SkipBack, SkipForward, StepBack, StepForward, X } from "lucide-react";
+import { BookOpen, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Expand, Info, Lock, Maximize2, Minimize2, Pause, Play, RotateCcw, Share2, SkipBack, SkipForward, StepBack, StepForward, TriangleAlert, X } from "lucide-react";
 import KakauLabMark from "@/components/KakauLabMark";
 import ThemeToggle from "@/components/ThemeToggle";
 import LabInfoDialog from "@/components/overlays/LabInfoDialog";
 import GuidedActivities from "@/components/doppler/GuidedActivities";
+import Rich from "@/components/doppler/Rich";
 import TheoryNotes from "@/components/doppler/TheoryNotes";
+import { MathProvider } from "@/components/math/MathJax";
 import TimeBand from "@/components/doppler/TimeBand";
 import WavefrontView from "@/components/doppler/WavefrontView";
 import { dopplerCopy } from "@/components/doppler/copy";
@@ -64,7 +66,7 @@ import {
 type Expanded = "wave" | "band" | null;
 type Snapshot = { setup: DopplerSetup; view: DopplerView; preset: DopplerPresetId | null; time: number; reference: DopplerReference | null };
 
-const RATES = [0.25, 0.5, 1, 2] as const;
+const RATES = [0.25, 0.5, 1, 2, 4] as const;
 const f2 = (v: number | null | undefined) => (v === null || v === undefined || !Number.isFinite(v) ? "—" : v.toFixed(2));
 const signedC = (u: number) => (u === 0 ? "0" : `${u > 0 ? "+" : "−"}${Math.abs(u).toFixed(2)}c`);
 
@@ -81,7 +83,7 @@ function useReducedMotion() {
 }
 
 /** A header button that opens a short list of choices. */
-function Menu({ label, children }: { label: string; children: ReactNode }) {
+function Menu({ label, ariaLabel, up = false, children }: { label: string; ariaLabel?: string; up?: boolean; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -95,10 +97,10 @@ function Menu({ label, children }: { label: string; children: ReactNode }) {
   }, [open]);
   return (
     <div className="doppler-menu" ref={ref}>
-      <button ref={trigger} className={open ? "active" : ""} onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="true">
+      <button ref={trigger} className={open ? "active" : ""} onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="true" aria-label={ariaLabel}>
         {label} <ChevronDown size={13} />
       </button>
-      {open && <div className="doppler-menu-list" role="group" aria-label={label} onClick={() => { setOpen(false); trigger.current?.focus(); }}>{children}</div>}
+      {open && <div className="doppler-menu-list" data-up={up} role="group" aria-label={ariaLabel ?? label} onClick={() => { setOpen(false); trigger.current?.focus(); }}>{children}</div>}
     </div>
   );
 }
@@ -131,7 +133,9 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
   const [expandNotice, setExpandNotice] = useState<string | null>(null);
   const [theoryOpen, setTheoryOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
-  const [notice, setNotice] = useState<string | null>(initial.error ? copy.status.shareErrors[initial.error] : null);
+  const [noticeState, setNoticeState] = useState<{ text: string; tone: "ok" | "warn" } | null>(initial.error ? { text: copy.status.shareErrors[initial.error], tone: "warn" } : null);
+  const notice = noticeState?.text ?? null;
+  const setNotice = useCallback((text: string | null, tone: "ok" | "warn" = "ok") => setNoticeState(text === null ? null : { text, tone }), []);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const snapshot = useRef<Snapshot | null>(null);
   const shellRef = useRef<HTMLElement>(null);
@@ -229,7 +233,7 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
     setNotice(null);
     setShareUrl(null);
     setLeaveConfirm(false);
-  }, [setup, view, preset, time, reference]);
+  }, [setup, view, preset, time, reference, setNotice]);
 
   const closeGuided = useCallback(() => {
     const saved = snapshot.current;
@@ -268,7 +272,7 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
       else download(JSON.stringify(result, null, 2), "kakau-doppler.json", "application/json;charset=utf-8");
       setNotice(copy.status.exported);
     } catch {
-      setNotice(copy.status.exportFailed);
+      setNotice(copy.status.exportFailed, "warn");
     }
   };
 
@@ -286,9 +290,16 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
       try { await navigator.clipboard.writeText(url.href); setNotice(copy.status.shared); }
       catch { setNotice(copy.status.shareManual); }
     } catch {
-      setNotice(copy.status.shareTooLong);
+      setNotice(copy.status.shareTooLong, "warn");
     }
   };
+
+  useEffect(() => {
+    if (!notice) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape" && !document.querySelector('[role="dialog"][aria-modal="true"]')) { setNoticeState(null); setShareUrl(null); } };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [notice]);
 
   /* ---- immersion: one science view at a time, with the clock still in reach ---- */
   useEffect(() => { expandedRef.current = expanded; }, [expanded]);
@@ -321,17 +332,20 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
   const checkOk = readout.complete && readout.frequency !== null && readout.wavelength !== null
     && Math.abs(readout.frequency - analytic.frequency) < 1e-6 && Math.abs(readout.wavelength - analytic.wavelength) < 1e-6;
 
-  const endNote = experiment.endReason === "before-coincidence" || atEnd ? copy.status.ended(experiment.endReason) : null;
   const cardTitle = (kind: "wave" | "band") => (kind === "wave" ? copy.figure.wavefrontTitle : copy.figure.bandTitle);
 
   const expandButton = (kind: "wave" | "band") => (
     expanded === kind ? (
       <div className="doppler-expand-actions">
-        <button onClick={async () => {
-          try { await document.documentElement.requestFullscreen(); setExpandNotice(null); }
-          catch { setExpandNotice(copy.actions.fullscreenUnavailable); }
-        }}>{copy.actions.fullscreen}</button>
-        <button ref={exitRef} className="doppler-expand-exit" onClick={collapse}><X size={16} /> {copy.actions.exitExpand}</button>
+        <button
+          aria-label={copy.actions.fullscreen}
+          title={copy.actions.fullscreen}
+          onClick={async () => {
+            try { await document.documentElement.requestFullscreen(); setExpandNotice(null); }
+            catch { setExpandNotice(copy.actions.fullscreenUnavailable); }
+          }}
+        ><Expand size={18} /></button>
+        <button ref={exitRef} className="doppler-expand-exit" aria-label={copy.actions.exitExpand} title={copy.actions.exitExpand} onClick={collapse}><Minimize2 size={18} /></button>
       </div>
     ) : (
       <button
@@ -382,6 +396,7 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
   const stageExpanded = expanded !== null;
 
   return (
+    <MathProvider>
     <main ref={shellRef} className="lab-shell doppler-lab doppler-c2 lab-c2" lang={locale === "en" ? "en" : "zh-Hant"}>
       <div className="topbar doppler-topbar" inert={stageExpanded}>
         <div className="doppler-identity">
@@ -419,12 +434,15 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
         </div>
       )}
       {notice && !guided && (
-        <div className="doppler-notice" role="status" data-testid="notice">
-          {notice}
-          {shareUrl && <label>{copy.status.shareLink}<input readOnly value={shareUrl} onFocus={(event) => event.target.select()} /></label>}
+        <div className="doppler-toast" role="status" data-testid="notice" data-tone={noticeState?.tone}>
+          {noticeState?.tone === "warn" ? <TriangleAlert size={20} className="doppler-toast-icon" aria-hidden="true" /> : <CircleCheck size={20} className="doppler-toast-icon" aria-hidden="true" />}
+          <div className="doppler-toast-body">
+            <p>{notice}</p>
+            {shareUrl && <label>{copy.status.shareLink}<input readOnly value={shareUrl} onFocus={(event) => event.target.select()} /></label>}
+          </div>
+          <button className="doppler-toast-close" aria-label={copy.status.dismiss} title={copy.status.dismiss} onClick={() => { setNoticeState(null); setShareUrl(null); }}><X size={18} /></button>
         </div>
       )}
-
       <div className="doppler-stage" data-expanded={expanded ?? "none"} data-guided={Boolean(guided)}>
         <div className="doppler-figures">
           <section className="viewport-card doppler-card" data-card="wave" aria-label={copy.figure.wavefrontTitle}>
@@ -486,9 +504,9 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
               onChange={(event) => goTo(Number(event.target.value))}
             />
             <output className="doppler-clock" data-testid="clock">{evidence.numeric ? copy.transport.clock(time.toFixed(2), experiment.duration.toFixed(2)) : copy.transport.clockMasked}</output>
-            <div className="doppler-rates" role="group" aria-label={copy.transport.speed}>
+            <Menu label={`${rate}×`} ariaLabel={`${copy.transport.speed}：${rate}×`} up>
               {RATES.map((r) => <button key={r} disabled={!timeAllowed} className={rate === r ? "active" : ""} aria-pressed={rate === r} onClick={() => setRate(r)}>{r}×</button>)}
-            </div>
+            </Menu>
           </div>
           <div className="doppler-live" aria-label={copy.readout.liveFrequency} data-testid="live-readout">
             {evidence.numeric ? (
@@ -496,13 +514,12 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
                 <span><i>t</i>{time.toFixed(2)} T₀</span>
                 <span><i>{copy.figure.emission}/{copy.figure.reception}</i>{emittedCount} / {receivedCount}</span>
                 {evidence.frequency
-                  ? <span className="doppler-live-f"><i>{copy.readout.live} f/f₀</i>{live ? live.frequency.toFixed(2) : copy.readout.liveWaiting}</span>
+                  ? <span className="doppler-live-f"><i><Rich>{copy.readout.live}</Rich></i>{live ? live.frequency.toFixed(2) : copy.readout.liveWaiting}</span>
                   : null}
               </>
             ) : <span className="doppler-masked">{copy.readout.masked}</span>}
           </div>
           {reduced && <p className="doppler-note">{copy.transport.reducedMotion}</p>}
-          {endNote && evidence.numeric && <p className="doppler-note" data-testid="end-note">{endNote}</p>}
         </div>
 
         {guided ? (
@@ -541,7 +558,7 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
                 {sliderRow("observer")}
                 <details className="doppler-check">
                   <summary>{copy.controls.more}</summary>
-                  <p className="doppler-note">{copy.controls.fixed} {copy.controls.range}。 {copy.status.modelHint}</p>
+                  <p className="doppler-note"><Rich>{copy.controls.fixed}</Rich> <Rich>{copy.status.modelHint}</Rich></p>
                   <div className="doppler-layer-toggles" role="group" aria-label={copy.layers.connectors}>
                     <label><input type="checkbox" checked={view.connectors} onChange={() => setView((v) => ({ ...v, connectors: !v.connectors }))} /> {copy.layers.connectors}</label>
                     <label><input type="checkbox" checked={view.labels} onChange={() => setView((v) => ({ ...v, labels: !v.labels }))} /> {copy.layers.labels}</label>
@@ -562,7 +579,7 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
                 </div>
                 {experiment.receptions.length < 2 ? <p className="doppler-note">{copy.readout.noPair}</p> : (
                   <dl className="doppler-readout-list">
-                    {readoutRows.map(([name, value]) => <div key={name}><dt>{name}</dt><dd data-waiting={value === copy.readout.waitingReal}>{value}</dd></div>)}
+                    {readoutRows.map(([name, value]) => <div key={name}><dt><Rich>{name}</Rich></dt><dd data-waiting={value === copy.readout.waitingReal}>{value}</dd></div>)}
                   </dl>
                 )}
                 <div className="doppler-reference-actions">
@@ -574,20 +591,20 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
                   <table className="doppler-compare doppler-reference-table" aria-label={copy.readout.compareTitle}>
                     <thead><tr><th scope="col"><span className="doppler-sr-only">{copy.readout.compareTitle}</span></th><th scope="col">{copy.readout.current}</th><th scope="col">{copy.readout.reference}</th></tr></thead>
                     <tbody>
-                      <tr><th scope="row">λ / λ₀</th><td>{f2(readout.wavelength)}</td><td>{reference ? f2(reference.ratios.wavelength) : "—"}</td></tr>
-                      <tr><th scope="row">Δt / T₀</th><td>{f2(readout.period)}</td><td>{reference ? f2(reference.ratios.period) : "—"}</td></tr>
-                      <tr><th scope="row">f / f₀</th><td>{f2(readout.frequency)}</td><td>{reference ? f2(reference.ratios.frequency) : "—"}</td></tr>
+                      <tr><th scope="row"><Rich>{copy.readout.spacing}</Rich></th><td>{f2(readout.wavelength)}</td><td>{reference ? f2(reference.ratios.wavelength) : "—"}</td></tr>
+                      <tr><th scope="row"><Rich>{copy.readout.period}</Rich></th><td>{f2(readout.period)}</td><td>{reference ? f2(reference.ratios.period) : "—"}</td></tr>
+                      <tr><th scope="row"><Rich>{copy.readout.frequency}</Rich></th><td>{f2(readout.frequency)}</td><td>{reference ? f2(reference.ratios.frequency) : "—"}</td></tr>
                     </tbody>
                   </table>
                   {reference
-                    ? <p className="doppler-note">{copy.readout.reference}：{copy.readout.referenceSetup(signedC(reference.sourceVelocity), signedC(reference.observerVelocity))}，{copy.readout.pair(reference.pair)}</p>
+                    ? <p className="doppler-note">{copy.readout.reference}：<Rich>{copy.readout.referenceSetup(signedC(reference.sourceVelocity), signedC(reference.observerVelocity))}</Rich>，{copy.readout.pair(reference.pair)}</p>
                     : <p className="doppler-note">{copy.readout.noReference}</p>}
                   {reference && <div className="doppler-reference-actions"><button onClick={() => setReference(null)}>{copy.readout.clearReference}</button></div>}
                 </details>
                 <details className="doppler-check">
                   <summary>{copy.readout.check}</summary>
-                  <p>{copy.readout.formulaLine}</p>
-                  <p>{readout.complete ? copy.readout.checkText(analytic.wavelength.toFixed(2), analytic.frequency.toFixed(2), checkOk) : copy.readout.waitingReal}</p>
+                  <p><Rich>{copy.readout.formulaLine}</Rich></p>
+                  <p data-testid="formula-check">{readout.complete ? <Rich dynamic>{copy.readout.checkText(analytic.wavelength.toFixed(2), analytic.frequency.toFixed(2), checkOk)}</Rich> : copy.readout.waitingReal}</p>
                 </details>
               </div>
             </div>
@@ -599,12 +616,13 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
         <LabInfoDialog title={copy.theory.modelInfoTitle} closeLabel={copy.theory.close} onClose={() => setInfoOpen(false)}>
           <article className="theory-body">
             <h2>{copy.theory.modelInfoTitle}</h2>
-            {copy.modelInfo.paragraphs.map((p) => <p key={p}>{p}</p>)}
+            {copy.modelInfo.paragraphs.map((p) => <p key={p}><Rich>{p}</Rich></p>)}
           </article>
         </LabInfoDialog>
       )}
       {theoryOpen && <LabInfoDialog title={copy.theory.title} closeLabel={copy.theory.close} onClose={() => setTheoryOpen(false)}><TheoryNotes locale={locale} /></LabInfoDialog>}
     </main>
+    </MathProvider>
   );
 }
 

@@ -46,6 +46,9 @@ export default function TimeBand({
   const e1 = emitted.find((e) => e.n === pair + 1);
   const r0 = received.find((r) => r.n === pair);
   const r1 = received.find((r) => r.n === pair + 1);
+  const endLabel = experiment.endReason === "before-coincidence" ? copy.figure.endCoincide : copy.figure.endMarker;
+  // Put the label on whichever side of the end line has room for it.
+  const endLabelOnLeft = (w - right - tx(experiment.duration)) < endLabel.length * font * 0.95;
   const ticks = Array.from({ length: MAX_DURATION / 2 + 1 }, (_, i) => i * 2).filter((v) => !compact || v % 4 === 0);
 
   return (
@@ -60,12 +63,21 @@ export default function TimeBand({
       data-received={received.length}
       style={{ display: "block", touchAction: "manipulation" }}
     >
-      {experiment.duration < MAX_DURATION - 1e-9 && (
-        <g data-testid="band-ended">
+      {/* The end of the run is always drawn, so it never appears from nowhere and shifts nothing around it. */}
+      <g data-testid="band-end" data-reason={experiment.endReason}>
+        <title>{copy.status.ended(experiment.endReason)}</title>
+        {experiment.duration < MAX_DURATION - 1e-9 && (
           <rect x={tx(experiment.duration)} y={6} width={tx(MAX_DURATION) - tx(experiment.duration)} height={axisY - 6} fill={C.ended} />
-          <text x={tx(experiment.duration) + 6} y={20} fill={C.label} fontSize={font}>{copy.figure.endMarker}</text>
-        </g>
-      )}
+        )}
+        <path d={`M${tx(experiment.duration)} 6V${axisY}`} stroke={C.label} strokeWidth={1.2} strokeDasharray="2 3" opacity={0.7} />
+        <text
+          x={endLabelOnLeft ? tx(experiment.duration) - 6 : tx(experiment.duration) + 6}
+          y={20}
+          textAnchor={endLabelOnLeft ? "end" : "start"}
+          fill={C.label}
+          fontSize={font}
+        >{endLabel}</text>
+      </g>
       <text x={8} y={eY + 4} fill={C.source} fontSize={font} fontWeight={700}>{compact ? copy.figure.emissionShort.split(" ")[0] : copy.figure.emissionShort}</text>
       <text x={8} y={rY + 4} fill={C.observer} fontSize={font} fontWeight={700}>{compact ? copy.figure.receptionShort.split(" ")[0] : copy.figure.receptionShort}</text>
       <path d={`M${left} ${eY}H${tx(experiment.duration)}M${left} ${rY}H${tx(experiment.duration)}`} stroke={C.axis} strokeWidth={1.2} />

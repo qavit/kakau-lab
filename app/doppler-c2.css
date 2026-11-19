@@ -18,7 +18,7 @@
 .doppler-c2 .doppler-icon-button { min-width: 44px; min-height: 44px; }
 
 /* ---- Buttons: one 44px control height, selected state = tint + ring + weight (not colour alone) ---- */
-.doppler-c2 :is(.header-actions, .doppler-menu-list, .doppler-modebar, .doppler-side, .doppler-dock, .doppler-notice, .doppler-leave-confirm, .guided-inner) button {
+.doppler-c2 :is(.header-actions, .doppler-menu-list, .doppler-modebar, .doppler-side, .doppler-dock, .doppler-toast, .doppler-leave-confirm, .guided-inner) button {
   min-height: 44px;
   border-color: var(--lc-border-control);
   border-radius: 10px;
@@ -60,6 +60,7 @@
 .doppler-c2 .doppler-menu { position: relative; }
 .doppler-c2 .doppler-menu-list { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; display: flex; flex-direction: column; gap: 3px; min-width: 240px; padding: 8px; border: 1px solid var(--lc-border); border-radius: 14px; background: var(--lc-raised); box-shadow: var(--lc-card-shadow); }
 .doppler-c2 .doppler-menu-list button { justify-content: flex-start; width: 100%; border-color: transparent; background: transparent; text-align: left; }
+.doppler-c2 .doppler-menu-list[data-up="true"] { top: auto; bottom: calc(100% + 6px); min-width: 120px; }
 .doppler-c2 .doppler-menu-note { margin: 0; padding: 8px 10px; max-width: 260px; color: var(--lc-muted); font-size: 13px; line-height: 1.5; }
 
 /* ---- Mode bar ---- */
@@ -68,9 +69,19 @@
 .doppler-c2 .doppler-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .doppler-c2 .doppler-leave-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 8px; padding: 10px 12px; border: 1px solid var(--lc-accent); border-radius: 10px; background: var(--lc-raised); }
 .doppler-c2 .doppler-leave-confirm p { flex: 1 1 220px; margin: 0; font-size: 14px; line-height: 1.5; }
-.doppler-c2 .doppler-notice { margin: 0 0 8px; padding: 10px 12px; border: 1px solid var(--lc-border); border-left: 3px solid var(--lc-accent); border-radius: 10px; background: var(--lc-raised); color: var(--lc-body); font-size: 14px; line-height: 1.5; }
-.doppler-c2 .doppler-notice label { display: grid; gap: 4px; margin-top: 6px; font-size: 12px; color: var(--lc-muted); }
-.doppler-c2 .doppler-notice input { min-height: 44px; padding: 0 10px; border: 1px solid var(--lc-border-control); border-radius: 10px; background: var(--lc-raised); color: var(--lc-text); }
+/* Notices float over the workspace, so showing or closing one never moves anything else. */
+.doppler-c2 .doppler-toast { position: fixed; z-index: 120; right: 16px; bottom: 16px; display: flex; align-items: flex-start; gap: 10px; width: min(440px, calc(100vw - 24px)); padding: 12px 8px 12px 14px; border: 1px solid var(--lc-border-control); border-left: 4px solid var(--lc-accent); border-radius: 12px; background: var(--lc-raised); color: var(--lc-text); box-shadow: 0 12px 32px #0000003d, var(--lc-card-shadow); }
+.doppler-c2 .doppler-toast[data-tone="warn"] { border-left-color: #b45309; }
+.doppler-c2 .doppler-toast-icon { flex: none; margin-top: 11px; color: var(--lc-accent); }
+.doppler-c2 .doppler-toast[data-tone="warn"] .doppler-toast-icon { color: #b45309; }
+.doppler-c2 .doppler-toast-body { flex: 1 1 auto; min-width: 0; padding-top: 10px; }
+.doppler-c2 .doppler-toast-body p { margin: 0; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+.doppler-c2 .doppler-toast-body label { display: grid; gap: 4px; margin-top: 8px; font-size: 12px; color: var(--lc-muted); }
+.doppler-c2 .doppler-toast-body input { width: 100%; min-height: 44px; padding: 0 10px; border: 1px solid var(--lc-border-control); border-radius: 10px; background: var(--lc-raised); color: var(--lc-text); font-size: 13px; }
+.doppler-c2 .doppler-toast-close { flex: none; width: 44px; min-width: 44px; padding: 0; }
+@media (prefers-color-scheme: dark) { html:not([data-mode]) .doppler-c2 .doppler-toast[data-tone="warn"] { border-left-color: #f59e0b; } html:not([data-mode]) .doppler-c2 .doppler-toast[data-tone="warn"] .doppler-toast-icon { color: #f59e0b; } }
+html[data-mode="dark"] .doppler-c2 .doppler-toast[data-tone="warn"] { border-left-color: #f59e0b; }
+html[data-mode="dark"] .doppler-c2 .doppler-toast[data-tone="warn"] .doppler-toast-icon { color: #f59e0b; }
 
 /* ---- Stage: figures + dock on the left, readouts and controls on the right ---- */
 .doppler-c2 .doppler-stage { display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-areas: "figures side" "dock side"; align-items: start; gap: 8px 12px; }
@@ -87,6 +98,7 @@
 .doppler-c2 .doppler-expand, .doppler-c2 .doppler-expand-actions button { min-width: 44px; min-height: 44px; border: 1px solid rgba(255, 255, 255, .28); border-radius: 10px; background: rgba(5, 20, 30, .5); color: #f4f7f8; }
 .doppler-c2 .doppler-expand:hover, .doppler-c2 .doppler-expand-actions button:hover { border-color: #9bd7dd; background: rgba(5, 20, 30, .8); transform: none; }
 .doppler-c2 .doppler-expand-actions { display: flex; gap: 6px; }
+.doppler-c2 .doppler-expand-actions button { width: 44px; padding: 0; }
 .doppler-c2 .doppler-expand-notice { margin: 0 14px; padding: 6px 10px; border-radius: 6px; background: #092439; color: #fff; font-size: 13px; }
 .doppler-c2 .doppler-host { position: relative; width: 100%; min-width: 0; }
 .doppler-c2 .doppler-wave-host { height: clamp(188px, calc(100vh - 530px), 340px); }
@@ -104,8 +116,7 @@
 .doppler-c2 .doppler-transport-buttons button[aria-label="Play"], .doppler-c2 .doppler-transport-buttons button[aria-label="Pause"] { min-width: 96px; }
 .doppler-c2 .doppler-scrub { width: 100%; min-width: 0; margin: 0; }
 .doppler-c2 .doppler-clock { color: var(--lc-muted); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.doppler-c2 .doppler-rates { display: flex; gap: 4px; }
-.doppler-c2 .doppler-rates button { min-width: 48px; padding: 6px 8px; font-size: 13px; }
+.doppler-c2 .doppler-transport .doppler-menu > button { min-width: 72px; padding: 6px 10px; font-size: 13px; font-variant-numeric: tabular-nums; }
 .doppler-c2 .doppler-live { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 24px; padding: 8px 14px; border-top: 1px solid var(--lc-border); font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .doppler-c2 .doppler-live i { margin-right: 6px; color: var(--lc-muted); font-size: 12px; font-style: normal; font-weight: 400; }
 .doppler-c2 .doppler-live .doppler-masked { font-size: 14px; font-weight: 500; color: var(--lc-body); }
@@ -191,12 +202,14 @@
   .doppler-c2 .doppler-transport-buttons { display: grid; grid-template-columns: 44px 44px minmax(0, 1fr) 44px 44px; gap: 4px; width: 100%; }
   .doppler-c2 .doppler-transport-buttons button { min-width: 0; padding: 6px 4px; }
   .doppler-c2 .doppler-transport-buttons button[aria-label] { min-width: 0; }
-  .doppler-c2 .doppler-rates { margin-left: auto; }
-  .doppler-c2 .doppler-rates button { min-width: 44px; padding: 6px 4px; }
+  .doppler-c2 .doppler-transport .doppler-menu { margin-left: auto; }
+  .doppler-c2 .doppler-transport .doppler-menu > button { min-width: 64px; }
   .doppler-c2 .doppler-clock { font-size: 12px; }
   .doppler-c2 .doppler-live { padding: 6px 10px; gap: 2px 14px; font-size: 14px; }
   .doppler-c2 .doppler-presets button { flex: 1 1 calc(50% - 6px); }
   .doppler-c2 .doppler-menu-list { right: auto; left: 0; max-width: calc(100vw - 24px); }
+  .doppler-c2 .doppler-transport .doppler-menu-list { left: auto; right: 0; }
+  .doppler-c2 .doppler-toast { right: 8px; left: 8px; bottom: 8px; width: auto; }
 }
 /* With enough height the two figures stay pinned while the controls scroll underneath. */
 @media (max-width: 660px) and (min-height: 700px) {

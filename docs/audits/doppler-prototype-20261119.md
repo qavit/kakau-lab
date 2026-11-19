@@ -47,7 +47,7 @@
 | Lint | `npm run lint` | 0 error；2 個 `StandardAtmosphereLab.tsx` 既有 warning（與本改動無關） |
 | Unit + build | `npm test`（= `npm run build` + `node --test tests/*.test.mjs`） | build 成功；**485 / 485 pass** |
 | 型別 | `npx tsc --noEmit` | 本改動無錯；`db/index.ts`、`worker/index.ts` 的 cloudflare 型別錯誤在 main 上即存在 |
-| Doppler E2E | `BASE_URL=http://localhost:3100 npx playwright test tests/e2e/doppler.spec.ts --project=desktop-chromium` | **25 / 25 pass**（dev server、Chromium） |
+| Doppler E2E | `BASE_URL=http://localhost:3100 npx playwright test tests/e2e/doppler.spec.ts --project=desktop-chromium` | **28 / 28 pass**（dev server、Chromium） |
 | 既有 Projectile E2E | `projectile-layered`、`projectile-export` | pass（一併跑的 32 個通過；theme-menu 見下） |
 | theme-menu E2E | `tests/e2e/theme-menu.spec.ts` | 本分支 12 / 36 失敗；**同一份 spec 在 main（dev server，同機）10 / 36 失敗**，失敗集合不同、症狀同為「選單 list 未出現」，判為 dev server 水合時序的既有不穩，**未診斷、未修**；Doppler 未影響這些頁面 |
 | 效能（非門檻） | `DOPPLER_PERF=1 npx playwright test tests/e2e/doppler-perf.spec.ts` | dev server／headless Chromium／未降速：首次可操作 322 ms；2× 播放 frame 平均 16.6 ms、p95 18.4 ms；放大視圖切換 22.7 ms。**這不是代表裝置的 baseline** |
@@ -110,7 +110,11 @@
 - 驗收題：**學生能從兩張圖說明為什麼 1.25 f₀ 和 1.20 f₀ 不同。** 介面把答案所需的三個量放在同一張比較卡：波源靠近 λ = 0.80 λ₀、Δt = 0.80 T₀（O 靜止，波前以 c 通過）；觀察者靠近 λ = 1.00 λ₀、Δt = 0.83 T₀（間距不變，O 以 1.2c 迎向）。能否由學生自己說出來，需要觀察，這裡沒有證據。
 - 要觀察的點：預測選項（「只看相對速率」）是否抓得到迷思；「間距」與「接收間隔」兩個詞學生是否分得開；提示三層是否夠用；任務一是否太簡單。
 
-## 8. 未做與後續
+## 8. 試用後的修正（Owner 回饋）
+
+分享、匯出的通知改成浮動 toast（圖示、關閉鈕、Esc，不再推動版面）；實驗結束改成時間帶內固定繪製的結束線與標示，不再在 dock 多出一行；播放倍率收成一個選單並加入 4×；全螢幕與退出放大改為圖示鈕；標籤、讀值、公式核對、模型資訊與導學比較卡的公式改用 MathJax。對應 3 個新 E2E（版面不位移、toast、倍率選單／圖示／排版）。導學選項按鈕內的 `λ₀`、`T₀` 仍是純文字（它們是被引用的整句選項，也是測試的選取依據）。
+
+## 9. 未做與後續
 
 - 音訊、路旁掠過、Mach 錐、光譜紅移、音量模型：依任務範圍列為後續。
 - 若 Owner 要把 Projectile 與本模組共有的模式列、傳輸、放大視圖、揭露政策抽成平台元件，需先走既有 Gate；本輪沒有動。

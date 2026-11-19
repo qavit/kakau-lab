@@ -15,6 +15,7 @@ import {
   type DopplerActivityId,
 } from "@/models/doppler-learning";
 import type { DopplerCopy } from "./copy";
+import Rich from "./Rich";
 
 const n2 = (value: number | null | undefined) => (value === null || value === undefined || !Number.isFinite(value) ? "—" : value.toFixed(2));
 
@@ -31,11 +32,11 @@ function ComparisonCard({ copy, columns, showFrequency, highlight }: { copy: Dop
           <tr><th scope="col">{copy.readout.current}</th>{columns.map((c) => <th scope="col" key={c.key}>{c.label}</th>)}</tr>
         </thead>
         <tbody>
-          <tr><th scope="row">{t.spacing}</th>{columns.map((c) => <td key={c.key}>{n2(c.values?.wavelength ?? c.partial?.wavelength)}</td>)}</tr>
-          <tr><th scope="row">{t.period}</th>{columns.map((c) => <td key={c.key}>{n2(c.values?.period ?? c.partial?.period)}</td>)}</tr>
+          <tr><th scope="row"><Rich>{t.spacing}</Rich></th>{columns.map((c) => <td key={c.key}>{n2(c.values?.wavelength ?? c.partial?.wavelength)}</td>)}</tr>
+          <tr><th scope="row"><Rich>{t.period}</Rich></th>{columns.map((c) => <td key={c.key}>{n2(c.values?.period ?? c.partial?.period)}</td>)}</tr>
           {showFrequency && (
             <tr>
-              <th scope="row">{t.frequency}</th>
+              <th scope="row"><Rich>{t.frequency}</Rich></th>
               {columns.map((c) => (
                 <td key={c.key} className={highlight === c.key ? "doppler-higher" : undefined}>
                   {n2(c.values?.frequency)}{highlight === c.key ? ` · ${t.higher}` : ""}
@@ -226,7 +227,7 @@ export default function GuidedActivities({
           {session.phase === "complete" && (
             <div className="guided-block guided-complete">
               <p className="guided-prediction"><b>{g.yourExplanation}</b>{session.explanation ? text.explanations[session.explanation] : null}</p>
-              <div className="guided-conclusion"><b>{g.modelShows}</b><p>{text.conclusion}</p></div>
+              <div className="guided-conclusion"><b>{g.modelShows}</b><p><Rich>{text.conclusion}</Rich></p></div>
               {!isBaseline && (
                 <>
                   <ComparisonCard copy={copy} showFrequency highlight={higher} columns={[

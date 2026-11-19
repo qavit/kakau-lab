@@ -14,6 +14,10 @@ async function open(page: Page, path = DOPPLER) {
 const preset = (page: Page, name: string) => page.getByRole("button", { name, exact: true }).click();
 const readout = (page: Page, label: string) => page.getByTestId("pair-readout").locator("dl > div", { hasText: label }).locator("dd");
 const toReception = (page: Page) => page.getByRole("button", { name: /^(播放到接收|Play to reception)$/ }).first().click();
+const setRate = async (page: Page, rate: string) => {
+  await page.getByRole("button", { name: /^播放倍率：/ }).click();
+  await page.getByRole("button", { name: rate, exact: true }).click();
+};
 const mode = (page: Page, name: string) => page.getByRole("button", { name, exact: true });
 
 test.describe("Doppler — free exploration", () => {
@@ -34,7 +38,7 @@ test.describe("Doppler — free exploration", () => {
     await expect(page.getByTestId("reception-bracket")).toContainText("0.80");
     await expect(page.getByTestId("live-readout")).toContainText("1.25");
     await page.getByText("公式核對").click();
-    await expect(page.getByText("公式 與事件量測一致")).toBeVisible();
+    await expect(page.getByTestId("formula-check")).toContainText("與事件量測一致");
   });
 
   test("keep a reference, change who moves, compare 1.25 with 1.20 on the same scale", async ({ page }) => {
@@ -48,10 +52,10 @@ test.describe("Doppler — free exploration", () => {
     await expect(page.getByTestId("clock")).toContainText("0.00 /"); // a new setup regenerates the experiment at t = 0
     await toReception(page);
     const table = page.getByRole("table", { name: "與參考比較" });
-    await expect(table.getByRole("row", { name: /f \/ f₀/ })).toContainText("1.20");
-    await expect(table.getByRole("row", { name: /f \/ f₀/ })).toContainText("1.25");
-    await expect(table.getByRole("row", { name: /λ \/ λ₀/ })).toContainText("1.00");
-    await expect(table.getByRole("row", { name: /λ \/ λ₀/ })).toContainText("0.80");
+    await expect(table.getByRole("row", { name: /接收頻率/ })).toContainText("1.20");
+    await expect(table.getByRole("row", { name: /接收頻率/ })).toContainText("1.25");
+    await expect(table.getByRole("row", { name: /波前間距/ })).toContainText("1.00");
+    await expect(table.getByRole("row", { name: /波前間距/ })).toContainText("0.80");
     expect(await page.getByTestId("wavefront-view").getAttribute("viewBox")).toBe(frontsBefore);
     await preset(page, "同向同速");
     await toReception(page);
@@ -122,7 +126,7 @@ test.describe("Doppler — free exploration", () => {
   test("playback advances the model clock and stops at the end with a reason; speed only changes the feel", async ({ page }) => {
     await open(page);
     await preset(page, "波源靠近");
-    await page.getByRole("button", { name: "2×" }).click();
+    await setRate(page, "2×");
     await page.getByRole("button", { name: "播放", exact: true }).click();
     await expect(page.getByRole("button", { name: "暫停" })).toBeVisible();
     await page.waitForTimeout(700);
@@ -132,12 +136,13 @@ test.describe("Doppler — free exploration", () => {
     await page.waitForTimeout(300);
     expect(await page.getByTestId("clock").innerText()).toBe(clock);
     await page.getByRole("button", { name: "跳到結束" }).click();
-    await expect(page.getByTestId("end-note")).toContainText("t = 16");
+    await expect(page.getByTestId("band-end")).toHaveAttribute("data-reason", "time-limit");
+    await expect(page.getByTestId("band-end")).toContainText("實驗結束");
     // Both closing at 0.5c: the run ends before S and O coincide, and says so.
     await page.getByLabel("波源 S · 波源速度", { exact: false }).fill("0.5");
     await page.getByLabel("觀察者 O · 觀察者速度", { exact: false }).fill("-0.5");
-    await expect(page.getByTestId("end-note")).toContainText("重合");
-    await expect(page.getByTestId("band-ended")).toBeVisible();
+    await expect(page.getByTestId("band-end")).toHaveAttribute("data-reason", "before-coincidence");
+    await expect(page.getByTestId("band-end")).toContainText("重合");
     await page.getByRole("button", { name: "跳到結束" }).click();
     const gap = await page.evaluate(() => {
       const s = document.querySelector('[data-testid="source-marker"]')!.getBoundingClientRect();
@@ -191,12 +196,70 @@ test.describe("Doppler — free exploration", () => {
     await expect(page.getByTestId("clock")).toContainText("16.00");
   });
 
+  test("the end of the run is always drawn, so reaching it never changes the layout", async ({ page }) => {
+    await open(page);
+    await preset(page, "波源靠近");
+    const geometry = () => page.evaluate(() => ({ dock: document.querySelector(".doppler-dock")!.getBoundingClientRect().height, page: document.documentElement.scrollHeight, band: document.querySelector('[data-card="band"]')!.getBoundingClientRect().height }));
+    const before = await geometry();
+    await expect(page.getByTestId("band-end")).toContainText("實驗結束");
+    await page.getByRole("button", { name: "跳到結束" }).click();
+    expect(await geometry()).toEqual(before);
+    await page.getByLabel("波源 S · 波源速度", { exact: false }).fill("0.5");
+    await page.getByLabel("觀察者 O · 觀察者速度", { exact: false }).fill("-0.5");
+    expect((await geometry()).dock).toBe(before.dock);
+  });
+
+  test("notices float: they shift nothing, carry an icon, close with the button or Escape", async ({ page }) => {
+    await open(page);
+    await preset(page, "波源靠近");
+    const layout = () => page.evaluate(() => ["[data-card=wave]", ".doppler-dock", ".doppler-side-inner"].map((q) => { const r = document.querySelector(q)!.getBoundingClientRect(); return [Math.round(r.top), Math.round(r.height)]; }));
+    const before = await layout();
+    await page.getByRole("button", { name: "工具", exact: true }).click();
+    await page.getByRole("button", { name: /分享起始設定/ }).click();
+    const toast = page.getByTestId("notice");
+    await expect(toast).toBeVisible();
+    expect(await toast.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+    await expect(toast.locator("svg").first()).toBeVisible();
+    expect(await layout()).toEqual(before);
+    await toast.getByRole("button", { name: "關閉通知" }).click();
+    await expect(toast).toHaveCount(0);
+    expect(await layout()).toEqual(before);
+    await page.getByRole("button", { name: "工具", exact: true }).click();
+    await page.getByRole("button", { name: /匯出教學圖/ }).click();
+    await expect(page.getByTestId("notice")).toContainText("已匯出");
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("notice")).toHaveCount(0);
+  });
+
+  test("playback rate is one menu with 0.25× to 4×, immersion controls are icons, formulas are typeset", async ({ page }) => {
+    await open(page);
+    await page.getByRole("button", { name: /^播放倍率：1×/ }).click();
+    for (const r of ["0.25×", "0.5×", "1×", "2×", "4×"]) await expect(page.getByRole("button", { name: r, exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "4×", exact: true }).click();
+    await expect(page.getByRole("button", { name: /^播放倍率：4×/ })).toBeVisible();
+    await page.getByRole("button", { name: /放大視圖：空氣參考系的波前/ }).click();
+    for (const name of ["全螢幕", "退出放大"]) {
+      const button = page.getByRole("button", { name, exact: true });
+      await expect(button.locator("svg")).toBeVisible();
+      expect((await button.innerText()).trim()).toBe("");
+      const box = await button.boundingBox();
+      expect(box!.width).toBeGreaterThanOrEqual(43.5);
+    }
+    await page.keyboard.press("Escape");
+    // Labels and the formula check use MathJax, not plain characters.
+    await page.getByRole("button", { name: "跳到結束" }).click();
+    await expect(page.getByTestId("pair-readout").locator("dl mjx-container").first()).toBeVisible();
+    await page.getByText("公式核對").click();
+    await expect(page.getByTestId("pair-readout").locator("details[open] mjx-container").first()).toBeVisible();
+    await expect(page.getByTestId("live-readout").locator("mjx-container")).toHaveCount(1);
+  });
+
   test("reduced motion: playback steps from event to event and stays readable and controllable", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await open(page);
     await preset(page, "都靜止");
     await expect(page.getByText("已減少動態")).toBeVisible();
-    await page.getByRole("button", { name: "2×" }).click();
+    await setRate(page, "2×");
     await page.getByRole("button", { name: "播放", exact: true }).click();
     await page.waitForTimeout(1500);
     await page.getByRole("button", { name: "暫停" }).click();
@@ -581,6 +644,7 @@ test("@a11y Doppler free exploration and guided states have no serious or critic
   await toReception(page);
   await scan("guided measure");
   await mode(page, "理論與計算").click();
+  await page.waitForTimeout(400); // let the dialog finish its fade-in; axe would read mid-fade colours
   await scan("theory dialog");
 });
 
@@ -609,6 +673,7 @@ test.describe("Doppler — dark appearance", () => {
     await page.screenshot({ path: evidencePath("guided-b-compare-dark-1280x720.png") });
     await mode(page, "理論與計算").click();
     await expect(page.getByRole("dialog")).toContainText("1.25");
+    await page.waitForTimeout(400);
     await scan("dark theory");
     await page.screenshot({ path: evidencePath("theory-dark-1280x720.png") });
   });
