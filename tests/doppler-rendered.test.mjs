@@ -41,3 +41,18 @@ test("an unreadable or foreign-version share renders the default experiment with
   const clean = await (await render("/doppler")).text();
   assert.doesNotMatch(clean, /分享連結無法讀取|格式版本不相容/);
 });
+
+test("the module stays unlisted: not in the sitemap, not on the catalog, noindex on both locales", async () => {
+  const sitemap = await (await render("/sitemap.xml")).text();
+  assert.match(sitemap, /<urlset/);
+  assert.doesNotMatch(sitemap, /doppler/i, "sitemap must not list /doppler or /en/doppler");
+  const catalog = await (await render("/")).text();
+  assert.doesNotMatch(catalog, /\/doppler|聲音的都普勒/, "the public catalog must not link to or name the prototype");
+  for (const path of ["/doppler", "/en/doppler"]) {
+    const html = await (await render(path)).text();
+    assert.match(html, /name="robots" content="noindex, follow"/, path);
+  }
+  const { labRegistry } = await import("../lib/labs/registry.ts");
+  const entry = labRegistry.find((lab) => lab.id === "doppler-effect");
+  assert.deepEqual([entry.maturity, entry.visibility], ["prototype", "unlisted"]);
+});

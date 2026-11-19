@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Copy, Expand, FileBraces, FileImage, Lock, Maximize2, Minimize2, Pause, Play, RotateCcw, Share2, SkipBack, SkipForward, StepBack, StepForward, TriangleAlert, Wrench, X } from "lucide-react";
 import KakauLabMark from "@/components/KakauLabMark";
@@ -86,26 +86,33 @@ function useReducedMotion() {
 
 /** A header button that opens a short list of choices. */
 /** An icon-only control that names itself in a tooltip on hover and keyboard focus (the accessible name is on the control). */
+/** True only from a Tab key's press to its release, when Tab itself is moving focus; also ends on any other key, a pointer press, or after 100 ms. */
+let tabNavigation = false;
+let tabListenersInstalled = false;
+function installTabListeners() {
+  if (tabListenersInstalled || typeof document === "undefined") return;
+  tabListenersInstalled = true;
+  const end = () => { tabNavigation = false; };
+  document.addEventListener("keydown", (event) => {
+    tabNavigation = event.key === "Tab";
+    if (tabNavigation) window.setTimeout(end, 100);
+  }, true);
+  document.addEventListener("keyup", end, true);
+  document.addEventListener("pointerdown", end, true);
+  window.addEventListener("blur", end);
+}
+
 function Tip({ label, children }: { label: string; children: ReactNode }) {
   const [hovered, setHovered] = useState(false);
   const [keyboardFocus, setKeyboardFocus] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
-  const tabbedAt = useRef(0);
   const showing = (hovered || keyboardFocus) && !dismissed;
-  /* Keyboard focus means focus that arrived by Tab or Shift+Tab. Focus that a script put back (a dialog returning to its
-   * button, a menu to its trigger) is not navigation, so it never raises a tooltip. */
-  useEffect(() => {
-    // Any other key, or a pointer press, ends "navigating by Tab".
-    const onKey = (event: KeyboardEvent) => { tabbedAt.current = event.key === "Tab" ? performance.now() : 0; };
-    const onPointer = () => { tabbedAt.current = 0; };
-    document.addEventListener("keydown", onKey, true);
-    document.addEventListener("pointerdown", onPointer, true);
-    return () => { document.removeEventListener("keydown", onKey, true); document.removeEventListener("pointerdown", onPointer, true); };
-  }, []);
-  /* A tooltip belongs to hovering or to keyboard focus, never to focus that a mouse click or a dialog's focus-return left behind,
-   * and it steps aside as soon as the control is used. While it is showing, Escape dismisses it (WCAG 1.4.13) without moving
-   * focus and without doing anything else (the capture phase keeps this Escape from also closing a notice); an open menu owns its Escape. */
+  useEffect(() => installTabListeners(), []);
+  /* A tooltip belongs to hovering or to focus that arrived by Tab or Shift+Tab. Focus that a script put back (a dialog returning
+   * to its button, a menu to its trigger) or that a click left behind never raises one, and it steps aside once the control is
+   * used. While it is showing, Escape dismisses it (WCAG 1.4.13) without moving focus and without doing anything else (the capture
+   * phase keeps this Escape from also closing a notice); an open menu owns its own Escape. */
   useEffect(() => {
     if (!showing) return;
     const onKey = (event: KeyboardEvent) => {
@@ -124,7 +131,7 @@ function Tip({ label, children }: { label: string; children: ReactNode }) {
       data-open={showing}
       onMouseEnter={() => { setHovered(true); setDismissed(false); }}
       onMouseLeave={() => { setHovered(false); setDismissed(false); }}
-      onFocus={(event) => { if (performance.now() - tabbedAt.current < 300 && event.target.matches(":focus-visible")) { setKeyboardFocus(true); setDismissed(false); } }}
+      onFocus={(event) => { if (tabNavigation && event.target.matches(":focus-visible")) { setKeyboardFocus(true); setDismissed(false); } }}
       onBlur={() => { setKeyboardFocus(false); setDismissed(false); }}
       onClick={() => setDismissed(true)}
     >
@@ -133,20 +140,54 @@ function Tip({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
+/**
+ * A button that opens a short list. Same rules as the shared appearance menu: the trigger toggles it; Escape, a press outside, or
+ * focus leaving it closes it (focus returns to the trigger after Escape and after choosing); ArrowDown/ArrowUp/Home/End move through
+ * the items; Tab is never trapped. A closed menu renders no items, so nothing hidden can take focus.
+ */
 function Menu({ label, ariaLabel, icon, chevron = true, up = false, children }: { label: string; ariaLabel?: string; icon?: ReactNode; chevron?: boolean; up?: boolean; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const focusAfterOpen = useRef<"first" | "last" | null>(null);
+  const items = () => Array.from(ref.current?.querySelectorAll<HTMLElement>(".doppler-menu-list button:not(:disabled), .doppler-menu-list a[href]") ?? []);
   useEffect(() => {
     if (!open) return;
-    const onDown = (event: MouseEvent) => { if (!ref.current?.contains(event.target as Node)) setOpen(false); };
+    const onDown = (event: PointerEvent) => { if (!ref.current?.contains(event.target as Node)) setOpen(false); };
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") { setOpen(false); trigger.current?.focus(); } };
-    document.addEventListener("mousedown", onDown);
+    document.addEventListener("pointerdown", onDown);
     document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
+    return () => { document.removeEventListener("pointerdown", onDown); document.removeEventListener("keydown", onKey); };
   }, [open]);
+  useEffect(() => {
+    if (!open || !focusAfterOpen.current) return;
+    const list = items();
+    (focusAfterOpen.current === "first" ? list[0] : list[list.length - 1])?.focus();
+    focusAfterOpen.current = null;
+  }, [open]);
+  const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    const list = items();
+    const index = list.indexOf(document.activeElement as HTMLElement);
+    if (!open) {
+      if (event.target === trigger.current && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+        event.preventDefault();
+        focusAfterOpen.current = event.key === "ArrowDown" ? "first" : "last";
+        setOpen(true);
+      }
+      return;
+    }
+    if (event.key === "ArrowDown") { event.preventDefault(); (list[index + 1] ?? list[0])?.focus(); }
+    else if (event.key === "ArrowUp") { event.preventDefault(); (index <= 0 ? list[list.length - 1] : list[index - 1])?.focus(); }
+    else if (event.key === "Home") { event.preventDefault(); list[0]?.focus(); }
+    else if (event.key === "End") { event.preventDefault(); list[list.length - 1]?.focus(); }
+  };
   return (
-    <div className="doppler-menu" ref={ref}>
+    <div
+      className="doppler-menu"
+      ref={ref}
+      onKeyDown={onKeyDown}
+      onBlur={(event) => { if (open && !event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false); }}
+    >
       <button ref={trigger} className={open ? "active" : ""} onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="true" aria-label={ariaLabel}>
         {icon ?? label}{chevron && <> <ChevronDown size={13} /></>}
       </button>
