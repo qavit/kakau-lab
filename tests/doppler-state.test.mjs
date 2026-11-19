@@ -189,7 +189,7 @@ test("disclosure follows the phase: nothing numeric, theoretical, shareable or e
   const free = dopplerEvidencePolicy(null);
   assert.deepEqual(Object.values(free), Array(Object.keys(free).length).fill(true));
   const predicting = dopplerEvidencePolicy(newGuidedSession("whoMoves"));
-  assert.deepEqual(predicting, { theory: false, modelInfo: false, numeric: false, guides: false, frequency: false, reference: false, share: false, export: false });
+  assert.deepEqual(predicting, { theory: false, numeric: false, guides: false, frequency: false, reference: false, share: false, export: false });
   let session = submitPrediction(newGuidedSession("whoMoves"), "same");
   const measuring = dopplerEvidencePolicy(session);
   assert.equal(measuring.numeric, true);

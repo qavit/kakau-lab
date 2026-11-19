@@ -159,8 +159,8 @@ export function dopplerEvidencePolicy(session: GuidedSession | null) {
   const predicting = session?.phase === "predict";
   const comparing = session !== null && session.activityId === "whoMoves" && ["compare", "explain", "verify", "complete"].includes(session.phase);
   return {
+    /** Theory and model notes are one entry: the assumptions, the formulas and what is schematic. */
     theory: !predicting,
-    modelInfo: !predicting,
     /** Numbers of any kind: pair readout, live frequency, brackets with values. */
     numeric: !predicting,
     /** Highlight of the selected pair and the spacing / interval brackets. */

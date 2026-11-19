@@ -249,6 +249,52 @@ test.describe("Doppler — free exploration", () => {
     await expect(page.getByRole("button", { name: "複製連結" })).toBeVisible({ timeout: 5000 }); // the check mark reverts
   });
 
+  test("the mode switch is one segmented toggle; the header is icon-only with a tooltip label; theory and model are one entry", async ({ page }) => {
+    await open(page);
+    const toggle = page.locator(".doppler-segmented");
+    await expect(toggle).toHaveAttribute("data-value", "free");
+    await expect(toggle.getByRole("button", { name: "自由探索" })).toHaveAttribute("aria-pressed", "true");
+    const thumb = () => toggle.evaluate((el) => getComputedStyle(el, "::before").transform);
+    const before = await thumb();
+    await toggle.getByRole("button", { name: "探索任務" }).click();
+    await expect(toggle).toHaveAttribute("data-value", "tasks");
+    await expect(toggle.getByRole("button", { name: "探索任務" })).toHaveAttribute("aria-pressed", "true");
+    await expect(toggle.getByRole("button", { name: "自由探索" })).toHaveAttribute("aria-pressed", "false");
+    await expect.poll(thumb).not.toBe(before); // the thumb slid to the other segment
+    await toggle.getByRole("button", { name: "自由探索" }).click();
+    await expect(toggle).toHaveAttribute("data-value", "free");
+
+    // Header controls: icon only, named by aria-label, with a tooltip that appears on hover and on keyboard focus.
+    const headerControls: [string | RegExp, string][] = [["理論與模型", "理論與模型"], ["工具", "工具"], ["語言：English", "English"], [/^外觀：/, "外觀"]];
+    for (const [name, tip] of headerControls) {
+      const control = page.locator(".header-actions").getByRole(typeof name === "string" && name.startsWith("語言") ? "link" : "button", typeof name === "string" ? { name, exact: true } : { name });
+      await expect(control.locator("svg").first()).toBeVisible();
+      expect((await control.innerText()).trim()).toBe("");
+      const box = await control.boundingBox();
+      expect(box!.height).toBeGreaterThanOrEqual(43.5);
+      expect(box!.width).toBeGreaterThanOrEqual(43.5);
+      await control.hover();
+      await expect.poll(() => control.evaluate((el) => { const w = el.closest(".doppler-tip")!; const style = getComputedStyle(w, "::after"); return [style.content, style.opacity]; })).toEqual([`"${tip}"`, "1"]);
+      await page.mouse.move(0, 400);
+      await expect.poll(() => control.evaluate((el) => getComputedStyle(el.closest(".doppler-tip")!, "::after").display)).toBe("none");
+    }
+    await page.getByRole("button", { name: "理論與模型" }).focus();
+    await expect.poll(() => page.getByRole("button", { name: "理論與模型" }).evaluate((el) => getComputedStyle(el.closest(".doppler-tip")!, "::after").opacity)).toBe("1");
+
+    // One entry for theory and model: no separate model-information control, and its content is in the theory.
+    await expect(page.getByRole("button", { name: /模型資訊/ })).toHaveCount(0);
+    await page.getByRole("button", { name: "理論與模型" }).click();
+    const dialog = page.getByRole("dialog", { name: /理論與模型/ });
+    await expect(dialog).toContainText("模型與假設");
+    await expect(dialog).toContainText("只是示意");
+    await expect(dialog).toContainText("實驗在 S 與 O 相距");
+    await page.keyboard.press("Escape");
+    // While a prediction is open the one entry is locked, and its tooltip says why.
+    await mode(page, "探索任務").click();
+    await expect(page.getByRole("button", { name: "理論與模型" })).toBeDisabled();
+    expect(await page.locator(".doppler-tip", { has: page.getByRole("button", { name: "理論與模型" }) }).getAttribute("data-tip")).toContain("送出預測後開放");
+  });
+
   test("playback rate is one menu with 0.25× to 4×, immersion controls are icons, formulas are typeset", async ({ page }) => {
     await open(page);
     await page.getByRole("button", { name: /^播放倍率：1×/ }).click();
@@ -274,7 +320,7 @@ test.describe("Doppler — free exploration", () => {
 
   test("theory lists every symbol with its name and SI unit next to the formulas, in both languages", async ({ page }) => {
     await open(page);
-    await mode(page, "理論與計算").click();
+    await mode(page, "理論與模型").click();
     const dialog = page.getByRole("dialog");
     const table = dialog.locator("table.theory-symbols");
     await expect(table).toBeVisible();
@@ -291,7 +337,7 @@ test.describe("Doppler — free exploration", () => {
     expect(order.indexOf("符號、名稱與單位")).toBe(order.indexOf("公式") + 1);
     await page.keyboard.press("Escape");
     await open(page, "/en/doppler");
-    await mode(page, "Theory & calculation").click();
+    await mode(page, "Theory & model").click();
     const en = page.getByRole("dialog").locator("table.theory-symbols");
     await expect(en.locator("thead th")).toHaveText(["Symbol", "Name", "SI unit", "Unit in this model (normalised)"]);
     await expect(en.locator("tbody tr")).toHaveCount(15);
@@ -368,8 +414,7 @@ test.describe("Doppler — guided tasks", () => {
     await expect(page.getByTestId("clock")).toHaveText("預測後可調整時間");
     await expect(page.getByLabel("時間 t")).toBeDisabled();
     await expect(page.getByRole("button", { name: "播放", exact: true })).toBeDisabled();
-    await expect(mode(page, "理論與計算")).toBeDisabled();
-    await expect(page.getByRole("button", { name: "模型資訊" })).toBeDisabled();
+    await expect(mode(page, "理論與模型")).toBeDisabled();
     await expect(page.locator("svg[data-testid=wavefront-view]")).toHaveAttribute("aria-label", /送出預測後才顯示讀值/);
     await expect(page.getByTestId("spacing-bracket")).toHaveCount(0);
     await page.getByRole("button", { name: "工具", exact: true }).click();
@@ -386,7 +431,7 @@ test.describe("Doppler — guided tasks", () => {
     await expect(measures).toContainText("1.00 T₀");
     await expect(measures).toContainText("1.00 λ₀");
     await expect(page.getByRole("button", { name: "我看到了，繼續" })).toBeEnabled();
-    await expect(mode(page, "理論與計算")).toBeEnabled();
+    await expect(mode(page, "理論與模型")).toBeEnabled();
     await page.getByRole("button", { name: "我看到了，繼續" }).click();
     await expect(panel).toHaveAttribute("data-phase", "explain");
     await page.getByRole("button", { name: /^靜止時每個波前都以同一速率 c/ }).click();
@@ -594,13 +639,13 @@ test.describe("Doppler — share, export, language", () => {
     await expect(page.getByTestId("guided-panel")).toContainText("How does the source make sound?");
     expect(await page.locator("main").innerText()).not.toMatch(ANSWERS);
     await page.getByRole("button", { name: /^Spacing is 1 λ₀ and the reception interval is 1 T₀/ }).click();
-    await page.getByRole("button", { name: "Theory & calculation" }).click();
+    await page.getByRole("button", { name: "Theory & model" }).click();
     await expect(page.getByRole("dialog", { name: /Doppler effect of sound/ })).toContainText("Pitch and loudness");
     await expect(page.getByRole("dialog")).toContainText("Frequency sets pitch");
     await page.keyboard.press("Escape");
     await page.goto("/doppler");
     await open(page);
-    await mode(page, "理論與計算").click();
+    await mode(page, "理論與模型").click();
     await expect(page.getByRole("dialog")).toContainText("頻率決定音調");
     await expect(page.getByRole("dialog")).toContainText("振幅決定音量");
   });
@@ -671,7 +716,7 @@ test.describe("Doppler — viewports", () => {
     await page.getByRole("button", { name: /^間距是 1 λ₀，接收間隔也是 1 T₀/ }).click();
     await toReception(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
-    await mode(page, "理論與計算").click();
+    await mode(page, "理論與模型").click();
     const dialogFits = await page.evaluate(() => { const d = document.querySelector('[role="dialog"]')!; return d.scrollWidth <= d.clientWidth + 1 || getComputedStyle(d.querySelector(".theory-scroll")!).overflowX !== "visible"; });
     expect(dialogFits).toBe(true);
     await page.keyboard.press("Escape");
@@ -722,7 +767,7 @@ test("@a11y Doppler free exploration and guided states have no serious or critic
   await page.getByRole("button", { name: /^間距是 1 λ₀，接收間隔也是 1 T₀/ }).click();
   await toReception(page);
   await scan("guided measure");
-  await mode(page, "理論與計算").click();
+  await mode(page, "理論與模型").click();
   await page.waitForTimeout(400); // let the dialog finish its fade-in; axe would read mid-fade colours
   await scan("theory dialog");
 });
@@ -750,7 +795,7 @@ test.describe("Doppler — dark appearance", () => {
     await page.getByRole("button", { name: "保留這組結果，比較兩組" }).click();
     await scan("dark guided compare");
     await page.screenshot({ path: evidencePath("guided-b-compare-dark-1280x720.png") });
-    await mode(page, "理論與計算").click();
+    await mode(page, "理論與模型").click();
     await expect(page.getByRole("dialog")).toContainText("1.25");
     await page.waitForTimeout(400);
     await scan("dark theory");

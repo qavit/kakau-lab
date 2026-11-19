@@ -14,10 +14,10 @@ const zh = {
   language: "語言",
   languages: { "zh-TW": "繁體中文", en: "English" } as Record<Locale, string>,
   pageDescription: "把同一列波前的空間間距和接收間隔放在一起看，理解波源移動與觀察者移動為什麼得到不同的頻移。",
-  modes: { nav: "學習模式", free: "自由探索", tasks: "探索任務", theory: "理論與計算", theoryLocked: "送出預測後開放" },
+  modes: { nav: "學習模式", free: "自由探索", tasks: "探索任務", theory: "理論與模型", theoryLocked: "送出預測後開放" },
   actions: {
     parameters: "參數", expand: "放大視圖", exitExpand: "退出放大", fullscreen: "全螢幕", fullscreenUnavailable: "全螢幕不可用；視窗內放大仍可使用。",
-    tools: "工具", share: "分享起始設定", exportSvg: "匯出教學圖 SVG", exportJson: "匯出事件資料 JSON", modelInfo: "模型資訊",
+    appearance: "外觀", tools: "工具", share: "分享起始設定", exportSvg: "匯出教學圖 SVG", exportJson: "匯出事件資料 JSON",
     guidedNoTools: "探索任務期間不提供分享與匯出；回到自由探索後可用。", resetExperiment: "重設實驗",
   },
   status: {
@@ -130,18 +130,7 @@ const zh = {
       table: { group: "比較卡", source: "波源靠近", observer: "觀察者靠近", sourceRecede: "波源遠離", observerRecede: "觀察者遠離", spacing: "波前間距 $\\lambda/\\lambda_0$", period: "接收間隔 $\\Delta t/T_0$", frequency: "接收頻率 $f/f_0$", higher: "較高" },
     },
   },
-  theory: { title: "聲音都普勒效應的理論與計算", modelInfoTitle: "模型資訊", close: "關閉" },
-  modelInfo: {
-    paragraphs: [
-      "靜止、均勻、無色散的空氣。波源 S 與觀察者 O 在同一直線上等速運動，兩者速率都低於聲速（這裡限制 $|u|\\le 0.5c$）。速度以空氣為參考系，向右為正。",
-      "使用正規化單位 $c=1$、$f_0=1$：長度以 $\\lambda_0=cT_0$ 為單位，時間以 $T_0$ 為單位。波前 $n$ 在 $t_n=nT_0$ 從波源當時的位置發出，之後圓心固定、半徑 $c(t-t_n)$。",
-      "接收時刻是 O 的位置與波前圓相交的解析解，不是用動畫的碰撞判斷；單步、暫停、回退與比較都從同一份事件資料重建。",
-      "實驗在 S 與 O 相距 $1\\,\\lambda_0$ 前結束，避免兩者重合；否則在 $t=16\\,T_0$ 結束。模型沒有音訊、Mach 錐、路旁掠過、光譜紅移或音量。",
-      "畫面上的圓、接收時刻與讀值來自模型計算；速度箭頭的長度、標記大小與標籤位置只是示意。",
-    ],
-    more: "閱讀完整理論與計算",
-  },
-  expandHint: "放大視圖",
+  theory: { title: "聲音都普勒效應的理論與模型", close: "關閉" },
 };
 
 type Copy = typeof zh;
@@ -153,10 +142,10 @@ const en: Copy = {
   language: "Language",
   languages: { "zh-TW": "繁體中文", en: "English" },
   pageDescription: "Read the spacing of one train of wavefronts together with the intervals at which they are received, and see why a moving source and a moving observer give different frequency shifts.",
-  modes: { nav: "Learning mode", free: "Free exploration", tasks: "Guided tasks", theory: "Theory & calculation", theoryLocked: "Opens after you commit a prediction" },
+  modes: { nav: "Learning mode", free: "Free exploration", tasks: "Guided tasks", theory: "Theory & model", theoryLocked: "Opens after you commit a prediction" },
   actions: {
     parameters: "Parameters", expand: "Expand view", exitExpand: "Exit expanded view", fullscreen: "Full screen", fullscreenUnavailable: "Full screen is unavailable; the in-window expanded view still works.",
-    tools: "Tools", share: "Share starting setup", exportSvg: "Export figure (SVG)", exportJson: "Export event data (JSON)", modelInfo: "Model information",
+    appearance: "Appearance", tools: "Tools", share: "Share starting setup", exportSvg: "Export figure (SVG)", exportJson: "Export event data (JSON)",
     guidedNoTools: "Sharing and export are not available during a guided task; they return with free exploration.", resetExperiment: "Reset experiment",
   },
   status: {
@@ -269,18 +258,7 @@ const en: Copy = {
       table: { group: "Comparison card", source: "Source approaches", observer: "Observer approaches", sourceRecede: "Source recedes", observerRecede: "Observer recedes", spacing: "Front spacing $\\lambda/\\lambda_0$", period: "Reception interval $\\Delta t/T_0$", frequency: "Received frequency $f/f_0$", higher: "higher" },
     },
   },
-  theory: { title: "Theory and calculation: the Doppler effect of sound", modelInfoTitle: "Model information", close: "Close" },
-  modelInfo: {
-    paragraphs: [
-      "Still, uniform, non-dispersive air. The source S and the observer O move on one line at constant velocity, each below the speed of sound (limited here to $|u|\\le 0.5c$). Velocities are measured in the air's frame, positive to the right.",
-      "Normalised units $c=1$, $f_0=1$: lengths in $\\lambda_0=cT_0$, times in $T_0$. Front $n$ is emitted at $t_n=nT_0$ from where the source is then; afterwards its centre stays fixed and its radius is $c(t-t_n)$.",
-      "A reception time is the exact intersection of O's position with the front's circle, not a collision test on animation frames; stepping, pausing, rewinding and comparing all rebuild from the same list of events.",
-      "The run ends before S and O come within $1\\,\\lambda_0$, so they never coincide; otherwise at $t=16\\,T_0$. The model has no audio, Mach cone, road pass-by, spectral redshift or loudness.",
-      "The circles, reception times and readings come from the model; the length of the velocity arrows, the marker sizes and the label positions are schematic.",
-    ],
-    more: "Read the full theory",
-  },
-  expandHint: "Expand view",
+  theory: { title: "Theory and model: the Doppler effect of sound", close: "Close" },
 };
 
 export const dopplerCopy: Record<Locale, Copy> = { "zh-TW": zh, en };

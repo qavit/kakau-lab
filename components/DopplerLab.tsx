@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Copy, Expand, FileBraces, FileImage, Info, Lock, Maximize2, Minimize2, Pause, Play, RotateCcw, Share2, SkipBack, SkipForward, StepBack, StepForward, TriangleAlert, X } from "lucide-react";
+import { BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Copy, Expand, FileBraces, FileImage, Languages, Lock, Maximize2, Minimize2, Pause, Play, RotateCcw, Share2, SkipBack, SkipForward, StepBack, StepForward, TriangleAlert, Wrench, X } from "lucide-react";
 import KakauLabMark from "@/components/KakauLabMark";
 import ThemeToggle from "@/components/ThemeToggle";
 import LabInfoDialog from "@/components/overlays/LabInfoDialog";
@@ -83,7 +83,12 @@ function useReducedMotion() {
 }
 
 /** A header button that opens a short list of choices. */
-function Menu({ label, ariaLabel, up = false, children }: { label: string; ariaLabel?: string; up?: boolean; children: ReactNode }) {
+/** An icon-only control that names itself in a tooltip on hover and keyboard focus (the accessible name is on the control). */
+function Tip({ label, children }: { label: string; children: ReactNode }) {
+  return <span className="doppler-tip" data-tip={label}>{children}</span>;
+}
+
+function Menu({ label, ariaLabel, icon, up = false, children }: { label: string; ariaLabel?: string; icon?: ReactNode; up?: boolean; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -98,7 +103,7 @@ function Menu({ label, ariaLabel, up = false, children }: { label: string; ariaL
   return (
     <div className="doppler-menu" ref={ref}>
       <button ref={trigger} className={open ? "active" : ""} onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="true" aria-label={ariaLabel}>
-        {label} <ChevronDown size={13} />
+        {icon ?? label} <ChevronDown size={13} />
       </button>
       {open && <div className="doppler-menu-list" data-up={up} role="group" aria-label={ariaLabel ?? label} onClick={() => { setOpen(false); trigger.current?.focus(); }}>{children}</div>}
     </div>
@@ -132,7 +137,6 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
   const [expanded, setExpanded] = useState<Expanded>(null);
   const [expandNotice, setExpandNotice] = useState<string | null>(null);
   const [theoryOpen, setTheoryOpen] = useState(false);
-  const [infoOpen, setInfoOpen] = useState(false);
   const [noticeState, setNoticeState] = useState<{ text: string; tone: "ok" | "warn" } | null>(initial.error ? { text: copy.status.shareErrors[initial.error], tone: "warn" } : null);
   const notice = noticeState?.text ?? null;
   const setNotice = useCallback((text: string | null, tone: "ok" | "warn" = "ok") => setNoticeState(text === null ? null : { text, tone }), []);
@@ -419,27 +423,32 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
           <div><div className="eyebrow">{copy.eyebrow}</div><h1><span className="live-dot" />{copy.title}</h1></div>
         </div>
         <nav className="doppler-modebar" aria-label={copy.modes.nav}>
-          <button className={!guided ? "active" : ""} aria-pressed={!guided} onClick={() => { if (guided) requestLeaveGuided(); }}>{copy.modes.free}</button>
-          <button className={guided ? "active" : ""} aria-pressed={Boolean(guided)} onClick={() => { if (!guided) startGuided("baseline"); }}>{copy.modes.tasks}</button>
-          <button className="doppler-theory-entry" disabled={!evidence.theory} aria-haspopup="dialog" aria-describedby={!evidence.theory ? "doppler-lock-note" : undefined} onClick={() => setTheoryOpen(true)} title={!evidence.theory ? copy.modes.theoryLocked : undefined}>
-            {evidence.theory ? <BookOpen size={14} /> : <Lock size={14} />} {copy.modes.theory}
-          </button>
-          {!evidence.theory && <span id="doppler-lock-note" className="doppler-sr-only">{copy.modes.theoryLocked}</span>}
+          <div className="doppler-segmented" role="group" aria-label={copy.modes.nav} data-value={guided ? "tasks" : "free"}>
+            <button className={!guided ? "active" : ""} aria-pressed={!guided} onClick={() => { if (guided) requestLeaveGuided(); }}>{copy.modes.free}</button>
+            <button className={guided ? "active" : ""} aria-pressed={Boolean(guided)} onClick={() => { if (!guided) startGuided("baseline"); }}>{copy.modes.tasks}</button>
+          </div>
         </nav>
         <div className="header-actions">
-          <Menu label={copy.actions.tools}>
-            {evidence.share && <button onClick={shareSetup}><Share2 size={14} /> {copy.actions.share}</button>}
-            {evidence.export && <>
-              <button onClick={() => exportResult("svg")}><FileImage size={14} /> {copy.actions.exportSvg}</button>
-              <button onClick={() => exportResult("json")}>
-                <FileBraces size={14} /> {copy.actions.exportJson}
-              </button>
-            </>}
-            {!evidence.share && !evidence.export && <p className="doppler-menu-note">{copy.actions.guidedNoTools}</p>}
-          </Menu>
-          <button className="doppler-icon-button" disabled={!evidence.modelInfo} onClick={() => setInfoOpen(true)} aria-haspopup="dialog" aria-label={copy.actions.modelInfo} title={copy.actions.modelInfo}><Info size={16} /></button>
-          <Link className="doppler-lang" href={shareHref(other)} hrefLang={other === "en" ? "en" : "zh-Hant"} lang={other === "en" ? "en" : "zh-Hant"} aria-label={`${copy.language}：${copy.languages[other]}`}>{copy.languages[other]}</Link>
-          <ThemeToggle locale={locale} />
+          <Tip label={evidence.theory ? copy.modes.theory : `${copy.modes.theory}：${copy.modes.theoryLocked}`}>
+            <button className="doppler-icon-button doppler-theory-entry" disabled={!evidence.theory} aria-haspopup="dialog" aria-label={copy.modes.theory} aria-describedby={!evidence.theory ? "doppler-lock-note" : undefined} onClick={() => setTheoryOpen(true)}>
+              {evidence.theory ? <BookOpen size={18} /> : <Lock size={18} />}
+            </button>
+          </Tip>
+          {!evidence.theory && <span id="doppler-lock-note" className="doppler-sr-only">{copy.modes.theoryLocked}</span>}
+          <Tip label={copy.actions.tools}>
+            <Menu label={copy.actions.tools} ariaLabel={copy.actions.tools} icon={<Wrench size={18} />}>
+              {evidence.share && <button onClick={shareSetup}><Share2 size={14} /> {copy.actions.share}</button>}
+              {evidence.export && <>
+                <button onClick={() => exportResult("svg")}><FileImage size={14} /> {copy.actions.exportSvg}</button>
+                <button onClick={() => exportResult("json")}><FileBraces size={14} /> {copy.actions.exportJson}</button>
+              </>}
+              {!evidence.share && !evidence.export && <p className="doppler-menu-note">{copy.actions.guidedNoTools}</p>}
+            </Menu>
+          </Tip>
+          <Tip label={copy.languages[other]}>
+            <Link className="doppler-lang doppler-icon-button" href={shareHref(other)} hrefLang={other === "en" ? "en" : "zh-Hant"} lang={other === "en" ? "en" : "zh-Hant"} aria-label={`${copy.language}：${copy.languages[other]}`}><Languages size={18} /></Link>
+          </Tip>
+          <Tip label={copy.actions.appearance}><ThemeToggle locale={locale} /></Tip>
         </div>
       </div>
 
@@ -636,14 +645,6 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
         )}
       </div>
 
-      {infoOpen && (
-        <LabInfoDialog title={copy.theory.modelInfoTitle} closeLabel={copy.theory.close} onClose={() => setInfoOpen(false)}>
-          <article className="theory-body">
-            <h2>{copy.theory.modelInfoTitle}</h2>
-            {copy.modelInfo.paragraphs.map((p) => <p key={p}><Rich>{p}</Rich></p>)}
-          </article>
-        </LabInfoDialog>
-      )}
       {theoryOpen && <LabInfoDialog title={copy.theory.title} closeLabel={copy.theory.close} onClose={() => setTheoryOpen(false)}><TheoryNotes locale={locale} /></LabInfoDialog>}
     </main>
     </MathProvider>

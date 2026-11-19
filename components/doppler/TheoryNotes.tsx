@@ -76,7 +76,7 @@ function Chinese() {
   return (
     <div className="theory-body">
       <div className="eyebrow">Kakau Lab · Model 11</div>
-      <h1>聲音都普勒效應的理論與計算</h1>
+      <h1>聲音都普勒效應的理論與模型</h1>
       <p>
         這個模型的核心主張是：<strong>頻率由「接收間隔」決定，而接收間隔同時受波前的空間間距和 O 的運動影響</strong>。
         所以「相對速率相同」並不代表「頻移相同」——要看是空氣中的哪一方在動。
@@ -134,6 +134,7 @@ function Chinese() {
 
       <h2>適用範圍與限制</h2>
       <p>
+        畫面上的圓、接收時刻與讀值來自模型計算；速度箭頭的長度、標記大小與標籤位置只是示意。<br />
         不含：音訊、實際路旁掠過、Mach 錐與超音速、光譜紅移、音量與衰減、風與介質運動。模型版本：<code>{DOPPLER_MODEL_VERSION}</code>。
         參考：OpenStax University Physics Vol. 1 §17.7「The Doppler Effect」。
       </p>
@@ -145,7 +146,7 @@ function English() {
   return (
     <div className="theory-body">
       <div className="eyebrow">Kakau Lab · Model 11</div>
-      <h1>Theory and calculation: the Doppler effect of sound</h1>
+      <h1>Theory and model: the Doppler effect of sound</h1>
       <p>
         The central claim: <strong>the received frequency is set by the reception interval, and the reception interval depends both on the spatial spacing of the wavefronts and on how O moves</strong>.
         So the same closing speed does not mean the same shift — it matters which of the two is moving through the air.
@@ -203,6 +204,7 @@ function English() {
 
       <h2>Scope and limits</h2>
       <p>
+        The circles, reception times and readings come from the model; the length of the velocity arrows, the marker sizes and the label positions are schematic.<br />
         Not included: audio, real road pass-by, Mach cone and supersonic motion, spectral redshift, loudness and attenuation, wind or a moving medium. Model version: <code>{DOPPLER_MODEL_VERSION}</code>.
         Reference: OpenStax University Physics Vol. 1, §17.7 “The Doppler Effect”.
       </p>

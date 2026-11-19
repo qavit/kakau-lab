@@ -19,7 +19,7 @@
 
 ## 2. 重用與缺口
 
-**直接重用（未複製）**：`app/lab-c2.css` 的 `--lc-*` token 與 44px range、`LabInfoDialog`（理論／模型資訊；新增選用 `closeLabel`，預設值不變，Projectile 行為不變）、`components/math/MathJax`（自架 MathJax）、`ThemeToggle`、`KakauLabMark`、`lib/i18n`（`Locale`、`localizedPath`）與 `proxy.ts` 的 URL 語系、`lib/site-metadata`、`globals.css` 內的 `.viewport-card`、`.theory-*`、`.guided-*`、registry、Playwright 設定與 `tests/e2e/evidence.ts`。
+**直接重用（未複製）**：`app/lab-c2.css` 的 `--lc-*` token 與 44px range、`LabInfoDialog`（理論與模型；新增選用 `closeLabel`，預設值不變，Projectile 行為不變）、`components/math/MathJax`（自架 MathJax）、`ThemeToggle`、`KakauLabMark`、`lib/i18n`（`Locale`、`localizedPath`）與 `proxy.ts` 的 URL 語系、`lib/site-metadata`、`globals.css` 內的 `.viewport-card`、`.theory-*`、`.guided-*`、registry、Playwright 設定與 `tests/e2e/evidence.ts`。
 
 **沿用慣例但各自實作（缺口，非平台抽象）**：工具選單、放大視圖／Fullscreen 回退、元素量測尺寸 hook、傳輸控制（播放、單步、倍率）、引導任務狀態機與揭露政策、分享 codec 的驗證邊界。這些在 Projectile 與本模組各有一份，**現在已有第二個 consumer**；是否抽取、抽成什麼，留給既有 Gate。本輪刻意不新增通用工作區、時鐘或物理引擎。
 
@@ -47,7 +47,7 @@
 | Lint | `npm run lint` | 0 error；2 個 `StandardAtmosphereLab.tsx` 既有 warning（與本改動無關） |
 | Unit + build | `npm test`（= `npm run build` + `node --test tests/*.test.mjs`） | build 成功；**485 / 485 pass** |
 | 型別 | `npx tsc --noEmit` | 本改動無錯；`db/index.ts`、`worker/index.ts` 的 cloudflare 型別錯誤在 main 上即存在 |
-| Doppler E2E | `BASE_URL=http://localhost:3100 npx playwright test tests/e2e/doppler.spec.ts --project=desktop-chromium` | **31 / 31 pass**（dev server、Chromium） |
+| Doppler E2E | `BASE_URL=http://localhost:3100 npx playwright test tests/e2e/doppler.spec.ts --project=desktop-chromium` | **32 / 32 pass**（dev server、Chromium） |
 | 既有 Projectile E2E | `projectile-layered`、`projectile-export` | pass（一併跑的 32 個通過；theme-menu 見下） |
 | theme-menu E2E | `tests/e2e/theme-menu.spec.ts` | 本分支 12 / 36 失敗；**同一份 spec 在 main（dev server，同機）10 / 36 失敗**，失敗集合不同、症狀同為「選單 list 未出現」，判為 dev server 水合時序的既有不穩，**未診斷、未修**；Doppler 未影響這些頁面 |
 | 效能（非門檻） | `DOPPLER_PERF=1 npx playwright test tests/e2e/doppler-perf.spec.ts` | dev server／headless Chromium／未降速：首次可操作 322 ms；2× 播放 frame 平均 16.6 ms、p95 18.4 ms；放大視圖切換 22.7 ms。**這不是代表裝置的 baseline** |
@@ -71,7 +71,7 @@
 
 | 編號 | 狀態 | E：證據 | 缺：缺口 |
 | --- | --- | --- | --- |
-| R01 共同資訊架構 | 部分 | 自由探索／探索任務／理論與計算三入口皆實質有內容，無空分頁；參數與讀值在工作區側欄，分享、匯出、語言、外觀、模型資訊在標頭（`doppler.spec`：Activity 1/2、free 系列） | 沒有「圖層」抽屜（只有 2 個 checkbox：連線、編號）；工具選單是本模組自有 |
+| R01 共同資訊架構 | 部分 | 自由探索／探索任務／理論與模型三入口皆實質有內容，無空分頁；參數與讀值在工作區側欄，分享、匯出、語言、外觀、模型資訊在標頭（`doppler.spec`：Activity 1/2、free 系列） | 沒有「圖層」抽屜（只有 2 個 checkbox：連線、編號）；工具選單是本模組自有 |
 | R02 桌機與手機工作區 | 部分 | 1366×768、1280×720、390×844、360×800、320×640 皆無橫向捲動、兩圖與時鐘在視窗寬內、主要入口 ≥44 px、tab 順序每一站有 ≥2 px 焦點環且在視窗內；1280×720 核心圖、傳輸、側欄操作在同一畫面（截圖 `free-1280x720.png`）；手機依「圖→時鐘→預設→參數→讀值」堆疊，兩圖在高度≥700 時釘住 | 200% 文字、400% zoom、旋轉**未測**；1280×720 頁面本身不捲動（量得 dock 底 705 px、`scrollHeight` 720），預設與兩個速度滑桿在首屏，但所選對讀值卡在側欄內要捲動才看全 |
 | R03 沉浸與重設 | 部分 | 兩個科學視圖各自放大／退出（Esc、焦點回到該視圖的觸發鈕），放大前後參數、時間、所選對皆保留；Fullscreen API 失敗時視窗內放大仍可用（程式存在）；重設實驗與重新開始任務分開 | Fullscreen API 成功與失敗路徑**未在瀏覽器驗**；波前圖沒有平移／縮放，所以沒有「視角復位」 |
 | R04 可重現分享 | 通過（測試範圍內） | 分享＝起始設定；含模型版本 `doppler-wavefront-1`、格式 v1、初始位置、速度、預設、所選對、呈現旗標；乾淨 browser context 開啟後暫停在 t=0 且參數、預設、所選對一致，再播放得 1.20；無效 JSON、格式 v2、模型版本不符、速度越界皆回到預設並說明原因（`doppler.spec` share 測試＋`doppler-state.test.mjs`＋伺服端渲染測試）。不含時間、作答、學生資訊 | 沒有舊格式可遷移（本模組只有 v1）；URL 長度上限 2000 之外的行為只靠單元測試 |
@@ -117,6 +117,11 @@
 ### 第二輪回饋
 
 分享 toast 加複製鈕（實測會寫入剪貼簿、短暫顯示勾號）；匯出選單項目加圖示；代表「波源」「觀察者」的下標一律改為正體大寫（$u_\\mathrm{S}$、$u_\\mathrm{O}$、$x_\\mathrm{S}$、$\\lambda_\\mathrm{S}$、$t_{\\mathrm{R},n}$、$\\Delta t_\\mathrm{R}$；匯出 SVG 以降低的 tspan 呈現），`f_\\mathrm{obs}` 與表示傳播方向的 $s$ 維持原樣，並以原始碼掃描測試防止小寫下標回來；理論對話框在公式旁新增符號表（符號、名稱、SI 單位，另附本模型的正規化單位，共 15 列，中英文各一份，窄螢幕在表內橫向捲動）。
+
+### 第三輪回饋
+
+模式切換改成單一分段式 toggle（滑動的選取塊，`data-value` 與 `aria-pressed` 同步；減少動態時不滑動）；標頭統一為圖示按鈕（理論與模型、工具、語言、外觀），名稱在 `aria-label`，滑過或鍵盤聚焦時顯示 tooltip，閒置的 tooltip 不渲染所以不會撐寬頁面；「模型資訊」與「理論與計算」合併為一個「理論與模型」入口（模型資訊獨有的「圓與讀值來自模型、箭頭與標記只是示意」併入理論的適用範圍；預測期間同樣鎖住）。側欄與圖＋dock 等高、傳輸列改依 dock 寬度換行（見 commit `b7b783b`）。
+未處理：tooltip 目前不支援 Esc 關閉（WCAG 1.4.13 的 dismissible），觸控裝置沒有 hover，圖示名稱只靠 `aria-label`。
 
 ## 9. 未做與後續
 
