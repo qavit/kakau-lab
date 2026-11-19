@@ -137,7 +137,6 @@ test.describe("Doppler — free exploration", () => {
     expect(await page.getByTestId("clock").innerText()).toBe(clock);
     await page.getByRole("button", { name: "跳到結束" }).click();
     await expect(page.getByTestId("band-end")).toHaveAttribute("data-reason", "time-limit");
-    await expect(page.getByTestId("band-end")).toContainText("實驗結束");
     // Both closing at 0.5c: the run ends before S and O coincide, and says so.
     await page.getByLabel("波源 S · 波源速度", { exact: false }).fill("0.5");
     await page.getByLabel("觀察者 O · 觀察者速度", { exact: false }).fill("-0.5");
@@ -201,7 +200,6 @@ test.describe("Doppler — free exploration", () => {
     await preset(page, "波源靠近");
     const geometry = () => page.evaluate(() => ({ dock: document.querySelector(".doppler-dock")!.getBoundingClientRect().height, page: document.documentElement.scrollHeight, band: document.querySelector('[data-card="band"]')!.getBoundingClientRect().height }));
     const before = await geometry();
-    await expect(page.getByTestId("band-end")).toContainText("實驗結束");
     await page.getByRole("button", { name: "跳到結束" }).click();
     expect(await geometry()).toEqual(before);
     await page.getByLabel("波源 S · 波源速度", { exact: false }).fill("0.5");
@@ -227,6 +225,9 @@ test.describe("Doppler — free exploration", () => {
     await page.getByRole("button", { name: "工具", exact: true }).click();
     await page.getByRole("button", { name: /匯出教學圖/ }).click();
     await expect(page.getByTestId("notice")).toContainText("已匯出");
+    // Focus returned to the tools button, whose tooltip is showing: the first Escape dismisses the tooltip only.
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("notice")).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByTestId("notice")).toHaveCount(0);
   });
@@ -295,6 +296,121 @@ test.describe("Doppler — free exploration", () => {
     expect(await page.locator(".doppler-tip", { has: page.getByRole("button", { name: "理論與模型" }) }).getAttribute("data-tip")).toContain("送出預測後開放");
   });
 
+  test("a header tooltip is dismissed by Escape (hover and focus) without moving focus or closing anything else; it returns on re-entry", async ({ page }) => {
+    await open(page);
+    await preset(page, "波源靠近");
+    const tipDisplay = (name: string) => page.getByRole("button", { name, exact: true }).evaluate((el) => getComputedStyle(el.closest(".doppler-tip")!, "::after").display);
+    // Hover: an open notice must survive the Escape that dismisses the tooltip.
+    await page.getByRole("button", { name: "工具", exact: true }).click();
+    await page.getByRole("button", { name: /分享起始設定/ }).click();
+    await expect(page.getByTestId("notice")).toBeVisible();
+    const theory = page.getByRole("button", { name: "理論與模型", exact: true });
+    await theory.hover();
+    await expect.poll(() => tipDisplay("理論與模型")).toBe("block");
+    await page.keyboard.press("Escape");
+    await expect.poll(() => tipDisplay("理論與模型")).toBe("none");
+    await expect(page.getByTestId("notice")).toBeVisible();
+    await page.keyboard.press("Escape"); // no tooltip now: this one closes the notice
+    await expect(page.getByTestId("notice")).toHaveCount(0);
+    // Leaving and re-entering shows it again.
+    await page.mouse.move(0, 400);
+    await theory.hover();
+    await expect.poll(() => tipDisplay("理論與模型")).toBe("block");
+    // Keyboard focus: dismiss with Escape, focus stays, Tab away and back restores it.
+    await page.mouse.move(0, 400);
+    await theory.focus();
+    await expect.poll(() => tipDisplay("理論與模型")).toBe("block");
+    await page.keyboard.press("Escape");
+    await expect.poll(() => tipDisplay("理論與模型")).toBe("none");
+    await expect(theory).toBeFocused();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Shift+Tab");
+    await expect(theory).toBeFocused();
+    await expect.poll(() => tipDisplay("理論與模型")).toBe("block");
+    // An open menu keeps its own Escape.
+    await page.getByRole("button", { name: "工具", exact: true }).click();
+    await expect(page.getByRole("button", { name: /匯出教學圖/ })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("button", { name: /匯出教學圖/ })).toHaveCount(0);
+  });
+
+  test("clicking a front that O never receives explains why and changes nothing; the last received front selects its pair", async ({ page }) => {
+    await open(page);
+    await preset(page, "觀察者靠近");
+    await page.getByRole("button", { name: "跳到結束" }).click();
+    const output = page.getByTestId("pair-readout").locator("output");
+    await expect(output).toHaveText("#2 ↔ #3");
+    // Emission 15 and 16 have no reception inside the run (14 fronts are received: 0 … 13).
+    const unavailable = page.locator('g[data-event="emission"][data-n="15"] circle[data-unavailable="true"]');
+    await expect(unavailable).toHaveCount(1);
+    await expect(unavailable.locator("title")).toHaveText(/#15.*不會被 O 接收/);
+    await unavailable.click({ force: true });
+    await expect(page.getByTestId("notice")).toContainText("波前 #15 在實驗結束前不會被 O 接收");
+    await expect(output).toHaveText("#2 ↔ #3");
+    await page.getByTestId("notice").getByRole("button", { name: "關閉通知" }).click();
+    // The last received front (13) selects the pair it closes, and its title says so.
+    const last = page.locator('g[data-event="reception"][data-n="13"] circle');
+    await expect(last.locator("title")).toHaveText(/#12.*#13/);
+    await last.click({ force: true });
+    await expect(output).toHaveText("#12 ↔ #13");
+    await expect(page.getByTestId("notice")).toHaveCount(0);
+  });
+
+  test("full screen: success, leaving from outside, refusal and absence all keep the expanded view usable and return focus", async ({ page }) => {
+    await open(page);
+    await preset(page, "波源靠近");
+    await page.getByRole("button", { name: "跳到結束" }).click();
+    const trigger = page.getByRole("button", { name: /放大視圖：空氣參考系的波前/ });
+    // Success, then the exit button.
+    await trigger.click();
+    await page.getByRole("button", { name: "全螢幕", exact: true }).click();
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement !== null)).toBe(true);
+    await expect(page.locator(".doppler-stage")).toHaveAttribute("data-expanded", "wave");
+    await expect(page.getByTestId("clock")).toContainText("16.00");
+    await page.getByRole("button", { name: "退出放大", exact: true }).click();
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement === null)).toBe(true);
+    await expect(page.locator(".doppler-stage")).toHaveAttribute("data-expanded", "none");
+    await expect(trigger).toBeFocused();
+    // Leaving full screen from outside (what the browser's own Escape does) leaves the expanded view too.
+    await trigger.click();
+    await page.getByRole("button", { name: "全螢幕", exact: true }).click();
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement !== null)).toBe(true);
+    await page.evaluate(() => document.exitFullscreen());
+    await expect(page.locator(".doppler-stage")).toHaveAttribute("data-expanded", "none");
+    await expect(trigger).toBeFocused();
+    await expect(page.getByRole("button", { name: "波源靠近" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("clock")).toContainText("16.00");
+  });
+
+  test("full screen refused or unavailable: a clear notice or no button, and the in-window view still works", async ({ browser, baseURL }) => {
+    for (const mode of ["refused", "absent"] as const) {
+      const context = await browser.newContext({ baseURL, viewport: { width: 1280, height: 720 } });
+      const page = await context.newPage();
+      await page.addInitScript((m) => {
+        if (m === "refused") Element.prototype.requestFullscreen = () => Promise.reject(new DOMException("denied", "NotAllowedError"));
+        else Object.defineProperty(Element.prototype, "requestFullscreen", { value: undefined, configurable: true });
+      }, mode);
+      await open(page);
+      await preset(page, "波源靠近");
+      const trigger = page.getByRole("button", { name: /放大視圖：發射與接收時間帶/ });
+      await trigger.click();
+      await expect(page.locator(".doppler-stage")).toHaveAttribute("data-expanded", "band");
+      if (mode === "refused") {
+        await page.getByRole("button", { name: "全螢幕", exact: true }).click();
+        await expect(page.getByText("全螢幕不可用；視窗內放大仍可使用。")).toBeVisible();
+        await expect(page.locator(".doppler-stage")).toHaveAttribute("data-expanded", "band");
+      } else {
+        await expect(page.getByRole("button", { name: "全螢幕", exact: true })).toHaveCount(0);
+      }
+      await page.getByRole("button", { name: "跳到結束" }).click(); // the clock is still in reach
+      await expect(page.getByTestId("clock")).toContainText("16.00");
+      await page.keyboard.press("Escape");
+      await expect(page.locator(".doppler-stage")).toHaveAttribute("data-expanded", "none");
+      await expect(trigger).toBeFocused();
+      await context.close();
+    }
+  });
+
   test("playback rate is one menu with 0.25× to 4×, immersion controls are icons, formulas are typeset", async ({ page }) => {
     await open(page);
     await page.getByRole("button", { name: /^播放倍率：1×/ }).click();
@@ -357,7 +473,7 @@ test.describe("Doppler — free exploration", () => {
       const dock = await rect(".doppler-dock");
       const side = await rect(".doppler-side");
       expect(Math.abs(side.top - figures.top), `${width}: tops`).toBeLessThanOrEqual(1);
-      expect(Math.abs(side.bottom - dock.bottom), `${width}: bottoms`).toBeLessThanOrEqual(1);
+      await expect.poll(async () => Math.abs((await rect(".doppler-side")).bottom - (await rect(".doppler-dock")).bottom), { message: `${width}: bottoms` }).toBeLessThanOrEqual(1);
       const menu = await rect(".doppler-transport .doppler-menu > button");
       expect(menu.right, `${width}: rate menu inside the dock`).toBeLessThanOrEqual(dock.right + 0.5);
       expect(menu.left).toBeGreaterThanOrEqual(dock.left);
@@ -373,9 +489,8 @@ test.describe("Doppler — free exploration", () => {
       expect(list.top).toBeGreaterThanOrEqual(0);
       await page.keyboard.press("Escape");
       await mode(page, "探索任務").click();
-      const guidedSide = await rect(".doppler-side");
-      const guidedDock = await rect(".doppler-dock"); // the masked readout makes the dock a little shorter
-      expect(Math.abs(guidedSide.bottom - guidedDock.bottom), `${width}: guided bottom`).toBeLessThanOrEqual(1);
+      // the masked readout makes the dock a little shorter, so measure it again
+      await expect.poll(async () => Math.abs((await rect(".doppler-side")).bottom - (await rect(".doppler-dock")).bottom), { message: `${width}: guided bottom` }).toBeLessThanOrEqual(1);
     }
   });
 

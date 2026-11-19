@@ -80,7 +80,7 @@
 .doppler-c2 .doppler-tip::after { content: attr(data-tip); display: none; position: absolute; z-index: 60; top: calc(100% + 6px); right: 0; padding: 4px 9px; border-radius: 7px; background: var(--lc-text); color: var(--lc-page); font-size: 12px; line-height: 1.5; white-space: nowrap; pointer-events: none; }
 .doppler-c2 .doppler-tip:is(:hover, :focus-within)::after { display: block; animation: doppler-tip-in 120ms ease 250ms both; }
 @keyframes doppler-tip-in { from { opacity: 0; } to { opacity: 1; } }
-.doppler-c2 .doppler-tip:has([aria-expanded="true"])::after { display: none; }
+.doppler-c2 .doppler-tip:has([aria-expanded="true"])::after, .doppler-c2 .doppler-tip[data-dismissed="true"]::after { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .doppler-c2 .doppler-tip::after { animation: none !important; } }
 .doppler-c2 .doppler-tip .doppler-menu > button { min-width: 44px; padding: 0 10px; gap: 4px; }
 .doppler-c2 .doppler-icon-button, .doppler-c2 .doppler-lang { min-width: 44px; min-height: 44px; padding: 0; }
@@ -246,7 +246,7 @@ html[data-mode="dark"] .doppler-c2 .doppler-toast[data-tone="warn"] .doppler-toa
 /* With enough height the two figures stay pinned while the controls scroll underneath. */
 @media (max-width: 660px) and (min-height: 700px) {
   .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-figures { position: sticky; top: 0; z-index: 15; padding-bottom: 4px; background: var(--lc-page); }
-  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-band-host { height: 150px; }
+  .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-band-host { height: 176px; }
   .doppler-c2 .doppler-stage[data-expanded="none"] .doppler-wave-host { height: 190px; }
 }
 @media (max-width: 660px) and (max-height: 520px) {

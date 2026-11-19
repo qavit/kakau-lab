@@ -27,7 +27,7 @@ function Arrow({ x, y, u, color, max }: { x: number; y: number; u: number; color
  * be compared by eye. S and O are drawn with different shapes, labels and velocity arrows.
  */
 export default function WavefrontView({
-  experiment, time, pair, guides, numeric, labels, width, height, copy, summary, onSelectPair,
+  experiment, time, pair, guides, numeric, labels, width, height, copy, summary, onSelectPair, onUnavailable,
 }: {
   experiment: DopplerExperiment;
   time: number;
@@ -42,6 +42,7 @@ export default function WavefrontView({
   copy: DopplerCopy;
   summary: string;
   onSelectPair: (n: number) => void;
+  onUnavailable: (n: number) => void;
 }) {
   const clipId = useId().replace(/:/g, "");
   const w = Math.max(280, width || 900);
@@ -50,7 +51,7 @@ export default function WavefrontView({
   const pad = { left: 12, right: 12, top: 8, bottom: 28 };
   const unit = (w - pad.left - pad.right) / (X_DOMAIN.max - X_DOMAIN.min);
   const sx = (x: number) => pad.left + (x - X_DOMAIN.min) * unit;
-  const axisY = pad.top + (h - pad.top - pad.bottom) * 0.6;
+  const axisY = pad.top + (h - pad.top - pad.bottom) * 0.55;
   const font = compact ? 11 : 13;
 
   const { setup } = experiment;
@@ -67,21 +68,21 @@ export default function WavefrontView({
   if (guides && frontA && frontB) {
     const xa = sx(frontA.centreX + side * frontA.radius);
     const xb = sx(frontB.centreX + side * frontB.radius);
-    const y = axisY + 30;
+    const y = axisY + 42;
     const mid = Math.min(w - 78, Math.max(78, (xa + xb) / 2));
     const spacing = side * ((frontA.centreX + side * frontA.radius) - (frontB.centreX + side * frontB.radius));
     bracket = (
       <g data-testid="spacing-bracket" stroke={C.pair} strokeWidth={2} fill="none">
         <path d={`M${xa} ${y - 6}V${y + 6}M${xb} ${y - 6}V${y + 6}M${xa} ${y}H${xb}`} />
         {numeric && (
-          <text x={mid} y={y + 20} textAnchor="middle" fill={C.pair} stroke="none" fontSize={font} fontWeight={700}>
+          <text x={mid} y={y + 19} textAnchor="middle" fill={C.pair} stroke="none" fontSize={font} fontWeight={700}>
             {copy.figure.spacingShort(spacing.toFixed(2))}
           </text>
         )}
         {labels && (
           <g fill={C.pair} stroke="none" fontSize={font} fontWeight={700} textAnchor="middle">
-            <text x={xa} y={axisY - 9}>{`#${pair}`}</text>
-            <text x={xb} y={axisY + 18}>{`#${pair + 1}`}</text>
+            <text x={xa} y={axisY - 16}>{`#${pair}`}</text>
+            <text x={xb} y={axisY + 28}>{`#${pair + 1}`}</text>
           </g>
         )}
       </g>
@@ -115,7 +116,7 @@ export default function WavefrontView({
           <text x={sx(tick)} y={h - 9} textAnchor="middle" fill={C.label} fontSize={compact ? 11 : 12}>{tick}</text>
         </g>
       ))}
-      <text x={w - pad.right} y={h - 24} textAnchor="end" fill={C.label} fontSize={compact ? 11 : 12}>{copy.figure.axisX}</text>
+      <text x={w - pad.right - 2} y={pad.top + 12} textAnchor="end" fill={C.label} fontSize={compact ? 11 : 12}>{copy.figure.axisX}</text>
       <line x1={pad.left} y1={axisY} x2={w - pad.right} y2={axisY} stroke={C.axis} strokeWidth={1.2} />
 
       <g clipPath={`url(#${clipId})`}>
@@ -127,8 +128,8 @@ export default function WavefrontView({
               {/* A wide invisible stroke makes the thin ring easy to hit with a pointer or a finger. */}
               <circle
                 cx={sx(f.centreX)} cy={axisY} r={Math.max(0, f.radius * unit)} fill="none" stroke="transparent" strokeWidth={14}
-                style={{ cursor: "pointer", pointerEvents: "stroke" }}
-                onClick={() => onSelectPair(Math.min(f.n, lastPair))}
+                style={{ cursor: f.n < experiment.receptions.length ? "pointer" : "not-allowed", pointerEvents: "stroke" }}
+                onClick={() => (f.n < experiment.receptions.length ? onSelectPair(Math.min(f.n, lastPair)) : onUnavailable(f.n))}
               />
               <circle cx={sx(f.centreX)} cy={axisY} r={2.6} fill={C.ended} stroke={C.front} strokeWidth={1} />
             </g>

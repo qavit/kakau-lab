@@ -85,7 +85,37 @@ function useReducedMotion() {
 /** A header button that opens a short list of choices. */
 /** An icon-only control that names itself in a tooltip on hover and keyboard focus (the accessible name is on the control). */
 function Tip({ label, children }: { label: string; children: ReactNode }) {
-  return <span className="doppler-tip" data-tip={label}>{children}</span>;
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+  const showing = (hovered || focused) && !dismissed;
+  /* WCAG 1.4.13: while a tooltip is showing, Escape dismisses it without moving focus and without doing anything else
+   * (the capture phase keeps this Escape from also closing a notice). A menu that is open owns its own Escape. */
+  useEffect(() => {
+    if (!showing) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || ref.current?.querySelector('[aria-expanded="true"]')) return;
+      event.stopPropagation();
+      setDismissed(true);
+    };
+    document.addEventListener("keydown", onKey, true);
+    return () => document.removeEventListener("keydown", onKey, true);
+  }, [showing]);
+  return (
+    <span
+      ref={ref}
+      className="doppler-tip"
+      data-tip={label}
+      data-dismissed={dismissed}
+      onMouseEnter={() => { setHovered(true); setDismissed(false); }}
+      onMouseLeave={() => { setHovered(false); setDismissed(false); }}
+      onFocus={() => { setFocused(true); setDismissed(false); }}
+      onBlur={() => { setFocused(false); setDismissed(false); }}
+    >
+      {children}
+    </span>
+  );
 }
 
 function Menu({ label, ariaLabel, icon, up = false, children }: { label: string; ariaLabel?: string; icon?: ReactNode; up?: boolean; children: ReactNode }) {
@@ -149,6 +179,7 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
   const bandHost = useRef<HTMLDivElement>(null);
   const expandedRef = useRef<Expanded>(null);
   const exitRef = useRef<HTMLButtonElement>(null);
+  const fullscreenRequested = useRef(false);
   const reduced = useReducedMotion();
   const waveSize = useElementSize(waveHost);
   const bandSize = useElementSize(bandHost);
@@ -223,6 +254,7 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
     applySetup({ ...setup, ...patch });
   };
 
+  const explainUnavailable = (n: number) => setNotice(copy.figure.notReceivable(n), "warn");
   const selectPair = useCallback((n: number) => setView((v) => ({ ...v, pair: Math.max(0, n) })), []);
 
   /* ---- guided ---- */
@@ -325,11 +357,20 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
   /* The trigger is replaced by the exit button while expanded, so focus goes back to whichever trigger remounts. */
   const collapse = useCallback(() => {
     const kind = expandedRef.current;
+    fullscreenRequested.current = false;
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
     setExpanded(null);
     setExpandNotice(null);
     requestAnimationFrame(() => requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-expand="${kind}"]`)?.focus()));
   }, []);
+  /* Leaving full screen from outside (the browser's own Escape, a system gesture) also leaves the expanded view. */
+  useEffect(() => {
+    const onChange = () => {
+      if (!document.fullscreenElement && fullscreenRequested.current) { fullscreenRequested.current = false; collapse(); }
+    };
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, [collapse]);
   useEffect(() => {
     if (!expanded) return;
     exitRef.current?.focus();
@@ -356,14 +397,16 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
   const expandButton = (kind: "wave" | "band") => (
     expanded === kind ? (
       <div className="doppler-expand-actions">
-        <button
-          aria-label={copy.actions.fullscreen}
-          title={copy.actions.fullscreen}
-          onClick={async () => {
-            try { await document.documentElement.requestFullscreen(); setExpandNotice(null); }
-            catch { setExpandNotice(copy.actions.fullscreenUnavailable); }
-          }}
-        ><Expand size={18} /></button>
+        {typeof document !== "undefined" && typeof document.documentElement.requestFullscreen === "function" && (
+          <button
+            aria-label={copy.actions.fullscreen}
+            title={copy.actions.fullscreen}
+            onClick={async () => {
+              try { await document.documentElement.requestFullscreen(); fullscreenRequested.current = true; setExpandNotice(null); }
+              catch { setExpandNotice(copy.actions.fullscreenUnavailable); }
+            }}
+          ><Expand size={18} /></button>
+        )}
         <button ref={exitRef} className="doppler-expand-exit" aria-label={copy.actions.exitExpand} title={copy.actions.exitExpand} onClick={collapse}><Minimize2 size={18} /></button>
       </div>
     ) : (
@@ -487,7 +530,7 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
             <div className="doppler-host doppler-wave-host" ref={waveHost}>
               <WavefrontView
                 experiment={experiment} time={time} pair={pair} guides={evidence.guides} numeric={evidence.numeric} labels={view.labels}
-                width={waveSize.width} height={waveSize.height} copy={copy} summary={waveSummary} onSelectPair={selectPair}
+                width={waveSize.width} height={waveSize.height} copy={copy} summary={waveSummary} onSelectPair={selectPair} onUnavailable={explainUnavailable}
               />
             </div>
             <div className="doppler-legend">
@@ -507,7 +550,7 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
             <div className="doppler-host doppler-band-host" ref={bandHost}>
               <TimeBand
                 experiment={experiment} time={time} pair={pair} guides={evidence.guides} numeric={evidence.numeric} labels={view.labels} connectors={view.connectors}
-                width={bandSize.width} height={bandSize.height} copy={copy} summary={bandSummary} onSelectPair={selectPair}
+                width={bandSize.width} height={bandSize.height} copy={copy} summary={bandSummary} onSelectPair={selectPair} onUnavailable={explainUnavailable}
               />
             </div>
           </section>
