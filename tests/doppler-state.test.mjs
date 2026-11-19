@@ -276,7 +276,7 @@ test("layering: lib/science/doppler.ts depends on nothing; models import lib/sci
 });
 
 test("subscripts that name the source or observer are upright capitals, never lowercase italic s / o", async () => {
-  const { readFile, readdir } = await import("node:fs/promises");
+  const { readFile } = await import("node:fs/promises");
   const files = ["../components/doppler/copy.ts", "../components/doppler/TheoryNotes.tsx", "../components/DopplerLab.tsx", "../models/doppler-export.ts"];
   for (const file of files) {
     const source = await readFile(new URL(file, import.meta.url), "utf8");
