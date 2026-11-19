@@ -163,8 +163,13 @@
 | --- | --- |
 | `npm run lint` | 0 error（2 個既有 warning） |
 | `npm test`（build + unit） | 486 / 486 |
-| Doppler Playwright | `doppler.spec.ts` 36 + `doppler-collisions.spec.ts` 10 = **46 / 46** |
+| Doppler Playwright | `doppler.spec.ts` 37 + `doppler-collisions.spec.ts` 10 = **47 / 47**（第四輪後） |
 
 ### 仍未通過或未驗
 
 學生理解（解釋題）、Owner Product UX Gate、真機與 Safari／Firefox／螢幕閱讀器、200%／400% 縮放與旋轉、台文 ruby、英文文案人工審稿、代表裝置效能、觸控裝置上的 tooltip（沒有 hover）。
+
+### 第四輪回饋（tooltip 殘留、標頭選單）
+
+- **tooltip 殘留**：原因是 tooltip 用 CSS 的 `:focus-within` 顯示，滑鼠點擊或對話框關閉後把焦點放回按鈕，焦點就一直在，tooltip 跟著不消失。改為由狀態驅動：只在**滑過**或**以 Tab／Shift+Tab 抵達的焦點**時顯示；程式放回的焦點（對話框、選單回到觸發鈕）不顯示；使用該控制項（點擊）即收起；Esc 仍可關閉。E2E 覆蓋：點開理論再關、關閉分享通知、鍵盤開關對話框後皆無殘留。
+- **標頭**：工具（無 chevron）、語言（顯示語言代碼 `ZH`／`EN`，下拉列出兩種語言、目前者打勾、另一種為連結並帶起始設定）、外觀（本來就是下拉）皆為 drop-down；理論與模型維持單一圖示按鈕。

@@ -225,9 +225,7 @@ test.describe("Doppler — free exploration", () => {
     await page.getByRole("button", { name: "工具", exact: true }).click();
     await page.getByRole("button", { name: /匯出教學圖/ }).click();
     await expect(page.getByTestId("notice")).toContainText("已匯出");
-    // Focus returned to the tools button, whose tooltip is showing: the first Escape dismisses the tooltip only.
-    await page.keyboard.press("Escape");
-    await expect(page.getByTestId("notice")).toBeVisible();
+    // Focus returned to the tools button without raising a tooltip, so this Escape closes the notice.
     await page.keyboard.press("Escape");
     await expect(page.getByTestId("notice")).toHaveCount(0);
   });
@@ -265,12 +263,14 @@ test.describe("Doppler — free exploration", () => {
     await toggle.getByRole("button", { name: "自由探索" }).click();
     await expect(toggle).toHaveAttribute("data-value", "free");
 
-    // Header controls: icon only, named by aria-label, with a tooltip that appears on hover and on keyboard focus.
-    const headerControls: [string | RegExp, string][] = [["理論與模型", "理論與模型"], ["工具", "工具"], ["語言：English", "English"], [/^外觀：/, "外觀"]];
-    for (const [name, tip] of headerControls) {
-      const control = page.locator(".header-actions").getByRole(typeof name === "string" && name.startsWith("語言") ? "link" : "button", typeof name === "string" ? { name, exact: true } : { name });
+    // Header controls: named by aria-label, with a tooltip on hover and on keyboard focus. Theory, tools and appearance are
+    // icon-only; the language menu shows its code. Tools has no chevron; language and appearance are drop-downs.
+    const headerControls: [string | RegExp, string, boolean][] = [["理論與模型", "理論與模型", true], ["工具", "工具", true], ["語言：繁體中文", "語言", false], [/^外觀：/, "外觀", true]];
+    for (const [name, tip, iconOnly] of headerControls) {
+      const control = page.locator(".header-actions").getByRole("button", typeof name === "string" ? { name, exact: true } : { name });
       await expect(control.locator("svg").first()).toBeVisible();
-      expect((await control.innerText()).trim()).toBe("");
+      if (iconOnly) expect((await control.innerText()).trim()).toBe("");
+      else expect((await control.innerText()).trim()).toBe("ZH");
       const box = await control.boundingBox();
       expect(box!.height).toBeGreaterThanOrEqual(43.5);
       expect(box!.width).toBeGreaterThanOrEqual(43.5);
@@ -279,7 +279,10 @@ test.describe("Doppler — free exploration", () => {
       await page.mouse.move(0, 400);
       await expect.poll(() => control.evaluate((el) => getComputedStyle(el.closest(".doppler-tip")!, "::after").display)).toBe("none");
     }
-    await page.getByRole("button", { name: "理論與模型" }).focus();
+    expect(await page.getByRole("button", { name: "工具", exact: true }).locator("svg").count()).toBe(1); // the wrench only: no chevron
+    await page.getByRole("button", { name: "探索任務" }).focus();
+    await page.keyboard.press("Tab"); // the next stop is the theory button
+    await expect(page.getByRole("button", { name: "理論與模型" })).toBeFocused();
     await expect.poll(() => page.getByRole("button", { name: "理論與模型" }).evaluate((el) => getComputedStyle(el.closest(".doppler-tip")!, "::after").opacity)).toBe("1");
 
     // One entry for theory and model: no separate model-information control, and its content is in the theory.
@@ -318,7 +321,9 @@ test.describe("Doppler — free exploration", () => {
     await expect.poll(() => tipDisplay("理論與模型")).toBe("block");
     // Keyboard focus: dismiss with Escape, focus stays, Tab away and back restores it.
     await page.mouse.move(0, 400);
-    await theory.focus();
+    await page.getByRole("button", { name: "探索任務" }).focus();
+    await page.keyboard.press("Tab");
+    await expect(theory).toBeFocused();
     await expect.poll(() => tipDisplay("理論與模型")).toBe("block");
     await page.keyboard.press("Escape");
     await expect.poll(() => tipDisplay("理論與模型")).toBe("none");
@@ -332,6 +337,57 @@ test.describe("Doppler — free exploration", () => {
     await expect(page.getByRole("button", { name: /匯出教學圖/ })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("button", { name: /匯出教學圖/ })).toHaveCount(0);
+  });
+
+  test("a tooltip never lingers after a click, a dialog, or a closed notice; the language menu is a drop-down", async ({ page }) => {
+    await open(page);
+    const tips = () => page.evaluate(() => [...document.querySelectorAll(".doppler-tip")].map((el) => getComputedStyle(el, "::after").display));
+    const none = (list: string[]) => list.every((display) => display === "none");
+    // Mouse: click the theory button, close the dialog (focus returns to the button), move away: nothing is left showing.
+    await page.getByRole("button", { name: "理論與模型", exact: true }).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await page.mouse.move(0, 400);
+    await expect.poll(async () => none(await tips())).toBe(true);
+    // The share notice: open it, close it with the mouse, move away: no tooltip anywhere.
+    await page.getByRole("button", { name: "工具", exact: true }).click();
+    await page.getByRole("button", { name: /分享起始設定/ }).click();
+    await page.getByTestId("notice").getByRole("button", { name: "關閉通知" }).click();
+    await expect(page.getByTestId("notice")).toHaveCount(0);
+    await page.mouse.move(0, 400);
+    await expect.poll(async () => none(await tips())).toBe(true);
+    // Keyboard: Tab to the button shows its tooltip; Enter opens the dialog; when it closes, the returned focus stays quiet.
+    await page.getByRole("button", { name: "探索任務" }).focus();
+    await page.keyboard.press("Tab");
+    await expect.poll(async () => (await tips()).includes("block")).toBe(true); // reached by Tab: the tooltip is for this
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "理論與模型", exact: true })).toBeFocused(); // focus came back...
+    await expect.poll(async () => none(await tips())).toBe(true); // ...without raising a tooltip
+
+    // Language: a drop-down of the two languages, current one marked, Escape closes it and returns focus.
+    const trigger = page.getByRole("button", { name: /^語言：繁體中文/ });
+    await expect(trigger).toHaveAttribute("aria-haspopup", "true");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await trigger.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    const menu = page.locator(".doppler-menu-list", { has: page.getByRole("link", { name: "English" }) });
+    await expect(menu.getByRole("button", { name: "繁體中文" })).toHaveAttribute("aria-pressed", "true");
+    await expect(menu.getByRole("link", { name: "English" })).toHaveAttribute("href", /^\/en\/doppler\?s=/);
+    await expect(menu.getByRole("link", { name: "English" })).toHaveAttribute("hreflang", "en");
+    const box = await menu.boundingBox();
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    await page.keyboard.press("Escape");
+    await expect(menu).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    // The appearance control is also a drop-down.
+    await page.getByRole("button", { name: /^外觀：/ }).click();
+    await expect(page.locator(".theme-menu__list")).toBeVisible();
+    await page.keyboard.press("Escape");
   });
 
   test("clicking a front that O never receives explains why and changes nothing; the last received front selects its pair", async ({ page }) => {
@@ -743,10 +799,13 @@ test.describe("Doppler — share, export, language", () => {
     await page.getByRole("button", { name: "Source approaches" }).click();
     await page.getByRole("button", { name: "Play to reception" }).first().click();
     await expect(page.getByTestId("pair-readout").locator("dl > div", { hasText: "Received frequency" }).locator("dd")).toHaveText("1.25");
-    await page.getByRole("link", { name: /繁體中文/ }).click();
+    await page.getByRole("button", { name: /^Language：English/ }).click();
+    await expect(page.getByRole("button", { name: "English", exact: true })).toHaveAttribute("aria-pressed", "true"); // the current language is marked
+    await page.getByRole("link", { name: "繁體中文" }).click();
     await expect.poll(() => new URL(page.url()).pathname).toBe("/doppler");
     await expect(page.getByRole("button", { name: "波源靠近" })).toHaveAttribute("aria-pressed", "true");
-    await page.getByRole("link", { name: /English/ }).click();
+    await page.getByRole("button", { name: /^語言：繁體中文/ }).click();
+    await page.getByRole("link", { name: "English" }).click();
     await expect.poll(() => new URL(page.url()).pathname).toBe("/en/doppler");
     await expect(page.getByRole("button", { name: "Source approaches" })).toHaveAttribute("aria-pressed", "true");
     // Guided English copy and theory.

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Copy, Expand, FileBraces, FileImage, Languages, Lock, Maximize2, Minimize2, Pause, Play, RotateCcw, Share2, SkipBack, SkipForward, StepBack, StepForward, TriangleAlert, Wrench, X } from "lucide-react";
+import { BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Copy, Expand, FileBraces, FileImage, Lock, Maximize2, Minimize2, Pause, Play, RotateCcw, Share2, SkipBack, SkipForward, StepBack, StepForward, TriangleAlert, Wrench, X } from "lucide-react";
 import KakauLabMark from "@/components/KakauLabMark";
 import ThemeToggle from "@/components/ThemeToggle";
 import LabInfoDialog from "@/components/overlays/LabInfoDialog";
@@ -15,7 +15,7 @@ import WavefrontView from "@/components/doppler/WavefrontView";
 import { dopplerCopy } from "@/components/doppler/copy";
 import { DOPPLER_COLORS as C } from "@/components/doppler/palette";
 import { useElementSize } from "@/components/doppler/useElementSize";
-import { localizedPath, type Locale } from "@/lib/i18n";
+import { localizedPath, supportedLocales, type Locale } from "@/lib/i18n";
 import {
   createDopplerExperiment,
   dopplerAnalytic,
@@ -66,6 +66,8 @@ import {
 type Expanded = "wave" | "band" | null;
 type Snapshot = { setup: DopplerSetup; view: DopplerView; preset: DopplerPresetId | null; time: number; reference: DopplerReference | null };
 
+/** Short language codes shown on the language menu's button. */
+const LOCALE_CODES: Record<Locale, string> = { "zh-TW": "ZH", en: "EN" };
 const RATES = [0.25, 0.5, 1, 2, 4] as const;
 const f2 = (v: number | null | undefined) => (v === null || v === undefined || !Number.isFinite(v) ? "—" : v.toFixed(2));
 const signedC = (u: number) => (u === 0 ? "0" : `${u > 0 ? "+" : "−"}${Math.abs(u).toFixed(2)}c`);
@@ -86,12 +88,24 @@ function useReducedMotion() {
 /** An icon-only control that names itself in a tooltip on hover and keyboard focus (the accessible name is on the control). */
 function Tip({ label, children }: { label: string; children: ReactNode }) {
   const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
+  const [keyboardFocus, setKeyboardFocus] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
-  const showing = (hovered || focused) && !dismissed;
-  /* WCAG 1.4.13: while a tooltip is showing, Escape dismisses it without moving focus and without doing anything else
-   * (the capture phase keeps this Escape from also closing a notice). A menu that is open owns its own Escape. */
+  const tabbedAt = useRef(0);
+  const showing = (hovered || keyboardFocus) && !dismissed;
+  /* Keyboard focus means focus that arrived by Tab or Shift+Tab. Focus that a script put back (a dialog returning to its
+   * button, a menu to its trigger) is not navigation, so it never raises a tooltip. */
+  useEffect(() => {
+    // Any other key, or a pointer press, ends "navigating by Tab".
+    const onKey = (event: KeyboardEvent) => { tabbedAt.current = event.key === "Tab" ? performance.now() : 0; };
+    const onPointer = () => { tabbedAt.current = 0; };
+    document.addEventListener("keydown", onKey, true);
+    document.addEventListener("pointerdown", onPointer, true);
+    return () => { document.removeEventListener("keydown", onKey, true); document.removeEventListener("pointerdown", onPointer, true); };
+  }, []);
+  /* A tooltip belongs to hovering or to keyboard focus, never to focus that a mouse click or a dialog's focus-return left behind,
+   * and it steps aside as soon as the control is used. While it is showing, Escape dismisses it (WCAG 1.4.13) without moving
+   * focus and without doing anything else (the capture phase keeps this Escape from also closing a notice); an open menu owns its Escape. */
   useEffect(() => {
     if (!showing) return;
     const onKey = (event: KeyboardEvent) => {
@@ -107,18 +121,19 @@ function Tip({ label, children }: { label: string; children: ReactNode }) {
       ref={ref}
       className="doppler-tip"
       data-tip={label}
-      data-dismissed={dismissed}
+      data-open={showing}
       onMouseEnter={() => { setHovered(true); setDismissed(false); }}
       onMouseLeave={() => { setHovered(false); setDismissed(false); }}
-      onFocus={() => { setFocused(true); setDismissed(false); }}
-      onBlur={() => { setFocused(false); setDismissed(false); }}
+      onFocus={(event) => { if (performance.now() - tabbedAt.current < 300 && event.target.matches(":focus-visible")) { setKeyboardFocus(true); setDismissed(false); } }}
+      onBlur={() => { setKeyboardFocus(false); setDismissed(false); }}
+      onClick={() => setDismissed(true)}
     >
       {children}
     </span>
   );
 }
 
-function Menu({ label, ariaLabel, icon, up = false, children }: { label: string; ariaLabel?: string; icon?: ReactNode; up?: boolean; children: ReactNode }) {
+function Menu({ label, ariaLabel, icon, chevron = true, up = false, children }: { label: string; ariaLabel?: string; icon?: ReactNode; chevron?: boolean; up?: boolean; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -133,7 +148,7 @@ function Menu({ label, ariaLabel, icon, up = false, children }: { label: string;
   return (
     <div className="doppler-menu" ref={ref}>
       <button ref={trigger} className={open ? "active" : ""} onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="true" aria-label={ariaLabel}>
-        {icon ?? label} <ChevronDown size={13} />
+        {icon ?? label}{chevron && <> <ChevronDown size={13} /></>}
       </button>
       {open && <div className="doppler-menu-list" data-up={up} role="group" aria-label={ariaLabel ?? label} onClick={() => { setOpen(false); trigger.current?.focus(); }}>{children}</div>}
     </div>
@@ -153,7 +168,6 @@ function download(contents: string, filename: string, type: string) {
 
 export default function DopplerLab({ share, locale = "zh-TW" }: { share?: DopplerShareInput; locale?: Locale }) {
   const copy = dopplerCopy[locale];
-  const other: Locale = locale === "en" ? "zh-TW" : "en";
   const initial = useMemo(() => decodeDopplerShare(share), [share]);
   const [setup, setSetup] = useState<DopplerSetup>(initial.setup);
   const [view, setView] = useState<DopplerView>(initial.view);
@@ -479,7 +493,7 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
           </Tip>
           {!evidence.theory && <span id="doppler-lock-note" className="doppler-sr-only">{copy.modes.theoryLocked}</span>}
           <Tip label={copy.actions.tools}>
-            <Menu label={copy.actions.tools} ariaLabel={copy.actions.tools} icon={<Wrench size={18} />}>
+            <Menu label={copy.actions.tools} ariaLabel={copy.actions.tools} icon={<Wrench size={18} />} chevron={false}>
               {evidence.share && <button onClick={shareSetup}><Share2 size={14} /> {copy.actions.share}</button>}
               {evidence.export && <>
                 <button onClick={() => exportResult("svg")}><FileImage size={14} /> {copy.actions.exportSvg}</button>
@@ -488,8 +502,12 @@ export default function DopplerLab({ share, locale = "zh-TW" }: { share?: Dopple
               {!evidence.share && !evidence.export && <p className="doppler-menu-note">{copy.actions.guidedNoTools}</p>}
             </Menu>
           </Tip>
-          <Tip label={copy.languages[other]}>
-            <Link className="doppler-lang doppler-icon-button" href={shareHref(other)} hrefLang={other === "en" ? "en" : "zh-Hant"} lang={other === "en" ? "en" : "zh-Hant"} aria-label={`${copy.language}：${copy.languages[other]}`}><Languages size={18} /></Link>
+          <Tip label={copy.language}>
+            <Menu label={LOCALE_CODES[locale]} ariaLabel={`${copy.language}：${copy.languages[locale]}`}>
+              {supportedLocales.map((target) => (target === locale
+                ? <button key={target} aria-pressed="true" lang={target === "en" ? "en" : "zh-Hant"}><Check size={14} /> {copy.languages[target]}</button>
+                : <Link key={target} className="doppler-menu-link" href={shareHref(target)} hrefLang={target === "en" ? "en" : "zh-Hant"} lang={target === "en" ? "en" : "zh-Hant"}><span className="doppler-menu-gap" aria-hidden="true" /> {copy.languages[target]}</Link>))}
+            </Menu>
           </Tip>
           <Tip label={copy.actions.appearance}><ThemeToggle locale={locale} /></Tip>
         </div>
